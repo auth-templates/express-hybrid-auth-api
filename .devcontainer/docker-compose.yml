@@ -1,0 +1,18 @@
+services:
+  postgres:
+    container_name: local-postgress
+    image: postgres:13.16-bookworm
+    environment:
+      POSTGRES_USER: admin_pg
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: flexible-leaves
+    ports:
+      - "5433:5432"
+    # volumes:
+    #   - ./init.sql:/docker-entrypoint-initdb.d/00_init.sql
+  
+  redis:
+    container_name: local-redis
+    image: redis:6.0.18-alpine
+    ports:
+      - "6379:6379"

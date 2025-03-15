@@ -2,10 +2,12 @@ import express from 'express';
 import swaggerUI from 'swagger-ui-express';
 import swaggerSpec from './swagger';
 import itemRouter from './routes/itemRoutes';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = 3000;
 
+app.use(cookieParser());
 app.use(express.json());
 
 // Serve Swagger documentation
