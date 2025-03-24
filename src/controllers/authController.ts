@@ -3,7 +3,7 @@ import { generateSessionToken, createSession } from "../lib/session";
 import { deleteSessionTokenCookie, setSessionTokenCookie } from '../lib/cookie';
 
 export const login = async (request: Request, response: Response): Promise<void> => {
-    // const { email, password } = request.body;
+    const { email, password } = request.body;
     const userId = 1000;
     try {
         const token = generateSessionToken();
@@ -15,7 +15,6 @@ export const login = async (request: Request, response: Response): Promise<void>
         response.status(500).json({ message: 'Error retrieving items', error });
     }
 };
-
 
 export const logout = async (request: Request, response: Response): Promise<void> => {
     try {
