@@ -1,42 +1,46 @@
 {
-  "name": "flexible-leaves-api",
-  "version": "1.0.0",
-  "description": "The backend api for flexible leaves application",
-  "main": "dist/index.js",
-  "scripts": {
-    "dev": "cross-env NODE_ENV=development npx nodemon",
-    "build": "rimraf ./dist && tsc",
-    "start": "npm run build && NODE_ENV=production node dist/index.js",
-    "lint": "eslint src/ --ext .ts",
-    "test": "NODE_ENV=testing echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@eslint/js": "^9.21.0",
-    "@types/cookie-parser": "^1.4.8",
-    "@types/express": "^5.0.0",
-    "@types/swagger-jsdoc": "^6.0.4",
-    "@types/swagger-ui-express": "^4.1.8",
-    "cross-env": "^7.0.3",
-    "eslint": "^9.21.0",
-    "globals": "^16.0.0",
-    "nodemon": "^3.1.9",
-    "rimraf": "^6.0.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.2",
-    "typescript-eslint": "^8.26.0"
-  },
-  "dependencies": {
-    "@oslojs/crypto": "^1.0.1",
-    "@oslojs/encoding": "^1.1.0",
-    "cookie-parser": "^1.4.7",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "ioredis": "^5.6.0",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-themes": "^1.4.3",
-    "swagger-ui-express": "^5.0.1"
-  }
+    "type": "module",
+    "name": "flexible-leaves-api",
+    "version": "1.0.0",
+    "description": "The backend api for flexible leaves application",
+    "main": "dist/index.js",
+    "scripts": {
+        "dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
+        "build": "rimraf ./dist && tsc && npm run swagger",
+        "start": "npm run build && cross-env NODE_ENV=production node dist/index.js",
+        "lint": "eslint src/ --ext .ts",
+        "test": "cross-env NODE_ENV=testing echo \"Error: no test specified\" && exit 1",
+        "swagger": "tsx src/swagger-generate.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@eslint/js": "^9.21.0",
+        "@types/cookie-parser": "^1.4.8",
+        "@types/express": "^5.0.0",
+        "@types/js-yaml": "^4.0.9",
+        "cross-env": "^7.0.3",
+        "eslint": "^9.21.0",
+        "globals": "^16.0.0",
+        "js-yaml": "^4.1.0",
+        "rimraf": "^6.0.1",
+        "tsx": "^4.19.3",
+        "typescript": "^5.8.2",
+        "typescript-eslint": "^8.26.0"
+    },
+    "dependencies": {
+        "@oslojs/crypto": "^1.0.1",
+        "@oslojs/encoding": "^1.1.0",
+        "@types/swagger-jsdoc": "^6.0.4",
+        "@types/swagger-ui-express": "^4.1.8",
+        "cookie-parser": "^1.4.7",
+        "dirname-filename-esm": "^1.1.2",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "ioredis": "^5.6.0",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-themes": "^1.4.3",
+        "swagger-ui-express": "^5.0.1"
+    }
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { generateSessionToken, createSession } from "../lib/session";
+import { createSession, generateSessionToken } from "../lib/session";
 import { deleteSessionTokenCookie, setSessionTokenCookie } from '../lib/cookie';
 
 export const login = async (request: Request, response: Response): Promise<void> => {
