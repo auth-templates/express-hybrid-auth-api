@@ -5,12 +5,14 @@
     "description": "The backend api for flexible leaves application",
     "main": "dist/index.js",
     "scripts": {
+        "predev": "npm run init-database",
         "dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
         "build": "rimraf ./dist && tsc && npm run swagger",
         "start": "npm run build && cross-env NODE_ENV=production node dist/index.js",
         "lint": "eslint src/ --ext .ts",
         "test": "cross-env NODE_ENV=testing echo \"Error: no test specified\" && exit 1",
-        "swagger": "tsx src/swagger-generate.ts"
+        "swagger": "tsx src/swagger-generate.ts",
+        "init-database": "docker-compose -f .devcontainer/docker-compose.yml down -v && docker-compose -f .devcontainer/docker-compose.yml pull && docker-compose -f .devcontainer/docker-compose.yml up --detach --remove-orphans"
     },
     "keywords": [],
     "author": "",
