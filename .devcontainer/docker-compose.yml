@@ -5,11 +5,13 @@ services:
     environment:
       POSTGRES_USER: admin_pg
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: flexible-leaves
+      POSTGRES_DB: flexible_leaves
     ports:
       - "5433:5432"
-    # volumes:
-    #   - ./init.sql:/docker-entrypoint-initdb.d/00_init.sql
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/00_init.sql
+      - ./import-data.sql:/docker-entrypoint-initdb.d/01_import_data.sql
+      - ./data:/data
   
   redis:
     container_name: local-redis

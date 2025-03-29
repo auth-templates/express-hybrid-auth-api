@@ -6,7 +6,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /login:
+ * /auth/login:
  *   post:
  *     summary: User Login
  *     description: Generates a session token for the user and sets it in an HTTP-only cookie.
@@ -49,7 +49,7 @@ router.post('/login', login);
 
 /**
  * @swagger
- * /logout:
+ * /auth/logout:
  *   post:
  *     summary: User Logout
  *     description: Logs out the user by deleting the session cookie.
