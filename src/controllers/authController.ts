@@ -2,6 +2,16 @@ import { Request, Response } from 'express';
 import { createSession, generateSessionToken } from "../lib/session";
 import { deleteSessionTokenCookie, setSessionTokenCookie } from '../lib/cookie';
 
+export const signup = async (request: Request, response: Response): Promise<void> => {
+    const { firstName, lastName, username, emailAddress, password, confirmPassword } = request.body; 
+    try { 
+          
+        console.log(firstName, lastName, username, emailAddress );
+    } catch ( error ) {
+        response.status(500).json({ message: 'Error retrieving items', error })
+    }
+}
+
 export const login = async (request: Request, response: Response): Promise<void> => {
     const { email, password } = request.body;
 

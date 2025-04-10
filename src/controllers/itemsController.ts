@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Item, readItemsFromFile, writeItemsToFile } from '../models/itemModel';
+import { Item, readItemsFromFile, writeItemsToFile } from '../models/item';
 
 export const getAllItems = async (req: Request, res: Response): Promise<void> => {
     try {
