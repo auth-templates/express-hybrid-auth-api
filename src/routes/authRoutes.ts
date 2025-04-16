@@ -1,8 +1,60 @@
 import express from 'express';
 
-import { login, logout } from '../controllers/authController';
+import { login, logout, signup } from '../controllers/authController';
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * /auth/signup:
+ *   post:
+ *     summary: User Signup
+ *     description: Registers a new user and saves them to the database with admin role.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - username
+ *               - emailAddress
+ *               - password
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: "John"
+ *               lastName:
+ *                 type: string
+ *                 example: "Doe"
+ *               username:
+ *                 type: string
+ *                 example: "johndoe"
+ *               emailAddress:
+ *                 type: string
+ *                 example: "john.doe@example.com"
+ *               password:
+ *                 type: string
+ *                 example: "SuperSecurePassword123"
+ *     responses:
+ *       200:
+ *         description: User successfully registered.
+ *       500:
+ *         description: Server error during signup.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error retrieving items
+ *                 error:
+ *                   type: string
+ */
+router.post('/signup', signup);
 
 /**
  * @swagger
@@ -45,7 +97,6 @@ const router = express.Router();
  *                   type: string
  */
 router.post('/login', login);
-
 
 /**
  * @swagger
