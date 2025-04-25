@@ -1,25 +1,37 @@
 import { Request, Response } from 'express';
 import { createSession, generateSessionToken } from "../lib/session";
 import { deleteSessionTokenCookie, setSessionTokenCookie } from '../lib/cookie';
-import { prismaClient } from '../lib/prisma-client';
 import { hashPassword } from "../lib/password";
+import { createSignupSchema } from '../lib/validation-schemas/signup';
+import { UserRepository } from '../repositories/users';
+import { AppError } from '../lib/error';
 
 export const signup = async (request: Request, response: Response): Promise<void> => {
-    const { firstName, lastName, username, emailAddress, password } = request.body; 
-    console.log("request.body", request.body);
+    const parseResult = createSignupSchema(request.t).safeParse(request.body);
+
+    if ( !parseResult.success ) {
+        response.status(400).json({ errors: parseResult.error.format() });
+    }
+
+    const { firstName, lastName, email, password } = parseResult.data; 
+
     try { 
-        await prismaClient.users.create({
-            data: {
-                name: firstName + ' ' + lastName,
-                email: emailAddress,
-                password_hash: await hashPassword(password),
-                role: 'admin',
-                created_at: new Date(Date.now())
-            },
+        UserRepository.createUser({
+            firstName,
+            lastName,
+            email,
+            passwordHash: await hashPassword(password),
+            role: 'admin'
         });
-        console.log(firstName, lastName, username, emailAddress );
+        response.status(204).send();
     } catch ( error ) {
-        response.status(500).json({ message: 'Error retrieving items', error })
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json({
+              message: request.t(error.translationKey, error.params),
+            });
+        }
+        console.error(error);
+        response.status(500).json({ message: request.t('errors.internal') });
     }
 }
 

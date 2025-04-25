@@ -20,7 +20,7 @@ const router = express.Router();
  *               - firstName
  *               - lastName
  *               - username
- *               - emailAddress
+ *               - email
  *               - password
  *             properties:
  *               firstName:
@@ -32,7 +32,7 @@ const router = express.Router();
  *               username:
  *                 type: string
  *                 example: "johndoe"
- *               emailAddress:
+ *               email:
  *                 type: string
  *                 example: "john.doe@example.com"
  *               password:

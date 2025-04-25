@@ -6,9 +6,12 @@ import authRouter from './routes/authRoutes';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import { dirname} from 'dirname-filename-esm';
+import i18nMiddleware from './middlewares/i18n';
 
 const app = express();
 const port = 3000;
+
+app.use(i18nMiddleware);
 
 app.use(cookieParser());
 app.use(express.json());

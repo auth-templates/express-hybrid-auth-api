@@ -7,7 +7,7 @@ content-type: application/json
   "firstName": "John",
   "lastName": "Doe",
   "username": "johndoe",
-  "emailAddress": "john.doe@example.com",
+  "email": "john.doe@example.com",
   "password": "SuperSecurePassword123"
 }
 

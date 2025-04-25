@@ -1,0 +1,19 @@
+{
+   
+    "greeting": "Hello!",
+    "errors": {
+        "internal": "An unexpected error occurred. Please try again later or contact support.",
+        "is_already_in_use": "{{item}} is already in use",
+        "userNotFound": "User not found.",
+        "emailExists": "Email already exists."
+    },
+    "validation": {
+        "min": "Must be at least {{min}} characters",
+        "max": "Must be at most {{max}} characters",
+        "email": "Invalid email address",
+        "username": {
+          "invalid": "Only letters, numbers, underscores, and dots are allowed",
+          "reserved": "This username is not allowed"
+        }
+      }
+  }

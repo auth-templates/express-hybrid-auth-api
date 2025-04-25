@@ -1,8 +1,18 @@
-interface User {
-    id: string;
-    name: string;
+export interface User {
+    id: number;
+    firstName: string;
+    lastName: string;
     email: string;
-    password_hash: string;
-    role: 'user' | 'admin' | string; // Adjust roles as needed
-    created_at: Date;
+    role: Role;
+    createdAt: Date;
 }
+  
+export type CreateUserInput = Omit<User, 'id' | 'createdAt'> & { password: string };
+export type UpdateUserInput = Partial<Omit<User, 'id' | 'createdAt'>>;
+
+export interface UserCredentials {
+    email: string;
+    password: string;
+}
+  
+export type Role = 'employee' | 'manager' | 'admin';

@@ -1,0 +1,7 @@
+{
+    "greeting": "¡Hola!",
+    "errors": {
+      "userNotFound": "Usuario no encontrado.",
+      "emailExists": "El correo ya existe."
+    }
+  }
