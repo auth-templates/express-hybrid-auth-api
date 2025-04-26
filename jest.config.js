@@ -20,8 +20,6 @@ export default {
         'node_modules/(?!(@oslojs|i18next)/)',
         'generated/',
     ],
-    // 🆕 Add these for coverage:
-    collectCoverage: true,
     coverageDirectory: 'coverage',
     collectCoverageFrom: [
         'src/**/*.{ts,tsx}',         // adjust if your code is not under src/

@@ -1,0 +1,35 @@
+import * as v from 'valibot';
+import { AppError } from '../error';
+
+const commonString = (min: number, max: number) => v.pipe(
+    v.string(), 
+    v.minLength(min, 'validation.min'), 
+    v.maxLength(max, 'validation.max')
+);
+
+export const passwordValidationSchema = () => v.pipe(
+    v.string(),
+    v.minLength(8, 'validation.password.minLength'), // Minimum length of 8
+    v.maxLength(100, 'validation.password.maxLength'), // Maximum length of 100
+    v.regex(/[A-Z]/, 'validation.password.uppercase'), // At least one uppercase letter
+    v.regex(/[a-z]/, 'validation.password.lowercase'), // At least one lowercase letter
+    v.regex(/\d/, 'validation.password.digit'), // At least one digit
+    v.regex(/[@$!%*?&]/, 'validation.password.special'), // At least one special character
+);
+
+export const createSignupSchema = () => {
+  return v.object({
+    firstName: commonString(3, 30),
+    lastName: commonString(3, 30),
+    email: v.pipe(v.string(), v.email('validation.email')),
+    password: passwordValidationSchema()
+  });
+};
+
+export const validateSignupData = (data: any) => {
+    try {
+        v.parse(passwordValidationSchema(), data);   
+    } catch (error) {
+        throw JSON.stringify(error, null, 2));
+    }
+}

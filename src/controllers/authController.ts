@@ -2,23 +2,22 @@ import { Request, Response } from 'express';
 import { createSession, generateSessionToken } from "../lib/session";
 import { deleteSessionTokenCookie, setSessionTokenCookie } from '../lib/cookie';
 import { hashPassword } from "../lib/password";
-import { createSignupSchema } from '../lib/validation-schemas/signup';
+import { createSignupSchema, validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
 
 export const signup = async (request: Request, response: Response): Promise<void> => {
-    const parseResult = createSignupSchema(request.t).safeParse(request.body);
+    // if ( !result.issues.length > 0 ) {
+    //     throw new AppError(parseResult.error.format())
+    //     response.status(400).json({ errors: parseResult.error.format() });
+    //     return;
+    // }
 
-    if ( !parseResult.success ) {
-        response.status(400).json({ errors: parseResult.error.format() });
-        return;
-    }
+    try {
+        const result = validateSignupData(request.body)
 
-    console.log(parseResult);
+        const { firstName, lastName, email, password } = request.body; 
 
-    const { firstName, lastName, email, password } = parseResult.data; 
-
-    try { 
         UserRepository.createUser({
             firstName,
             lastName,
@@ -32,6 +31,7 @@ export const signup = async (request: Request, response: Response): Promise<void
             response.status(error.statusCode).json({
               message: request.t(error.translationKey, error.params),
             });
+            return
         }
         console.error(error);
         response.status(500).json({ message: request.t('errors.internal') });

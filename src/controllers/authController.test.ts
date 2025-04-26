@@ -24,9 +24,7 @@ describe('POST /signup', () => {
       password: 'short', // assuming your validation requires a valid email and longer password
     };
 
-    const response = await request(app)
-      .post('/signup')
-      .send(invalidData);
+    const response = await request(app).post('/signup').send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body.errors).toHaveProperty('email');
