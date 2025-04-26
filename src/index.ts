@@ -5,8 +5,8 @@ import itemRouter from './routes/itemRoutes';
 import authRouter from './routes/authRoutes';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import { dirname} from 'dirname-filename-esm';
 import i18nMiddleware from './middlewares/i18n';
+import appRoot from 'app-root-path'
 
 const app = express();
 const port = 3000;
@@ -16,9 +16,11 @@ app.use(i18nMiddleware);
 app.use(cookieParser());
 app.use(express.json());
 
+console.log("env:", process.env.NODE_ENV)
+
 if ( process.env.NODE_ENV === 'development' ) {
-    const __dirname = dirname(import.meta);
-    app.use('/swagger-dark.css', express.static(path.join(__dirname, '../public/swagger-dark.css')));
+    console.log("swagger-dark", path.join(appRoot.path, 'public/swagger-dark.css'));
+    app.use('/swagger-dark.css', express.static(path.join(appRoot.path, 'public/swagger-dark.css')));
     app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec, {
         customCssUrl: '/swagger-dark.css' 
     }));

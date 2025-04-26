@@ -11,7 +11,10 @@ export const signup = async (request: Request, response: Response): Promise<void
 
     if ( !parseResult.success ) {
         response.status(400).json({ errors: parseResult.error.format() });
+        return;
     }
+
+    console.log(parseResult);
 
     const { firstName, lastName, email, password } = parseResult.data; 
 

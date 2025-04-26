@@ -4,9 +4,11 @@
         "module": "esnext",
         "esModuleInterop": true,
         "moduleResolution": "node",
+        // "strict": true,  // Enable strict type-checking
+        "skipLibCheck": true,  // Skip library declaration file checks
         "sourceMap": true,
         "outDir": "dist"
     },
-    "include": ["src"],
-    "lib": ["es2022"]
+    "include": ["src", "setupTests.ts"],
+    "exclude": ["node_modules", "dist"]
   }
