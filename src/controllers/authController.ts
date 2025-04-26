@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { createSession, generateSessionToken } from "../lib/session";
 import { deleteSessionTokenCookie, setSessionTokenCookie } from '../lib/cookie';
 import { hashPassword } from "../lib/password";
-import { createSignupSchema, validateSignupData } from '../lib/validation-schemas/signup-schema';
+import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
 
@@ -14,7 +14,7 @@ export const signup = async (request: Request, response: Response): Promise<void
     // }
 
     try {
-        const result = validateSignupData(request.body)
+        validateSignupData(request.body);
 
         const { firstName, lastName, email, password } = request.body; 
 

@@ -19,7 +19,6 @@ const router = express.Router();
  *             required:
  *               - firstName
  *               - lastName
- *               - username
  *               - email
  *               - password
  *             properties:
@@ -29,15 +28,12 @@ const router = express.Router();
  *               lastName:
  *                 type: string
  *                 example: "Doe"
- *               username:
- *                 type: string
- *                 example: "johndoe"
  *               email:
  *                 type: string
  *                 example: "john.doe@example.com"
  *               password:
  *                 type: string
- *                 example: "SuperSecurePassword123"
+ *                 example: "$SuperSecurePassword123"
  *     responses:
  *       200:
  *         description: User successfully registered.

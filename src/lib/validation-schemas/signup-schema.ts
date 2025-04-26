@@ -1,5 +1,4 @@
 import * as v from 'valibot';
-import { AppError } from '../error';
 
 const commonString = (min: number, max: number) => v.pipe(
     v.string(), 
@@ -28,8 +27,11 @@ export const createSignupSchema = () => {
 
 export const validateSignupData = (data: any) => {
     try {
-        v.parse(passwordValidationSchema(), data);   
+        console.log("data:", data);
+        v.parse(createSignupSchema(), data);   
     } catch (error) {
-        throw JSON.stringify(error, null, 2));
+        console.log("here", error);
+        //TO DO: throw the correct AppError error with translationKey and items
+        throw JSON.stringify(error, null, 2);
     }
 }
