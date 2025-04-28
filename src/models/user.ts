@@ -14,5 +14,9 @@ export interface UserCredentials {
     email: string;
     password: string;
 }
-  
-export type Role = 'employee' | 'manager' | 'admin';
+
+export enum Role {
+    Employee = 'employee',
+    Manager = 'manager',
+    Admin = 'admin'
+}

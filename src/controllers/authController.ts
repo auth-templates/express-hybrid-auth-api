@@ -5,25 +5,27 @@ import { hashPassword } from "../lib/password";
 import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
+import { Role } from '../models/user';
 
 export const signup = async (request: Request, response: Response): Promise<void> => {
-    // if ( !result.issues.length > 0 ) {
-    //     throw new AppError(parseResult.error.format())
-    //     response.status(400).json({ errors: parseResult.error.format() });
-    //     return;
-    // }
-
     try {
-        validateSignupData(request.body);
+        const issues = validateSignupData(request.body);
+        console.log("issues", issues.map((item: any) => item.items));
+        if ( issues.length > 0 ) {
+            response.status(400).json(
+                issues.map(({message, items}) => request.t(message, items))
+            );
+            return
+        }
 
-        const { firstName, lastName, email, password } = request.body; 
+        const { firstName, lastName, email, password, role } = request.body; 
 
-        UserRepository.createUser({
+        await UserRepository.createUser({
             firstName,
             lastName,
             email,
             passwordHash: await hashPassword(password),
-            role: 'admin'
+            role: role as Role
         });
         response.status(204).send();
     } catch ( error ) {

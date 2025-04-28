@@ -8,12 +8,23 @@
         "emailExists": "Email already exists."
     },
     "validation": {
-        "min": "Must be at least {{min}} characters",
-        "max": "Must be at most {{max}} characters",
+        "firstname": {
+            "min_one": "First name must be at least {{count}} character",
+            "min_other": "First name must be at least {{count}} characters",
+            "max": "First name must be at most {{count}} characters"
+        },
+        "lastname": {
+            "min_one": "Last name must be at least {{count}} character",
+            "min_other": "Last name must be at least {{count}} characters",
+            "max": "Last name must be at most {{count}} characters"
+        },
+        "min_one": "Must be at least {{count}} character",
+        "min_other": "Must be at least {{count}} characters",
+        "max": "Must be at most {{count}} characters",
         "email": "Invalid email address",
         "password": {
-            "minLength": "Password must be at least {{min}} characters",
-            "maxLength": "Password must be at most {{max}} characters",
+            "minLength": "Password must be at least {{count}} characters",
+            "maxLength": "Password must be at most {{count}} characters",
             "uppercase": "Password must contain at least one uppercase letter",
             "lowercase": "Password must contain at least one lowercase letter",
             "digit": "Password must contain at least one digit", 

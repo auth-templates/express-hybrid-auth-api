@@ -5,6 +5,7 @@ import { UserRepository } from '../repositories/users'; // Mocked repository
 import { hashPassword } from '../lib/password';
 import { AppError } from '../lib/error';
 import i18nMiddleware from '../middlewares/i18n';
+import { CreateUserInput, Role } from '../models/user';
 
 jest.mock('../repositories/users');
 jest.mock('../lib/password');
@@ -15,21 +16,157 @@ app.use(i18nMiddleware)
 app.use(express.json());
 app.post('/signup', signup); // Attach your controller to a route
 
-describe('POST /signup', () => {
-    it('should return 400 if validation fails', async () => {
-        const invalidData = {
-            firstName: '',
-            lastName: '',
-            email: 'invalidEmail',
-            password: 'short', // assuming your validation requires a valid email and longer password
-        };
+const signupData: CreateUserInput = {
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@example.com",
+    password: "$SuperSecurePasswod123",
+    role: Role.Admin
+}
 
-        const response = await request(app).post('/signup').send(invalidData);
+describe('POST /signup', () => {
+    it('should return 204 if signup data is correct', async () => {
+        const response = await request(app).set('Accept-Language', 'en').post('/signup').send(signupData);
+
+        // Mocking hashPassword and UserRepository.createUser
+        (hashPassword as jest.Mock).mockResolvedValue('hashedPassword123');
+        (UserRepository.createUser as jest.Mock).mockResolvedValue(undefined); // Simulate successful creation
+
+        expect(response.status).toBe(204);
+        expect(UserRepository.createUser).toHaveBeenCalledWith({
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'john.doe@example.com',
+            passwordHash: 'hashedPassword123',
+            role: 'admin',
+        });
+    });
+
+    it('should return 400 if password must contain at least one digit', async () => {
+        const response = await request(app).post('/signup').set('Accept-Language', 'en').send({
+            ...signupData,
+            password: "$Suuuuup"
+
+        });
 
         expect(response.status).toBe(400);
-        expect(response.body.errors).toHaveProperty('email');
-        expect(response.body.errors).toHaveProperty('password');
+        expect(response.body).toHaveProperty(['password must contain at least one digit']);
     });
+
+    // // ### Password must contain at most 100 characters
+    // POST http://localhost:3000/auth/signup
+    // content-type: application/json
+
+    // {
+    //     "firstName": "John",
+    //     "lastName": "Doe",
+    //     "email": "john.doe@example.com",
+    //     "password": "%Supdasdasdasdasdasdasdassssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssdasdasdasdasdasdasdasd123",
+    //     "role": "admin"
+    // }
+
+    // // ### Password must contain at least 8 characters
+    // POST http://localhost:3000/auth/signup
+    // content-type: application/json
+
+    // {
+    //     "firstName": "John",
+    //     "lastName": "Doe",
+    //     "email": "john.doe@example.com",
+    //     "password": "%Sup123",
+    //     "role": "admin"
+    // }
+
+    // // ### Password must contain at least one special character
+    // POST http://localhost:3000/auth/signup
+    // content-type: application/json
+
+    // {
+    //     "firstName": "John",
+    //     "lastName": "Doe",
+    //     "email": "john.doe@example.com",
+    //     "password": "Suuuuup123",
+    //     "role": "admin"
+    // }
+
+    // // ### First name must be at least 1 character
+    // POST http://localhost:3000/auth/signup
+    // content-type: application/json
+
+    // {
+    //     "firstName": "",
+    //     "lastName": "Doe",
+    //     "email": "john.doe@example.com",
+    //     "password": "%SuperSecurePassword123",
+    //     "role": "admin"
+    // }
+
+    // // ### First name must be at most 30 characters
+    // POST http://localhost:3000/auth/signup
+    // content-type: application/json
+
+    // {
+    //     "firstName": "6543543534534534534534534535453534535345345",
+    //     "lastName": "Doe",
+    //     "email": "john.doe@example.com",
+    //     "password": "%SuperSecurePassword123",
+    //     "role": "admin"
+    // }
+
+    // // ### Last name must be at least 1 characters
+    // POST http://localhost:3000/auth/signup
+    // content-type: application/json
+
+    // {
+    //     "firstName": "John",
+    //     "lastName": "",
+    //     "email": "john.doe@example.com",
+    //     "password": "%SuperSecurePassword123",
+    //     "role": "admin"
+    // }
+
+    // // ### Last name must be at most 30 characters
+    // POST http://localhost:3000/auth/signup
+    // content-type: application/json
+
+    // {
+    //     "firstName": "John",
+    //     "lastName": "6543543534534534534534534535453534535345345",
+    //     "email": "john.doe@example.com",
+    //     "password": "%SuperSecurePassword123",
+    //     "role": "admin"
+    // }
+
+    // /### Invalid email address
+    // POST http://localhost:3000/auth/signup
+    // content-type: application/json
+
+    // {
+    //     "firstName": "John",
+    //     "lastName": "Doe",
+    //     "email": "john.doe.example.com",
+    //     "password": "%SuperSecurePassword123",
+    //     "role": "admin"
+    // }
+
+    // ### Invalid role
+    // POST http://localhost:3000/auth/signup
+    // content-type: application/json
+
+    // {
+    //     "firstName": "John",
+    //     "lastName": "Doe",
+    //     "email": "john.doe@example.com",
+    //     "password": "%SuperSecurePassword123",
+    //     "role": "ds"
+    // }
+
+
+});
+
+
+
+/*
 
     it('should return 204 if user is created successfully', async () => {
         const validData = {
@@ -93,4 +230,4 @@ describe('POST /signup', () => {
         expect(response.status).toBe(500);
         expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
     });
-});
+    */

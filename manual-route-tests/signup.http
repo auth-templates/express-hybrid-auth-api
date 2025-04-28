@@ -1,0 +1,132 @@
+
+### Good password
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "$Suuuuup",
+    "role": "admin"
+}
+
+### Password must contain at least one digit
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "$Suuuuup",
+    "role": "admin"
+}
+
+### Password must contain at most 100 characters
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "%Supdasdasdasdasdasdasdassssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssdasdasdasdasdasdasdasd123",
+    "role": "admin"
+}
+
+### Password must contain at least 8 characters
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "%Sup123",
+    "role": "admin"
+}
+
+### Password must contain at least one special character
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "Suuuuup123",
+    "role": "admin"
+}
+
+### First name must be at least 1 character
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "%SuperSecurePassword123",
+    "role": "admin"
+}
+
+### First name must be at most 30 characters
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "6543543534534534534534534535453534535345345",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "%SuperSecurePassword123",
+    "role": "admin"
+}
+
+### Last name must be at least 1 characters
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "",
+    "email": "john.doe@example.com",
+    "password": "%SuperSecurePassword123",
+    "role": "admin"
+}
+
+### Last name must be at most 30 characters
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "6543543534534534534534534535453534535345345",
+    "email": "john.doe@example.com",
+    "password": "%SuperSecurePassword123",
+    "role": "admin"
+}
+
+### Invalid email address
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe.example.com",
+    "password": "%SuperSecurePassword123",
+    "role": "admin"
+}
+
+### Invalid role
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "%SuperSecurePassword123",
+    "role": "ds"
+}
