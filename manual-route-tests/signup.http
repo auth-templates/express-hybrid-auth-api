@@ -7,7 +7,7 @@ content-type: application/json
     "firstName": "John",
     "lastName": "Doe",
     "email": "john.doe@example.com",
-    "password": "$Suuuuup",
+    "password": "$SuperSecurePassword45",
     "role": "admin"
 }
 
@@ -19,7 +19,7 @@ content-type: application/json
     "firstName": "John",
     "lastName": "Doe",
     "email": "john.doe@example.com",
-    "password": "$Suuuuup",
+    "password": "",
     "role": "admin"
 }
 

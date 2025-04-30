@@ -6,6 +6,7 @@ import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
 import { Role } from '../models/user';
+import { sendTestEmail } from '../lib/mailer';
 
 export const signup = async (request: Request, response: Response): Promise<void> => {
     try {
@@ -27,8 +28,11 @@ export const signup = async (request: Request, response: Response): Promise<void
             passwordHash: await hashPassword(password),
             role: role as Role
         });
+     
+        await sendTestEmail();
         response.status(204).send();
     } catch ( error ) {
+        console.log(error);
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
               message: request.t(error.translationKey, error.params),
