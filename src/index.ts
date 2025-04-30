@@ -5,7 +5,7 @@ import itemRouter from './routes/itemRoutes';
 import authRouter from './routes/authRoutes';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import i18nMiddleware from './middlewares/i18n';
+import { i18nMiddleware } from './middlewares/i18n';
 import appRoot from 'app-root-path'
 
 const app = express();

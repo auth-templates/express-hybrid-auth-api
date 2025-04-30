@@ -10,7 +10,7 @@ import { Role } from '../models/user';
 export const signup = async (request: Request, response: Response): Promise<void> => {
     try {
         const issues = validateSignupData(request.body);
-        console.log("issues", issues.map((item: any) => item.items));
+
         if ( issues.length > 0 ) {
             response.status(400).json(
                 issues.map(({message, items}) => request.t(message, items))
@@ -35,7 +35,6 @@ export const signup = async (request: Request, response: Response): Promise<void
             });
             return
         }
-        console.error(error);
         response.status(500).json({ message: request.t('errors.internal') });
     }
 }

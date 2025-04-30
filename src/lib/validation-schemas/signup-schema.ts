@@ -25,7 +25,7 @@ export const createSignupSchema = () => {
     lastName: commonString(1, 30, 'lastname'),
     email: v.pipe(v.string(), v.email('validation.email')),
     password: passwordValidationSchema(),
-    role: v.enum(Role), // <-- use v.enumType
+    role: v.enum(Role),
   });
 };
 

@@ -1,7 +1,34 @@
 {
-    "greeting": "¡Hola!",
+    "greeting": "Salut!",
     "errors": {
-      "userNotFound": "Usuario no encontrado.",
-      "emailExists": "El correo ya existe."
+      "internal": "A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu sau contactează suportul.",
+      "is_already_in_use": "{{item}} este deja folosit",
+      "userNotFound": "Utilizatorul nu a fost găsit.",
+      "emailExists": "Adresa de email există deja."
+    },
+    "validation": {
+      "firstname": {
+        "min_one": "Prenumele trebuie să conțină cel puțin {{count}} caracter",
+        "min_other": "Prenumele trebuie să conțină cel puțin {{count}} caractere",
+        "max": "Prenumele trebuie să conțină cel mult {{count}} caractere"
+      },
+      "lastname": {
+        "min_one": "Numele trebuie să conțină cel puțin {{count}} caracter",
+        "min_other": "Numele trebuie să conțină cel puțin {{count}} caractere",
+        "max": "Numele trebuie să conțină cel mult {{count}} caractere"
+      },
+      "min_one": "Trebuie să conțină cel puțin {{count}} caracter",
+      "min_other": "Trebuie să conțină cel puțin {{count}} caractere",
+      "max": "Trebuie să conțină cel mult {{count}} caractere",
+      "email": "Adresă de email invalidă",
+      "password": {
+        "minLength": "Parola trebuie să aibă cel puțin {{count}} caractere",
+        "maxLength": "Parola trebuie să aibă cel mult {{count}} caractere",
+        "uppercase": "Parola trebuie să conțină cel puțin o literă mare",
+        "lowercase": "Parola trebuie să conțină cel puțin o literă mică",
+        "digit": "Parola trebuie să conțină cel puțin o cifră",
+        "special": "Parola trebuie să conțină cel puțin un caracter special"
+      }
     }
   }
+  

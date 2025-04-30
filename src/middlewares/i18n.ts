@@ -6,16 +6,21 @@ import appRoot from 'app-root-path'
 
 const rootDir = appRoot.path;
 
-i18next.use(Backend).use(middleware.LanguageDetector).init({
+const i18nReady = i18next
+  .use(Backend)
+  .use(middleware.LanguageDetector)
+  .init({
     fallbackLng: 'en',
     preload: ['en', 'ro'],
     backend: {
-        loadPath: path.join(rootDir, 'src/locales/{{lng}}/translation.json'),
+      loadPath: path.join(rootDir, 'src/locales/{{lng}}/translation.json'),
     },
     detection: {
-        order: ['querystring', 'header'],
-        lookupQuerystring: 'lng'
+      order: ['querystring', 'header'],
+      lookupQuerystring: 'lng',
     }
 });
 
-export default middleware.handle(i18next);
+const i18nMiddleware = middleware.handle(i18next);
+
+export { i18next, i18nMiddleware, i18nReady };
