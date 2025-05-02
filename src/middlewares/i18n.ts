@@ -18,7 +18,8 @@ const i18nReady = i18next
     detection: {
       order: ['querystring', 'header'],
       lookupQuerystring: 'lng',
-    }
+    },
+    initImmediate: false, // <- makes it synchronous
 });
 
 const i18nMiddleware = middleware.handle(i18next);

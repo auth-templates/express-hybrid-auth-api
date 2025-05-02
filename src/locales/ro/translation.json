@@ -1,34 +1,187 @@
 {
     "greeting": "Salut!",
     "errors": {
-      "internal": "A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu sau contactează suportul.",
-      "is_already_in_use": "{{item}} este deja folosit",
-      "userNotFound": "Utilizatorul nu a fost găsit.",
-      "emailExists": "Adresa de email există deja."
+        "internal": "A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu sau contactează suportul.",
+        "is_already_in_use": "{{item}} este deja folosit",
+        "userNotFound": "Utilizatorul nu a fost găsit.",
+        "emailExists": "Adresa de email există deja."
     },
     "validation": {
-      "firstname": {
-        "min_one": "Prenumele trebuie să conțină cel puțin {{count}} caracter",
-        "min_other": "Prenumele trebuie să conțină cel puțin {{count}} caractere",
-        "max": "Prenumele trebuie să conțină cel mult {{count}} caractere"
-      },
-      "lastname": {
-        "min_one": "Numele trebuie să conțină cel puțin {{count}} caracter",
-        "min_other": "Numele trebuie să conțină cel puțin {{count}} caractere",
-        "max": "Numele trebuie să conțină cel mult {{count}} caractere"
-      },
-      "min_one": "Trebuie să conțină cel puțin {{count}} caracter",
-      "min_other": "Trebuie să conțină cel puțin {{count}} caractere",
-      "max": "Trebuie să conțină cel mult {{count}} caractere",
-      "email": "Adresă de email invalidă",
-      "password": {
-        "minLength": "Parola trebuie să aibă cel puțin {{count}} caractere",
-        "maxLength": "Parola trebuie să aibă cel mult {{count}} caractere",
-        "uppercase": "Parola trebuie să conțină cel puțin o literă mare",
-        "lowercase": "Parola trebuie să conțină cel puțin o literă mică",
-        "digit": "Parola trebuie să conțină cel puțin o cifră",
-        "special": "Parola trebuie să conțină cel puțin un caracter special"
-      }
+        "firstname": {
+            "min_one": "Prenumele trebuie să conțină cel puțin {{count}} caracter",
+            "min_other": "Prenumele trebuie să conțină cel puțin {{count}} caractere",
+            "max": "Prenumele trebuie să conțină cel mult {{count}} caractere"
+        },
+        "lastname": {
+            "min_one": "Numele trebuie să conțină cel puțin {{count}} caracter",
+            "min_other": "Numele trebuie să conțină cel puțin {{count}} caractere",
+            "max": "Numele trebuie să conțină cel mult {{count}} caractere"
+        },
+        "min_one": "Trebuie să conțină cel puțin {{count}} caracter",
+        "min_other": "Trebuie să conțină cel puțin {{count}} caractere",
+        "max": "Trebuie să conțină cel mult {{count}} caractere",
+        "email": "Adresă de email invalidă",
+        "password": {
+            "minLength": "Parola trebuie să aibă cel puțin {{count}} caractere",
+            "maxLength": "Parola trebuie să aibă cel mult {{count}} caractere",
+            "uppercase": "Parola trebuie să conțină cel puțin o literă mare",
+            "lowercase": "Parola trebuie să conțină cel puțin o literă mică",
+            "digit": "Parola trebuie să conțină cel puțin o cifră",
+            "special": "Parola trebuie să conțină cel puțin un caracter special"
+        }
+    },
+    "emails": {
+        "2fa-code-email": {
+            "preview": "Codul tău de verificare 2FA",
+            "heading": "Codul tău de autentificare cu doi factori",
+            "instruction": "Te rugăm să folosești codul de mai jos pentru a finaliza autentificarea. Acest cod este valabil timp de {{expiresInMinutes}} minute.",
+            "label": "Cod de verificare",
+            "ignore": "Dacă nu ai solicitat acest cod, poți ignora acest e-mail în siguranță.",
+            "securityWarning": "Pentru siguranța ta, nu împărtăși acest cod cu nimeni.",
+            "footer": {
+                "supportPrompt": "Ai nevoie de ajutor? Vizitează",
+                "supportLink": "centrul de suport"
+            }
+        },
+        "account-activation-email": {
+            "preview": "Contul tău este acum activ",
+            "logoAlt": "Sigla companiei",
+            "heading": "Bun venit! Contul tău este acum activ",
+            "intro": "Ne bucurăm să te avem alături. Contul tău a fost activat cu succes și acum te poți autentifica și începe să folosești serviciile noastre.",
+            "cta": "Accesează tabloul de bord",
+            "warning": "Dacă nu ai creat acest cont, te rugăm să contactezi echipa noastră de suport.",
+            "footer": {
+                "notice": "Acest mesaj a fost trimis de Compania Ta, Str. Exemplu 123, Oraș, Țară. Vezi",
+                "privacyLink": "politica de confidențialitate"
+            }
+        },
+        "account-deactivation-email": {
+            "preview": "Contul tău a fost dezactivat",
+            "logoAlt": "Sigla companiei",
+            "heading": "Contul tău a fost dezactivat",
+            "message1": "Contul tău a fost dezactivat cu succes. Dacă aceasta a fost o greșeală sau dorești să reactivezi contul, te rugăm să ne contactezi imediat.",
+            "message2": "Poți, de asemenea, să te autentifici oricând pentru a reactiva contul sau să vizitezi centrul nostru de suport pentru asistență.",
+            "message3": "Dacă nu ai solicitat această acțiune, contactează imediat echipa noastră de suport pentru a asigura securitatea contului tău.",
+            "supportPrompt": "Dacă ai nevoie de ajutor suplimentar, vizitează",
+            "supportLink": "centrul de suport",
+            "footer": "Îți mulțumim că ai fost clientul nostru. Suntem aici dacă ai nevoie de noi."
+        },
+        "account-deletion-email": {
+            "preview": "Contul tău a fost șters",
+            "logoAlt": "Sigla companiei",
+            "heading": "Contul tău a fost șters",
+            "message1": "Ne pare rău că pleci! Contul tău și toate datele asociate au fost șterse definitiv.",
+            "message2": "Odată șters, contul nu mai poate fi restaurat. Dacă dorești să revii, va trebui să creezi un cont nou.",
+            "message3": "Dacă consideri că aceasta este o greșeală, contactează imediat echipa noastră de suport pentru a preveni eventuale probleme.",
+            "supportPrompt": "Dacă ai întrebări sau ai nevoie de asistență, vizitează",
+            "supportLink": "centrul de suport",
+            "footer": "Îți mulțumim pentru timpul petrecut cu noi. Dacă te vei întoarce, te vom primi cu brațele deschise."
+        },
+        "account-details-updated-email": {
+            "preview": "Detaliile contului tău au fost actualizate",
+            "logoAlt": "Sigla companiei",
+            "heading": "Informațiile contului tău au fost actualizate",
+            "message1": "Următoarele informații din contul tău au fost recent actualizate: <strong>{{fields}}</strong>.",
+            "message2": "Dacă ai făcut aceste modificări, nu este necesară nicio altă acțiune.",
+            "message3": "Dacă nu ai autorizat această modificare, securizează imediat contul.",
+            "message4": "Poți revizui setările contului din",
+            "dashboardLink": "tabloul de bord",
+            "securityTip": "Pentru siguranța ta, îți recomandăm să activezi autentificarea cu doi factori dacă nu ai făcut-o deja.",
+            "footer": "Ai nevoie de ajutor? Vizitează",
+            "supportLink": "centrul de suport"
+        },
+        "account-reactivation-email": {
+            "preview": "Bun venit din nou! Reactivează-ți contul",
+            "logoAlt": "Sigla companiei",
+            "heading": "Bun venit din nou! Reactivează-ți contul",
+            "message1": "Am observat că ți-ai dezactivat anterior contul. Ne-ar plăcea să revii și să te bucuri din nou de toate funcționalitățile noastre.",
+            "message2": "Dacă ești pregătit să revii, apasă butonul de mai jos pentru a-ți reactiva contul. Dacă nu mai dorești să folosești serviciul nostru, nu este necesară nicio acțiune și contul tău va fi dezactivat permanent.",
+            "reactivateButton": "Reactivează contul",
+            "caution": "Dacă nu ai solicitat această reactivare sau ai întrebări, nu ezita să",
+            "contactLink": "contactezi suportul",
+            "footer": "Așteptăm cu nerăbdare să revii! Dacă ai nevoie de ajutor, contactează echipa noastră."
+        },
+        "email-address-changed-email": {
+            "preview": "Notificare schimbare adresă de e-mail",
+            "logoAlt": "Sigla companiei",
+            "heading": "Adresa ta de e-mail a fost schimbată",
+            "message1": "Adresa de e-mail a contului tău a fost recent schimbată din <strong>{{oldEmail}}</strong> în <strong>{{newEmail}}</strong>.",
+            "message2": "Dacă ai făcut această modificare, confirm-o prin clic pe linkul de mai jos:",
+            "confirmLinkText": "Confirmă schimbarea adresei de e-mail",
+            "message3": "Dacă nu ai solicitat această actualizare, îți recomandăm să îți schimbi parola și să contactezi suportul imediat.",
+            "caution": "Pentru siguranța ta, asigură-te că modificările aduse contului tău sunt dorite și autorizate.",
+            "footerBeforeLink": "Ai nevoie de ajutor? Vizitează",
+            "supportCenter": "centrul de suport"
+        },
+        "inactive-account-reminder-email": {
+            "preview": "Ne este dor de tine! Revino în contul tău",
+            "logoAlt": "Sigla companiei",
+            "heading": "Ne este dor de tine!",
+            "message1": "A trecut ceva timp de când nu te-ai autentificat. Vrem doar să ne asigurăm că totul este în regulă și să vedem dacă te putem ajuta cu ceva.",
+            "message2": "Te așteaptă multe noutăți! De ce să nu te conectezi acum și să vezi ce e nou? Am făcut actualizări interesante și ne-ar plăcea să le descoperi.",
+            "ctaButton": "Autentifică-te acum",
+            "unsubscribeText": "Dacă nu mai dorești să primești aceste notificări, poți",
+            "unsubscribeLink": "dezabona-te aici",
+            "footer": "Sperăm să te revedem curând! Dacă ai nevoie de ajutor, contactează echipa noastră de suport."
+        },
+        "new-device-login-email": {
+            "preview": "S-a detectat o nouă autentificare",
+            "logoAlt": "Sigla companiei",
+            "heading": "S-a detectat o nouă autentificare",
+            "message1": "S-a detectat o nouă autentificare în contul tău {{email}}.",
+            "deviceLabel": "Dispozitiv",
+            "locationLabel": "Locație",
+            "ipLabel": "Adresă IP",
+            "timeLabel": "Oră",
+            "message2": "Dacă tu ai făcut această autentificare, nu este necesară nicio acțiune. În caz contrar, securizează-ți contul imediat.",
+            "ctaButton": "Revizuiește activitatea contului",
+            "securityTip": "Pentru mai multă siguranță, ia în considerare activarea autentificării cu doi factori.",
+            "footer": "Această alertă a fost trimisă pentru a-ți proteja contul. Întrebări? Vizitează",
+            "supportLink": "centrul de suport"
+        },
+        "password-changed-email": {
+            "preview": "Parola ta a fost schimbată",
+            "logoAlt": "Sigla companiei",
+            "heading": "Parola ta a fost schimbată",
+            "message1": "Aceasta este o confirmare că parola contului tău {{email}} a fost schimbată cu succes.",
+            "message2": "Dacă nu ai efectuat această schimbare, contactează imediat echipa noastră de suport folosind linkul de mai jos.",
+            "ctaButton": "Contactează suportul",
+            "securityTip": "Pentru siguranța ta, îți recomandăm să îți schimbi parola regulat și să activezi autentificarea cu doi factori.",
+            "footer": "Acest mesaj a fost trimis de Compania Ta. Ai nevoie de ajutor? Vizitează",
+            "supportLink": "centrul de suport"
+        },
+        "password-reset-email": {
+            "preview": "Resetează-ți parola",
+            "logoAlt": "Sigla companiei",
+            "heading": "Resetează-ți parola",
+            "message1": "Am primit o solicitare de resetare a parolei contului tău. Dacă tu ai făcut această solicitare, apasă butonul de mai jos pentru a-ți reseta parola.",
+            "ctaButton": "Resetează parola",
+            "message2": "Dacă nu ai solicitat o resetare a parolei, poți ignora acest e-mail. Parola ta va rămâne neschimbată.",
+            "securityTip": "Pentru siguranța ta, acest link expiră în 30 de minute. Dacă întâmpini probleme, contactează suportul.",
+            "footer": "Acest mesaj a fost trimis de Compania Ta, Str. Exemplu 123, Oraș, Țară. Vezi",
+            "privacyLink": "politica de confidențialitate"
+        },
+        "verification": {
+            "preview": "Confirmă-ți adresa de e-mail pentru a începe",
+            "logoAlt": "Sigla companiei",
+            "heading": "Confirmă-ți adresa de e-mail",
+            "message1": "Îți mulțumim că te-ai înregistrat! Pentru a finaliza înregistrarea, confirmă adresa ta de e-mail apăsând butonul de mai jos.",
+            "ctaButton": "Confirmă e-mailul",
+            "message2": "Dacă butonul nu funcționează, poți copia și lipi acest URL în browser:",
+            "securityTip": "Dacă nu ai creat un cont, poți ignora în siguranță acest e-mail.",
+            "footer": "Acest mesaj a fost trimis de Compania Ta, Str. Exemplu 123, Oraș, Țară.",
+            "privacyLink": "politica de confidențialitate"
+        },
+        "welcome-email": {
+            "preview": "Bine ai venit pe platforma noastră!",
+            "logoAlt": "Sigla companiei",
+            "heading": "Bine ai venit!",
+            "message1": "Îți mulțumim că te-ai înregistrat! Ne bucurăm să te avem alături. Explorează toate instrumentele și funcțiile noastre pentru a începe.",
+            "message2": "Dacă ai întrebări, nu ezita să contactezi echipa noastră de suport.",
+            "signature": "— Echipa",
+            "securityReminder": "Primești acest e-mail deoarece tocmai ți-ai înregistrat un cont. Dacă nu tu ai făcut asta, contactează echipa noastră de suport.",
+            "footer": "Acest mesaj a fost trimis de Compania Ta, Str. Exemplu 123, Oraș, Țară. Vezi",
+            "privacyLink": "politica de confidențialitate"
+        }
     }
-  }
-  
+}

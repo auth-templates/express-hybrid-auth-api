@@ -6,7 +6,7 @@ import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
 import { Role } from '../models/user';
-import { sendTestEmail } from '../lib/mailer';
+import { sendVerificationEmail } from '../lib/mailer';
 
 export const signup = async (request: Request, response: Response): Promise<void> => {
     try {
@@ -29,7 +29,7 @@ export const signup = async (request: Request, response: Response): Promise<void
             role: role as Role
         });
      
-        await sendTestEmail();
+        await sendVerificationEmail({t: request.t});
         response.status(204).send();
     } catch ( error ) {
         console.log(error);

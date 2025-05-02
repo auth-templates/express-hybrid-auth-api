@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "resolveJsonModule": true,
+        "jsx": "react-jsx",
         "target": "esnext",
         "module": "esnext",
         "esModuleInterop": true,
@@ -9,6 +11,6 @@
         "sourceMap": true,
         "outDir": "dist"
     },
-    "include": ["src", "setupTests.ts"],
+    "include": ["src", "setupTests.ts", "emails/templates/2fa-code-email.tsx", "emails/templates/account-activation-email.tsx", "emails/templates/account-deactivation-confirmation-email.tsx", "emails/templates/account-deletion-confirmation-email.tsx", "emails/templates/account-details-updated-email.tsx", "emails/templates/account-reactivation-email.tsx", "emails/templates/email-address-changed-email.tsx", "emails/templates/inactive-account-reminder-email.tsx", "emails/templates/new-device-login.tsx", "emails/templates/passsword-changed-email.tsx", "emails/templates/password-reset-email.tsx", "emails/templates/verification-email.tsx", "emails/templates/welcome-email.tsx"],
     "exclude": ["node_modules", "dist"]
   }
