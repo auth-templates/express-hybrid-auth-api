@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { login, logout, signup } from '../controllers/authController';
+import { login, logout, signup, verifySignup } from '../controllers/authController';
 
 const router = express.Router();
 
@@ -51,6 +51,36 @@ const router = express.Router();
  *                   type: string
  */
 router.post('/signup', signup);
+
+/**
+ * @swagger
+ * /auth/verify-signup:
+ *   post:
+ *     summary: Verify Signup Token
+ *     description: Verifies a user's signup token and activates their account.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 example: "signup-verification-token-here"
+ *     responses:
+ *       200:
+ *         description: Token verified and user activated.
+ *       400:
+ *         description: Invalid or expired token.
+ *       404:
+ *         description: User not found.
+ *       500:
+ *         description: Server error during verification.
+ */
+router.post('/verify-signup', verifySignup);
 
 /**
  * @swagger

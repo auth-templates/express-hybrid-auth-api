@@ -20,3 +20,11 @@ export enum Role {
     Manager = 'manager',
     Admin = 'admin'
 }
+
+export enum UserStatus {
+    Pending = "pending",
+    Active = "active",
+    Suspended = "suspended",
+    Deactivated = "deactivated",
+    Deleted = "deleted"
+}

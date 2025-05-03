@@ -1,6 +1,7 @@
 import { render } from '@react-email/components';
 import VerificationEmail from '../../emails/templates/verification-email'
 import nodemailer from 'nodemailer';
+import AccountActivationEmail from '../../emails/templates/account-activation-email';
 
 export const transporter = nodemailer.createTransport({
   host: 'localhost',
@@ -13,17 +14,35 @@ export const transporter = nodemailer.createTransport({
 //   },
 });
 
-export async function sendVerificationEmail({t}:{t: (key: string, options?: any) => string}) {
+export async function sendVerificationEmail({token, t}:{token: string, t: (key: string, options?: any) => string}) {
     const emailHtml = await render(
-        <VerificationEmail verificationUrl="https://yourdomain.com/verify?token=abc123" t={t}/>
+        <VerificationEmail verificationUrl={`https://yourdomain.com/verify?token=${token}`} t={t}/>
     );
 
     const options = {
         from: 'you@example.com',
         to: 'user@gmail.com',
-        subject: 'hello world',
+        subject: 'Email verification',
         html: emailHtml,
     };
     
     await transporter.sendMail(options);
 }
+
+export async function sendAccountActivationEmail({t}:{t: (key: string, options?: any) => string}) {
+    const emailHtml = await render(
+        <AccountActivationEmail loginUrl={`https://yourdomain.com/login`} t={t}/>
+    );
+
+    const options = {
+        from: 'you@example.com',
+        to: 'user@gmail.com',
+        subject: 'Account activated',
+        html: emailHtml,
+    };
+    
+    await transporter.sendMail(options);
+}
+
+
+

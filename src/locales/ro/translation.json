@@ -30,6 +30,11 @@
             "special": "Parola trebuie să conțină cel puțin un caracter special"
         }
     },
+    "tokens": {
+        "expired": "Linkul de verificare a expirat. Te rugăm să soliciți unul nou pentru a continua.",
+        "used": "Acest link de verificare a fost deja folosit. Dacă nu ai finalizat înregistrarea, solicită un nou link.",
+        "invalid": "Linkul de verificare este invalid sau nu mai este valabil. Verifică linkul sau solicită unul nou."
+    },
     "emails": {
         "2fa-code-email": {
             "preview": "Codul tău de verificare 2FA",

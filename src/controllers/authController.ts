@@ -5,8 +5,40 @@ import { hashPassword } from "../lib/password";
 import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
-import { Role } from '../models/user';
-import { sendVerificationEmail } from '../lib/mailer';
+import { Role, UserStatus } from '../models/user';
+import { sendAccountActivationEmail, sendVerificationEmail } from '../lib/mailer';
+import { generateToken } from '../lib/token';
+import { VerificationTokensRepository } from '../repositories/verification-tokens';
+import { TokenType } from '../models/verification-token';
+
+export async function saveSignupToken(userId: number, hashedToken: string): Promise<void> {
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+    await VerificationTokensRepository.createToken({
+        userId: userId,
+        token: hashedToken,
+        type: TokenType.SignUp,
+        expiresAt: expiresAt
+    })
+}
+
+export const verifySignup = async (request: Request, response: Response): Promise<void> => {
+    const { token } = request.body;
+    try {
+        const { userId } = await VerificationTokensRepository.verifySignupToken(token);
+        await UserRepository.updateUserStatus(userId, UserStatus.Active)
+        await sendAccountActivationEmail({t: request.t});
+        response.status(204).send();
+    } catch (error) {
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json({
+              message: request.t(error.translationKey, error.params),
+            });
+            return
+        }
+        response.status(500).json({ message: request.t('errors.internal') });
+    }
+}
 
 export const signup = async (request: Request, response: Response): Promise<void> => {
     try {
@@ -21,15 +53,16 @@ export const signup = async (request: Request, response: Response): Promise<void
 
         const { firstName, lastName, email, password, role } = request.body; 
 
-        await UserRepository.createUser({
+        const id = await UserRepository.createUser({
             firstName,
             lastName,
             email,
             passwordHash: await hashPassword(password),
             role: role as Role
         });
-     
-        await sendVerificationEmail({t: request.t});
+        const {token, hashedToken} = await generateToken();
+        await saveSignupToken(id, hashedToken);
+        await sendVerificationEmail({token, t: request.t});
         response.status(204).send();
     } catch ( error ) {
         console.log(error);

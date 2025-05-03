@@ -1,14 +1,16 @@
 import request from 'supertest';
 import express from 'express';
-import { signup } from './authController'; // Import your controller function
-import { UserRepository } from '../repositories/users'; // Mocked repository
-import { hashPassword } from '../lib/password';
-import { i18nMiddleware, i18nReady } from '../middlewares/i18n';
-import { CreateUserInput, Role } from '../models/user';
-import { AppError } from '../lib/error';
+import { signup } from '../authController'; // Import your controller function
+import { UserRepository } from '../../repositories/users'; // Mocked repository
+import { hashPassword } from '../../lib/password';
+import { i18nMiddleware, i18nReady } from '../../middlewares/i18n';
+import { CreateUserInput, Role } from '../../models/user';
+import { AppError } from '../../lib/error';
+import { VerificationTokensRepository } from '../../repositories/verification-tokens';
+import * as emailService from '../../lib/mailer';
 
-jest.mock('../repositories/users');
-jest.mock('../lib/password');
+jest.mock('../../repositories/users');
+jest.mock('../../lib/password');
 
 // Create an Express app to test the route
 const app = express();
@@ -31,7 +33,9 @@ describe('POST /signup', () => {
 
     it('should return 204 if signup data is correct', async () => {        
         (hashPassword as jest.Mock).mockResolvedValue('hashedPassword123');
-        (UserRepository.createUser as jest.Mock).mockResolvedValue(undefined); // Simulate successful creation
+        (UserRepository.createUser as jest.Mock).mockResolvedValue(100); // Simulate successful creation
+        jest.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined); // Since it's void
+        jest.spyOn(emailService, 'sendVerificationEmail').mockResolvedValue(undefined); // because it returns void
 
         const response = await request(app).post('/signup').set('Accept-Language', 'en').send(signupData);
 
@@ -168,3 +172,4 @@ describe('POST /signup', () => {
         expect(response.body).toStrictEqual([ "Invalid type: Expected (\"employee\" | \"manager\" | \"admin\") but received \"ds\""]);
     });
 });
+

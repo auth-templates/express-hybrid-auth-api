@@ -31,6 +31,11 @@
             "special": "Password must contain at least one special character"
         }
     },
+    "tokens" : {
+        "expired": "Your verification link has expired. Please request a new one to continue.",
+        "used": "This verification link has already been used. If you haven’t completed your signup, request a new link.",
+        "invalid": "The verification link is invalid or no longer available. Please check the link or request a new one."
+    },
     "emails": {
         "2fa-code-email": {
             "preview": "Your 2FA verification code",

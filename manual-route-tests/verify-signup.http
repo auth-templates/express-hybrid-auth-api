@@ -1,0 +1,39 @@
+
+### Valid token
+
+POST http://localhost:3000/auth/verify-signup
+content-type: application/json
+
+{
+    "token": "signup-valid-1"
+}
+
+
+### Used token
+
+POST http://localhost:3000/auth/verify-signup
+content-type: application/json
+
+{
+    "token": "signup-used-1"
+}
+
+
+### Expired token
+
+POST http://localhost:3000/auth/verify-signup
+content-type: application/json
+
+{
+    "token": "signup-expired-1"
+}
+
+### Not found token
+
+POST http://localhost:3000/auth/verify-signup
+content-type: application/json
+
+{
+    "token": "signup-not-found"
+}
+
