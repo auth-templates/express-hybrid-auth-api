@@ -1,11 +1,9 @@
 {
-   
     "greeting": "Hello!",
     "errors": {
         "internal": "An unexpected error occurred. Please try again later or contact support.",
         "is_already_in_use": "{{item}} is already in use",
-        "userNotFound": "User not found.",
-        "emailExists": "Email already exists."
+        "invalid_credentials": "Invalid email or password. Please try again."
     },
     "validation": {
         "firstname": {

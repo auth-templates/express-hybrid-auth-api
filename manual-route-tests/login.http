@@ -3,6 +3,6 @@ POST http://localhost:3000/auth/login
 content-type: application/json
 
 {
-  "email": "user@example.com",
-  "password": "password123"
+  "email": "dev@mail.com",
+  "password": "$SuperSecurePassword45"
 }

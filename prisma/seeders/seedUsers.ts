@@ -4,22 +4,22 @@ export async function seedUsers(prisma: PrismaClient) {
     await prisma.users.createMany({
         data: [
             {
+                first_name: 'Dev',
+                last_name: 'User',
+                email: 'dev@mail.com',
+                password_hash: '$argon2id$v=19$m=19456,t=2,p=1$lfggMWVNc/sOmayyBm0G3g$ZhlH2V1j6j24exoUZCW7lO2Vso6lIakT+DN3VZd1TbI',
+                role: 'admin',
+                status: 'active',
+                created_at: new Date('2023-10-04 02:42:19'),
+                status_changed_at: new Date('2023-10-05 02:42:19'),
+            },
+            {
                 first_name: 'Zachary',
                 last_name: 'Lopez',
                 email: 'michael41@walker.info',
                 password_hash: '1FTbyFaG(smq',
                 role: 'manager',
                 created_at: new Date('2022-02-27 05:33:21')
-            },
-            {
-                first_name: 'Timothy',
-                last_name: 'Glass',
-                email: 'steven16@schmidt.com',
-                password_hash: 't(oQlB*xm18H',
-                role: 'admin',
-                status: 'active',
-                created_at: new Date('2023-10-04 02:42:19'),
-                status_changed_at: new Date('2023-10-05 02:42:19'),
             },
             {
                 first_name: 'Anthony',

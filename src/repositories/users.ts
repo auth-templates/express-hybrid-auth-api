@@ -1,8 +1,9 @@
 import { Prisma } from '../../generated/prisma';
 import { AppError } from '../lib/error';
+import { verifyPasswordHash } from '../lib/password';
 import { prismaClient } from '../lib/prisma-client';
 import { PrismaErrorCode } from '../lib/prisma-error-codes';
-import { User, UserStatus } from '../models/user';
+import { Role, User, UserStatus } from '../models/user';
 
 type CreateUserInput = Omit<User, 'id' | 'createdAt'> & { passwordHash: string }
 
@@ -46,4 +47,47 @@ export class UserRepository {
             throw new AppError('errors.internal', {}, 500);
         }
     }
+
+    static async login(email: string, password: string): Promise<User> {
+        try {
+            const userRecord = await prismaClient.users.findUnique({
+                where: { email: email },
+                select: {
+                    id: true,
+                    first_name: true,
+                    last_name: true,
+                    email: true,
+                    password_hash: true, 
+                    role: true,
+                    created_at: true,
+                },
+            });
+            
+            if ( !userRecord ) {
+                throw new AppError('user.invalid_credentials', {}, 400);
+            }
+
+            const isMatch = await verifyPasswordHash(userRecord.password_hash, password);
+
+            if ( !isMatch ) {
+                throw new AppError('user.invalid_credentials', {}, 400);
+            }
+
+            const user: User = {
+                id: userRecord.id,
+                firstName: userRecord.first_name,
+                lastName: userRecord.last_name,
+                email: userRecord.email,
+                role: userRecord.role as Role,
+                createdAt: userRecord.created_at || new Date(),
+            };
+
+            return user;
+        } catch (error) {
+            if ( error instanceof AppError ) {
+                throw error
+            }
+            throw new AppError('errors.internal', {}, 500);
+        }
+    }    
 }

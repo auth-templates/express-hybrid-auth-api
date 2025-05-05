@@ -3,8 +3,7 @@
     "errors": {
         "internal": "A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu sau contactează suportul.",
         "is_already_in_use": "{{item}} este deja folosit",
-        "userNotFound": "Utilizatorul nu a fost găsit.",
-        "emailExists": "Adresa de email există deja."
+        "invalid_credentials": "Email sau parolă incorectă. Te rugăm să încerci din nou."
     },
     "validation": {
         "firstname": {

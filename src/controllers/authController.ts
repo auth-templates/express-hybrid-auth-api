@@ -10,6 +10,7 @@ import { sendAccountActivationEmail, sendVerificationEmail } from '../lib/mailer
 import { generateToken } from '../lib/token';
 import { VerificationTokensRepository } from '../repositories/verification-tokens';
 import { TokenType } from '../models/verification-token';
+import { validateLoginData } from '../lib/validation-schemas/login-schema';
 
 export async function saveSignupToken(userId: number, hashedToken: string): Promise<void> {
     const expiresAt = new Date();
@@ -79,14 +80,30 @@ export const signup = async (request: Request, response: Response): Promise<void
 export const login = async (request: Request, response: Response): Promise<void> => {
     const { email, password } = request.body;
 
-    const userId = 1000;
     try {
+        const issues = validateLoginData(request.body);
+
+        if ( issues.length > 0 ) {
+            response.status(400).json(
+                issues.map(({message, items}) => request.t(message, items))
+            );
+            return
+        }
+
+        const user = await UserRepository.login(email, password);
         const token = generateSessionToken();
-        const session = await createSession(token, userId);
+        const session = await createSession(token, user.id);
         setSessionTokenCookie(response, token, session.expiresAt);
-        response.status(200).send();
+        response.status(200).send(user);
     } catch (error) {
-        response.status(500).json({ message: 'Error retrieving items', error });
+        console.log(error);
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json({
+              message: request.t(error.translationKey, error.params),
+            });
+            return
+        }
+        response.status(500).json({ message: request.t('errors.internal') });
     }
 };
 
@@ -95,6 +112,12 @@ export const logout = async (request: Request, response: Response): Promise<void
         deleteSessionTokenCookie(response);
         response.status(204);
     } catch (error) {
-        response.status(500).json({ message: 'Error retrieving items', error });
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json({
+              message: request.t(error.translationKey, error.params),
+            });
+            return
+        }
+        response.status(500).json({ message: request.t('errors.internal') });
     }
 }
