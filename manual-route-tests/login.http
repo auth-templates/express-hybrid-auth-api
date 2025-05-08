@@ -1,8 +1,35 @@
-####
+### Valid credentials
 POST http://localhost:3000/auth/login
 content-type: application/json
 
 {
   "email": "dev@mail.com",
   "password": "$SuperSecurePassword45"
+}
+
+#### Invalid email
+POST http://localhost:3000/auth/login
+content-type: application/json
+
+{
+  "email": "dev.mail.com",
+  "password": "$SuperSecurePassword45"
+}
+
+
+#### Invalid password
+POST http://localhost:3000/auth/login
+content-type: application/json
+
+{
+  "email": "dev@mail.com",
+  "password": "SuperSecurePassword45"
+}
+
+
+#### Invalid password
+POST http://localhost:3000/auth/login
+content-type: application/json
+
+{
 }

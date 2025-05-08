@@ -85,18 +85,18 @@ export const login = async (request: Request, response: Response): Promise<void>
 
         if ( issues.length > 0 ) {
             response.status(400).json(
-                issues.map(({message, items}) => request.t(message, items))
+                [issues[0]].map(({message, items}) => request.t(message, items))
             );
             return
         }
 
         const user = await UserRepository.login(email, password);
         const token = generateSessionToken();
-        const session = await createSession(token, user.id);
+        const session = await createSession(token, { userId: user.id, pending2FA: user.enabled2FA });
         setSessionTokenCookie(response, token, session.expiresAt);
+        
         response.status(200).send(user);
     } catch (error) {
-        console.log(error);
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
               message: request.t(error.translationKey, error.params),

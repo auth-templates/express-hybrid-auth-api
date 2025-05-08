@@ -5,6 +5,7 @@ export interface User {
     email: string;
     role: Role;
     createdAt: Date;
+    enabled2FA?: boolean; 
 }
   
 export type CreateUserInput = Omit<User, 'id' | 'createdAt'> & { password: string };

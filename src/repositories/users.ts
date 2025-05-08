@@ -60,17 +60,18 @@ export class UserRepository {
                     password_hash: true, 
                     role: true,
                     created_at: true,
+                    twofa_enabled: true
                 },
             });
             
             if ( !userRecord ) {
-                throw new AppError('user.invalid_credentials', {}, 400);
+                throw new AppError('errors.invalid_credentials', {}, 400);
             }
 
             const isMatch = await verifyPasswordHash(userRecord.password_hash, password);
 
             if ( !isMatch ) {
-                throw new AppError('user.invalid_credentials', {}, 400);
+                throw new AppError('errors.invalid_credentials', {}, 400);
             }
 
             const user: User = {
@@ -80,6 +81,7 @@ export class UserRepository {
                 email: userRecord.email,
                 role: userRecord.role as Role,
                 createdAt: userRecord.created_at || new Date(),
+                enabled2FA: userRecord.twofa_enabled
             };
 
             return user;

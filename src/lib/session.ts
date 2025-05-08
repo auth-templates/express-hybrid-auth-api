@@ -13,18 +13,20 @@ export function generateSessionToken(): string {
 
 const redisController = new RedisController(new Redis(GlobalConfig.REDIS_PORT, GlobalConfig.REDIS_HOST));
  
-export async function createSession(token: string, userId: number): Promise<Session> {
+export async function createSession(token: string, { userId, pending2FA }: {userId: number, pending2FA: boolean}): Promise<Session> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const session: Session = {
 		id: sessionId,
 		userId,
-		expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) // 30 days
+		expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+        pending2FA
 	};
     await redisController.add(`session:${session.id}`,
 		JSON.stringify({
 			id: session.id,
 			user_id: session.userId,
-			expires_at: Math.floor(session.expiresAt.getTime() / 1000)
+			expires_at: Math.floor(session.expiresAt.getTime() / 1000),
+            pending_2fa: pending2FA
 		}),  Math.floor(session.expiresAt.getTime() / 1000)
 	);
     await redisController.addToSet(`user_sessions:${userId}`, sessionId);
@@ -43,7 +45,8 @@ export async function validateSessionToken(token: string): Promise<Session | nul
 	const session: Session = { 
 		id: result.id,
 		userId: result.user_id,
-		expiresAt: new Date(result.expires_at * 1000)
+		expiresAt: new Date(result.expires_at * 1000),
+        pending2FA: result.pending_2fa
 	};
 	if ( Date.now() >= session.expiresAt.getTime() ) {
 		await redisController.remove(`session:${sessionId}`);
@@ -57,7 +60,8 @@ export async function validateSessionToken(token: string): Promise<Session | nul
 			JSON.stringify({
 				id: session.id,
 				user_id: session.userId,
-				expires_at: Math.floor(session.expiresAt.getTime() / 1000)
+				expires_at: Math.floor(session.expiresAt.getTime() / 1000),
+                pending_2fa: session.pending2FA
 			}), 
             Math.floor(session.expiresAt.getTime() / 1000)
 		);
@@ -82,4 +86,5 @@ export interface Session {
 	id: string;
 	userId: number;
 	expiresAt: Date;
+    pending2FA?: boolean;
 }
