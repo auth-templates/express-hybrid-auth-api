@@ -85,12 +85,16 @@ model users {
 }
 
 model verification_tokens {
-  id          Int       @id @default(autoincrement())
-  user_id     Int
-  token       String    @db.VarChar(255) // Store hashed token (hashed via bcrypt or similar)
-  type        TokenType
-  expires_at  DateTime
-  used_at     DateTime? // Track when the token was used (null if not used)
-  created_at  DateTime  @default(now())
-  user        users     @relation(fields: [user_id], references: [id])
+  id                Int        @id @default(autoincrement())
+  user_id           Int
+  token_hash        String     @db.VarChar(255) // Argon2 hashed token
+  token_fingerprint String     @db.Char(64)     // SHA-256 hex fingerprint (64 characters)
+  type              TokenType
+  expires_at        DateTime
+  used_at           DateTime? // Track when the token was used (null if not used)
+  created_at        DateTime  @default(now())
+
+  user              users     @relation(fields: [user_id], references: [id])
+
+  @@index([token_fingerprint]) // for fast lookup
 }

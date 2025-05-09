@@ -1,5 +1,8 @@
 import { PrismaClient, TokenType, UserStatus } from '../../generated/prisma';
 import { hash } from '@node-rs/argon2';
+import { createHash } from 'node:crypto';
+
+const createTokenFingerprint = (token: string) => createHash('sha256').update(token).digest('hex');
 
 export async function seedVerificationTokens(prisma: PrismaClient) {
     const users = await prisma.users.findMany();
@@ -16,7 +19,8 @@ export async function seedVerificationTokens(prisma: PrismaClient) {
 
             tokens.push({
                 user_id: user.id,
-                token: await hash(`signup-valid-${user.id}`),
+                token_hash: await hash(`signup-valid-${user.id}`),
+                token_fingerprint: createTokenFingerprint(`signup-valid-${user.id}`),
                 type: TokenType.signup,
                 expires_at: new Date(now.getTime() + 1000 * 60 * 60 * 24),
                 created_at: now,
@@ -25,7 +29,8 @@ export async function seedVerificationTokens(prisma: PrismaClient) {
 
             tokens.push({
                 user_id: user.id,
-                token: await hash(`signup-used-${user.id}`),
+                token_hash: await hash(`signup-used-${user.id}`),
+                token_fingerprint: createTokenFingerprint(`signup-used-${user.id}`),
                 type: TokenType.signup,
                 expires_at: new Date(now.getTime() + 1000 * 60 * 60 * 24),
                 created_at: now,
@@ -34,7 +39,8 @@ export async function seedVerificationTokens(prisma: PrismaClient) {
 
             tokens.push({
                 user_id: user.id,
-                token: await hash(`signup-expired-${user.id}`),
+                token_hash: await hash(`signup-expired-${user.id}`),
+                token_fingerprint: createTokenFingerprint(`signup-expired-${user.id}`),
                 type: TokenType.signup,
                 expires_at: new Date(now.getTime() - 1000 * 60 * 60),
                 created_at: now,
@@ -48,7 +54,8 @@ export async function seedVerificationTokens(prisma: PrismaClient) {
 
             tokens.push({
                 user_id: user.id,
-                token: await hash(`twofa-valid-${user.id}`),
+                token_hash: await hash(`twofa-valid-${user.id}`),
+                token_fingerprint: createTokenFingerprint(`twofa-valid-${user.id}`),
                 type: TokenType.twofa,
                 expires_at: new Date(now.getTime() + 1000 * 60 * 10),
                 created_at: now,
@@ -57,7 +64,8 @@ export async function seedVerificationTokens(prisma: PrismaClient) {
 
             tokens.push({
                 user_id: user.id,
-                token: await hash(`twofa-used-${user.id}`),
+                token_hash: await hash(`twofa-used-${user.id}`),
+                token_fingerprint: createTokenFingerprint(`twofa-used-${user.id}`),
                 type: TokenType.twofa,
                 expires_at: new Date(now.getTime() + 1000 * 60 * 10),
                 created_at: now,
@@ -66,7 +74,8 @@ export async function seedVerificationTokens(prisma: PrismaClient) {
 
             tokens.push({
                 user_id: user.id,
-                token: await hash(`twofa-expired-${user.id}`),
+                token_hash: await hash(`twofa-expired-${user.id}`),
+                token_fingerprint: createTokenFingerprint(`twofa-expired-${user.id}`),
                 type: TokenType.twofa,
                 expires_at: new Date(now.getTime() - 1000 * 60 * 10),
                 created_at: now,

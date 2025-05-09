@@ -1,0 +1,39 @@
+
+### Valid token
+
+POST http://localhost:3000/2fa/confirm-recover
+content-type: application/json
+
+{
+    "token": "twofa-valid-1"
+}
+
+
+### Used token
+
+POST http://localhost:3000/2fa/confirm-recover
+content-type: application/json
+
+{
+    "token": "twofa-used-1"
+}
+
+
+### Expired token
+
+POST http://localhost:3000/2fa/confirm-recover
+content-type: application/json
+
+{
+    "token": "twofa-expired-1"
+}
+
+### Not found token
+
+POST http://localhost:3000/2fa/confirm-recover
+content-type: application/json
+
+{
+    "token": "twofa-not-found"
+}
+

@@ -12,13 +12,26 @@ import { VerificationTokensRepository } from '../repositories/verification-token
 import { TokenType } from '../models/verification-token';
 import { validateLoginData } from '../lib/validation-schemas/login-schema';
 
-export async function saveSignupToken(userId: number, hashedToken: string): Promise<void> {
+export async function saveSignupToken(userId: number, tokenFingerprint: string, hashedToken: string): Promise<void> {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
     await VerificationTokensRepository.createToken({
         userId: userId,
-        token: hashedToken,
+        tokenHash: hashedToken,
+        tokenFingerprint: tokenFingerprint,
         type: TokenType.SignUp,
+        expiresAt: expiresAt
+    })
+}
+
+export async function save2FAToken(userId: number, tokenFingerprint: string, hashedToken: string): Promise<void> {
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+    await VerificationTokensRepository.createToken({
+        userId: userId,
+        tokenHash: hashedToken,
+        tokenFingerprint: tokenFingerprint,
+        type: TokenType.TwoFA,
         expiresAt: expiresAt
     })
 }
@@ -31,6 +44,7 @@ export const verifySignup = async (request: Request, response: Response): Promis
         await sendAccountActivationEmail({t: request.t});
         response.status(204).send();
     } catch (error) {
+            console.log(error);
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
               message: request.t(error.translationKey, error.params),
@@ -61,8 +75,8 @@ export const signup = async (request: Request, response: Response): Promise<void
             passwordHash: await hashPassword(password),
             role: role as Role
         });
-        const {token, hashedToken} = await generateToken();
-        await saveSignupToken(id, hashedToken);
+        const {token, tokenFingerprint, hashedToken} = await generateToken();
+        await saveSignupToken(id, tokenFingerprint, hashedToken);
         await sendVerificationEmail({token, t: request.t});
         response.status(204).send();
     } catch ( error ) {

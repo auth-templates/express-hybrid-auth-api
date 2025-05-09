@@ -91,5 +91,70 @@ export class UserRepository {
             }
             throw new AppError('errors.internal', {}, 500);
         }
-    }    
+    }
+    
+    static async getUserById(id: number): Promise<User> {
+        try {
+            const userRecord = await prismaClient.users.findUnique({
+                where: { id: id },
+                select: {
+                    id: true,
+                    first_name: true,
+                    last_name: true,
+                    email: true,
+                    password_hash: true, 
+                    role: true,
+                    created_at: true,
+                    twofa_enabled: true
+                },
+            });
+            
+            if ( !userRecord ) {
+                throw new AppError('errors.user_not_found', {}, 400);
+            }
+
+            const user: User = {
+                id: userRecord.id,
+                firstName: userRecord.first_name,
+                lastName: userRecord.last_name,
+                email: userRecord.email,
+                role: userRecord.role as Role,
+                createdAt: userRecord.created_at || new Date(),
+                enabled2FA: userRecord.twofa_enabled
+            };
+
+            return user;
+        } catch (error) {
+            if ( error instanceof AppError ) {
+                throw error
+            }
+            throw new AppError('errors.internal', {}, 500);
+        }
+    }
+
+    static async verifyAndSaveSecret(userId: number, twofa_secret: string): Promise<void> {
+        try {
+            await prismaClient.users.update({
+                where: { id: userId },
+                data: {
+                    twofa_secret: twofa_secret,
+                    twofa_enabled: true
+                },
+            });
+        } catch (error) {
+            throw new AppError('errors.internal', {}, 500);
+        }
+    }
+    
+    static async disable2FA(userId: number): Promise<void> {
+        try {
+            await prismaClient.users.update({
+                where: { id: userId },
+                data: { twofa_secret: null },
+            });
+        } catch (error) {
+            console.log(error);
+            throw new AppError('errors.internal', {}, 500);
+        }
+    }
 }

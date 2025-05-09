@@ -30,11 +30,30 @@
         }
     },
     "tokens" : {
-        "expired": "Your verification link has expired. Please request a new one to continue.",
-        "used": "This verification link has already been used. If you haven’t completed your signup, request a new link.",
-        "invalid": "The verification link is invalid or no longer available. Please check the link or request a new one."
+        "signup": {
+            "expired": "Your verification link has expired. Please request a new one to continue.",
+            "used": "This verification link has already been used. If you haven’t completed your signup, request a new link.",
+            "invalid": "The verification link is invalid or no longer available. Please check the link or request a new one."
+        },
+        "2fa": {
+            "expired": "Your 2FA recovery link has expired. Please start the recovery process again to regain access to your account.",
+            "used": "This 2FA recovery link has already been used. If you still need access, request a new recovery link.",
+            "invalid": "The 2FA recovery link is invalid or no longer available. Please request a new link to recover your account."
+        }
     },
     "emails": {
+        "2fa-disabled": {
+            "preview": "Two-Factor Authentication was disabled",
+            "logoAlt": "Company Logo",
+            "heading": "Two-Factor Authentication Disabled",
+            "body": "Two-factor authentication has been turned off for your account.",
+            "recommendation": "If you did not perform this action, we strongly recommend securing your account immediately.",
+            "warning": "You are no longer protected by 2FA. Re-enabling it is recommended for your security.",
+            "footer": {
+            "supportPrompt": "Need help?",
+            "supportLink": "Contact support"
+            }
+        },
         "2fa-code-email": {
             "preview": "Your 2FA verification code",
             "heading": "Your Two-Factor Authentication Code",

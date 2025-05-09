@@ -1,7 +1,7 @@
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
 import Redis from "ioredis";
-import { RedisController } from "./redis-controller";
+import { RedisController } from "./redis/redis-controller";
 import GlobalConfig from "../config";
 
 export function generateSessionToken(): string {

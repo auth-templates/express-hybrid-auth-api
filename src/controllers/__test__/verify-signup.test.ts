@@ -35,7 +35,7 @@ describe('POST /auth/verify-signup', () => {
 
     it('should return 400 for a used token', async () => {
         (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
-            new AppError('tokens.used', {}, 400)
+            new AppError('tokens.signup.used', {}, 400)
         );
 
         const response = await request(app)
@@ -48,7 +48,7 @@ describe('POST /auth/verify-signup', () => {
 
     it('should return 400 for an expired token', async () => {
         (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
-            new AppError('tokens.expired', {}, 400)
+            new AppError('tokens.signup.expired', {}, 400)
         );
 
         const response = await request(app)
@@ -61,7 +61,7 @@ describe('POST /auth/verify-signup', () => {
 
     it('should return 400 for a non-existent token or invalid token', async () => {
         (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
-            new AppError('tokens.invalid', {}, 400)
+            new AppError('tokens.signup.invalid', {}, 400)
         );
 
         const response = await request(app)

@@ -30,11 +30,30 @@
         }
     },
     "tokens": {
-        "expired": "Linkul de verificare a expirat. Te rugăm să soliciți unul nou pentru a continua.",
-        "used": "Acest link de verificare a fost deja folosit. Dacă nu ai finalizat înregistrarea, solicită un nou link.",
-        "invalid": "Linkul de verificare este invalid sau nu mai este valabil. Verifică linkul sau solicită unul nou."
+        "signup": {
+            "expired": "Linkul de verificare a expirat. Te rugăm să soliciți unul nou pentru a continua.",
+            "used": "Acest link de verificare a fost deja folosit. Dacă nu ai finalizat înregistrarea, solicită un nou link.",
+            "invalid": "Linkul de verificare este invalid sau nu mai este valabil. Verifică linkul sau solicită unul nou."
+        },
+        "2fa": {
+            "expired": "Link-ul de recuperare 2FA a expirat. Te rugăm să începi din nou procesul de recuperare pentru a-ți recăpăta accesul la cont.",
+            "used": "Acest link de recuperare 2FA a fost deja utilizat. Dacă ai nevoie în continuare de acces, solicită un nou link de recuperare.",
+            "invalid": "Link-ul de recuperare 2FA este invalid sau nu mai este disponibil. Te rugăm să soliciți un nou link pentru a-ți recupera contul."
+        }
     },
     "emails": {
+        "2fa-disabled": {
+            "preview": "Autentificarea cu doi factori a fost dezactivată",
+            "logoAlt": "Sigla companiei",
+            "heading": "Autentificare cu doi factori dezactivată",
+            "body": "Autentificarea cu doi factori a fost dezactivată pentru contul tău.",
+            "recommendation": "Dacă nu ai inițiat tu această acțiune, îți recomandăm să-ți securizezi contul cât mai curând posibil.",
+            "warning": "Contul tău nu mai este protejat de autentificarea cu doi factori. Este recomandat să o activezi din nou pentru o mai bună securitate.",
+            "footer": {
+                "supportPrompt": "Ai nevoie de ajutor?",
+                "supportLink": "Contactează suportul"
+            }
+        },
         "2fa-code-email": {
             "preview": "Codul tău de verificare 2FA",
             "heading": "Codul tău de autentificare cu doi factori",

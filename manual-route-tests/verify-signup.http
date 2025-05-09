@@ -5,7 +5,7 @@ POST http://localhost:3000/auth/verify-signup
 content-type: application/json
 
 {
-    "token": "signup-valid-1"
+    "token": "signup-valid-2"
 }
 
 
@@ -15,7 +15,7 @@ POST http://localhost:3000/auth/verify-signup
 content-type: application/json
 
 {
-    "token": "signup-used-1"
+    "token": "signup-used-2"
 }
 
 
@@ -25,7 +25,7 @@ POST http://localhost:3000/auth/verify-signup
 content-type: application/json
 
 {
-    "token": "signup-expired-1"
+    "token": "signup-expired-2"
 }
 
 ### Not found token

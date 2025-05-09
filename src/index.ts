@@ -3,6 +3,7 @@ import swaggerUI from 'swagger-ui-express';
 import swaggerSpec from './swagger-config';
 import itemRouter from './routes/itemRoutes';
 import authRouter from './routes/authRoutes';
+import twofaRoutes from './routes/2faRoutes';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import { i18nMiddleware } from './middlewares/i18n';
@@ -26,6 +27,7 @@ if ( process.env.NODE_ENV === 'development' ) {
     }));
 }
 
+app.use('/2fa', twofaRoutes);
 app.use('/auth', authRouter);
 app.use('/items', itemRouter);
 
