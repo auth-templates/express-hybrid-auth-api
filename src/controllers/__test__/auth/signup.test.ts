@@ -1,16 +1,16 @@
 import request from 'supertest';
 import express from 'express';
-import { signup } from '../authController'; // Import your controller function
-import { UserRepository } from '../../repositories/users'; // Mocked repository
-import { hashPassword } from '../../lib/password';
-import { i18nMiddleware, i18nReady } from '../../middlewares/i18n';
-import { CreateUserInput, Role } from '../../models/user';
-import { AppError } from '../../lib/error';
-import { VerificationTokensRepository } from '../../repositories/verification-tokens';
-import * as emailService from '../../lib/mailer';
+import { signup } from '../../authController'; // Import your controller function
+import { UserRepository } from '../../../repositories/users'; // Mocked repository
+import { hashPassword } from '../../../lib/password';
+import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
+import { CreateUserInput, Role } from '../../../models/user';
+import { AppError } from '../../../lib/error';
+import { VerificationTokensRepository } from '../../../repositories/verification-tokens';
+import * as emailService from '../../../lib/mailer';
 
-jest.mock('../../repositories/users');
-jest.mock('../../lib/password');
+jest.mock('../../../repositories/users');
+jest.mock('../../../lib/password');
 
 // Create an Express app to test the route
 const app = express();

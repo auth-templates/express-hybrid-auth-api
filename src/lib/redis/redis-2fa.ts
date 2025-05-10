@@ -1,21 +1,20 @@
 import { authenticator } from 'otplib';
 import qrcode from 'qrcode';
 import { RedisController } from './redis-controller';
-import Redis from 'ioredis';
 import config from '../../config';
 import { AppError } from '../error';
+import { redisClient } from './client';
 
-const redisClient = new Redis(); 
 const redisController = new RedisController(redisClient);
 
 const TEMP_SECRET_EXPIRY = 600; // 10 minutes expiration
 
-type TwofaSetup = {
+export type TwofaSetup = {
     qrCodeUrl: string, 
     secret: string
 }
 
-export async function verify2faSetup(userId: string, code: string): Promise<string> {
+export async function verify2faSetup(userId: number, code: string): Promise<string> {
     const tempSecret = await redisController.get(`2fa:temp:${userId}`);
         
     if ( !tempSecret ) {

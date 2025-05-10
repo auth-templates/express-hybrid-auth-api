@@ -1,6 +1,4 @@
 import { Request, Response } from 'express';
-import { createSession, generateSessionToken } from "../lib/session";
-import { deleteSessionTokenCookie, setSessionTokenCookie } from '../lib/cookie';
 import { hashPassword } from "../lib/password";
 import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
@@ -11,6 +9,17 @@ import { generateToken } from '../lib/token';
 import { VerificationTokensRepository } from '../repositories/verification-tokens';
 import { TokenType } from '../models/verification-token';
 import { validateLoginData } from '../lib/validation-schemas/login-schema';
+import { redisClient } from '../lib/redis/client';
+import jwt from 'jsonwebtoken';
+import { RedisController } from '../lib/redis/redis-controller';
+import GlobalConfig from '../config';
+import { randomBytes } from 'node:crypto'
+
+function createSecureRandomToken(): string {
+  return randomBytes(48).toString('hex'); // 96-character hex string
+}
+
+const redisController = new RedisController(redisClient);
 
 export async function saveSignupToken(userId: number, tokenFingerprint: string, hashedToken: string): Promise<void> {
     const expiresAt = new Date();
@@ -105,12 +114,40 @@ export const login = async (request: Request, response: Response): Promise<void>
         }
 
         const user = await UserRepository.login(email, password);
-        const token = generateSessionToken();
-        const session = await createSession(token, { userId: user.id, pending2FA: user.enabled2FA });
-        setSessionTokenCookie(response, token, session.expiresAt);
         
+        request.session.user = {
+            id: user.id,
+            email: user.email
+        };
+        request.session.pending2FA = user.enabled2FA;
+
+        const refreshToken = createSecureRandomToken();
+
+        response.cookie('refresh_token', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: GlobalConfig.SESSION_MAX_AGE / 1000
+        });
+        
+        await redisController.add(`refresh:${user.id}:${refreshToken}`, refreshToken, GlobalConfig.SESSION_MAX_AGE / 1000);
+
+        const newAccessToken = jwt.sign(
+            { userId: user.id, pending2FA: user.enabled2FA },
+            GlobalConfig.ACCESS_TOKEN_SECRET,
+            { expiresIn: '15m' }
+        );
+
+        response.cookie('access_token', newAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE
+        });
+
         response.status(200).send(user);
     } catch (error) {
+        console.log(error);
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
               message: request.t(error.translationKey, error.params),
@@ -122,8 +159,16 @@ export const login = async (request: Request, response: Response): Promise<void>
 };
 
 export const logout = async (request: Request, response: Response): Promise<void> => {
+    const userId = request.session.user.id;
+    const refreshToken = request.cookies.refreshToken;
     try {
-        deleteSessionTokenCookie(response);
+        await redisController.remove(`refresh:${userId}:${refreshToken}`);
+
+        request.session.destroy((err) => {
+            response.clearCookie('ssid');
+            response.clearCookie('refresh_token');
+        });
+
         response.status(204);
     } catch (error) {
         if (error instanceof AppError) {
@@ -134,4 +179,35 @@ export const logout = async (request: Request, response: Response): Promise<void
         }
         response.status(500).json({ message: request.t('errors.internal') });
     }
+}
+
+export const refresh = async (request: Request, response: Response): Promise<void> => {
+    const refreshToken = request.cookies.refreshToken;
+    const ssid = request.cookies.ssid;
+    const userId = request.session.user.id;
+    const pending2FA = request.session.pending2FA;
+
+    const stored = await redisController.get(`refresh:${ssid}:${refreshToken}`);
+
+    if ( !refreshToken || refreshToken !== stored ) {
+        response.status(403).json({ message: 'Invalid refresh token' });
+        return;
+    }
+
+    await redisController.resetExpiration(`refresh:${userId}:${refreshToken}`, GlobalConfig.SESSION_MAX_AGE / 1000);
+
+    const newAccessToken = jwt.sign(
+        { userId: userId, pending2FA: pending2FA },
+        GlobalConfig.ACCESS_TOKEN_SECRET,
+        { expiresIn: '15m' }
+    );
+
+    response.cookie('access_token', newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE
+    });
+
+    response.status(204);
 }

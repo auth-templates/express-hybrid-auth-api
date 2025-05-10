@@ -1,6 +1,7 @@
 import express from 'express';
 
-import { login, logout, signup, verifySignup } from '../controllers/authController';
+import { login, logout, signup, verifySignup, refresh } from '../controllers/authController';
+import { authenticate } from '../middlewares/authenticate';
 
 const router = express.Router();
 
@@ -97,10 +98,10 @@ router.post('/verify-signup', verifySignup);
  *             properties:
  *               email:
  *                 type: string
- *                 example: "user@example.com"
+ *                 example: "dev@mail.com"
  *               password:
  *                 type: string
- *                 example: "password123"
+ *                 example: "$SuperSecurePassword45"
  *     responses:
  *       200:
  *         description: Login successful, session token set in cookie.
@@ -146,7 +147,8 @@ router.post('/login', login);
  *                 error:
  *                   type: string
 */
-router.post('/logout', logout);
+router.post('/logout', authenticate, logout);
 
+router.post('/refresh', authenticate, refresh);
 
 export default router;

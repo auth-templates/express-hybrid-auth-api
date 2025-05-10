@@ -9,7 +9,8 @@
         // "strict": true,  // Enable strict type-checking
         "skipLibCheck": true,  // Skip library declaration file checks
         "sourceMap": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "typeRoots": ["src/@types", "./node_modules/@types"],    
     },
     "include": [
         "src", 

@@ -8,12 +8,28 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { i18nMiddleware } from './middlewares/i18n';
 import appRoot from 'app-root-path'
+import session from 'express-session';
+import { RedisStore } from 'connect-redis';
+import { redisClient } from './lib/redis/client';
+import GlobalConfig from './config';
 
 const app = express();
 const port = 3000;
 
-app.use(i18nMiddleware);
+app.use(session({
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    rolling: true, // This enables automatic touch
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // secure: true requires HTTPS, which is usually off in dev
+        httpOnly: true,
+        maxAge: GlobalConfig.SESSION_MAX_AGE
+    }
+}));
 
+app.use(i18nMiddleware);
 app.use(cookieParser());
 app.use(express.json());
 

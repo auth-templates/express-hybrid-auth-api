@@ -1,8 +1,7 @@
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
-import Redis from "ioredis";
 import { RedisController } from "./redis/redis-controller";
-import GlobalConfig from "../config";
+import { redisClient } from "./redis/client";
 
 export function generateSessionToken(): string {
 	const bytes = new Uint8Array(20);
@@ -11,7 +10,7 @@ export function generateSessionToken(): string {
 	return token;
 }
 
-const redisController = new RedisController(new Redis(GlobalConfig.REDIS_PORT, GlobalConfig.REDIS_HOST));
+const redisController = new RedisController(redisClient);
  
 export async function createSession(token: string, { userId, pending2FA }: {userId: number, pending2FA: boolean}): Promise<Session> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));

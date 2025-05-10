@@ -1,13 +1,13 @@
 import request from 'supertest';
 import express from 'express';
-import { verifySignup } from '../authController';
-import { VerificationTokensRepository } from '../../repositories/verification-tokens';
-import { AppError } from '../../lib/error';
-import { i18nMiddleware, i18nReady } from '../../middlewares/i18n';
-import { UserRepository } from '../../repositories/users';
-import * as emailService from '../../lib/mailer';
+import { verifySignup } from '../../authController';
+import { VerificationTokensRepository } from '../../../repositories/verification-tokens';
+import { AppError } from '../../../lib/error';
+import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
+import { UserRepository } from '../../../repositories/users';
+import * as emailService from '../../../lib/mailer';
 
-jest.mock('../../repositories/verification-tokens');
+jest.mock('../../../repositories/verification-tokens');
 
 const app = express();
 app.use(i18nMiddleware);

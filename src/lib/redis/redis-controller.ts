@@ -7,6 +7,8 @@ export interface Controller {
     removeFromSet(key: string, value: string): Promise<void>;
     get(key: string): Promise<string | null>;
     getAllFromSet(key: string): Promise<string[]>;
+    isMemberOfSet(key: string, value: string): Promise<boolean>;
+    resetExpiration(key: string, expiresInSeconds: number): Promise<void>;
     removeMultiple(keys: string[]): Promise<void>;
 }
 
@@ -38,6 +40,15 @@ export class RedisController implements Controller {
 
     async getAllFromSet(key: string): Promise<string[]> {
         return this.client.smembers(key);
+    }
+
+    async isMemberOfSet(key: string, value: string): Promise<boolean> {
+        const result = await this.client.sismember(key, value);
+        return result === 1;
+    }
+
+    async resetExpiration(key: string, expiresInSeconds: number): Promise<void> {
+        await this.client.expire(key, expiresInSeconds);
     }
 
     async removeMultiple(keys: string[]): Promise<void> {

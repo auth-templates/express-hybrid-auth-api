@@ -1,5 +1,6 @@
 import express from 'express';
 import { setup2FA, verify2FASetup, disable2FA, recover2FA, confirm2FARecover } from '../controllers/2faController';
+import { authenticate } from '../middlewares/authenticate';
 
 const router = express.Router();
 
@@ -29,7 +30,7 @@ const router = express.Router();
  *       401:
  *         description: Unauthorized - missing or invalid token
  */
-router.post('/setup', setup2FA);
+router.post('/setup', authenticate, setup2FA);
 
 /**
  * @swagger
@@ -59,7 +60,7 @@ router.post('/setup', setup2FA);
  *       401:
  *         description: Unauthorized
  */
-router.post('/verify-setup', verify2FASetup);
+router.post('/verify-setup', authenticate, verify2FASetup);
 
 /**
  * @swagger
@@ -77,7 +78,7 @@ router.post('/verify-setup', verify2FASetup);
  *       401:
  *         description: Unauthorized - missing or invalid token
  */
-router.delete('/disable', disable2FA);
+router.delete('/disable', authenticate, disable2FA);
 
 /**
  * @swagger

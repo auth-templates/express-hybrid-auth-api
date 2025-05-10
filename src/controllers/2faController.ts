@@ -3,12 +3,14 @@ import { UserRepository } from '../repositories/users';
 import { get2faSetup, verify2faSetup } from '../lib/redis/redis-2fa';
 import { AppError } from '../lib/error';
 import { generateToken } from '../lib/token';
-import { save2FAToken, saveSignupToken } from './authController';
+import { save2FAToken } from './authController';
 import { VerificationTokensRepository } from '../repositories/verification-tokens';
 import { send2FADisabledEmail, send2FARecoverEmail } from '../lib/mailer';
 
 export const setup2FA = async (request: Request, response: Response): Promise<void> => {
-    const { userId, userEmail } = request.body;
+    const userId = request.session.user.id;
+    const userEmail = request.session.user.email;
+
     try {
         const { qrCodeUrl, secret } = await get2faSetup(userId, userEmail);
         response.status(200).json({ qrCodeUrl, secret });
@@ -24,7 +26,9 @@ export const setup2FA = async (request: Request, response: Response): Promise<vo
 }
 
 export const verify2FASetup = async (request: Request, response: Response): Promise<void> => {
-    const { userId, code } = request.body;
+    const userId = request.session.user.id;
+
+    const { code } = request.body;
     try {
         const twoStepSecret = await verify2faSetup(userId, code);
 
@@ -43,7 +47,8 @@ export const verify2FASetup = async (request: Request, response: Response): Prom
 };
 
 export const disable2FA = async (request: Request, response: Response): Promise<void> => {
-    const { userId, userEmail } = request.body;
+    const userId = request.session.user.id;
+
     try {
         await UserRepository.disable2FA(userId);
         response.status(204);
@@ -59,11 +64,13 @@ export const disable2FA = async (request: Request, response: Response): Promise<
 }
 
 export const recover2FA = async (request: Request, response: Response): Promise<void> => {
-    const { userId, userEmail } = request.body;
+    const { userEmail } = request.body;
+    
     try {
         const { token, tokenFingerprint, hashedToken } = await generateToken();
-        await save2FAToken(userId, tokenFingerprint, hashedToken);
-        await send2FARecoverEmail({verificationCode: token, expiresInMinutes: 1440, t: request.t});
+        const user = await UserRepository.getUserByEmail(userEmail); 
+        await save2FAToken(user.id, tokenFingerprint, hashedToken);
+        await send2FARecoverEmail({verificationCode: token, userEmail, expiresInMinutes: 1440, t: request.t});
         response.status(204);
     } catch (error) {
         if (error instanceof AppError) {
@@ -77,7 +84,7 @@ export const recover2FA = async (request: Request, response: Response): Promise<
 }
 
 export const confirm2FARecover = async (request: Request, response: Response): Promise<void> => {
-    const { token } = request.body;
+    const token = request.query.token as string;
     try {
         const { userId } = await VerificationTokensRepository.verify2FAToken(token);
         await UserRepository.disable2FA(userId);

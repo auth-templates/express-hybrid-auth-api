@@ -46,7 +46,7 @@ export async function sendAccountActivationEmail({t}:{t: (key: string, options?:
     await transporter.sendMail(options);
 }
 
-export async function send2FARecoverEmail({verificationCode, expiresInMinutes, t}:{verificationCode: string, expiresInMinutes: number, t: (key: string, options?: any) => string}) {
+export async function send2FARecoverEmail({verificationCode, userEmail, expiresInMinutes, t}:{verificationCode: string, userEmail: string, expiresInMinutes: number, t: (key: string, options?: any) => string}) {
     const emailHtml = await render(
         <TwoFactorAuthEmail 
             expiresInMinutes={expiresInMinutes}
