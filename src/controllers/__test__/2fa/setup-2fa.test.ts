@@ -7,7 +7,6 @@ import { UserRepository } from '../../../repositories/users';
 import * as Redis2FA from '../../../lib/redis/redis-2fa';
 
 jest.mock('../../../repositories/users');
-jest.mock('../../../lib/session');
 
 const app = express();
 app.use(i18nMiddleware);

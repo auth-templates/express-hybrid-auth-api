@@ -4,11 +4,8 @@ import { login } from '../../authController';
 import { AppError } from '../../../lib/error';
 import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
 import { UserRepository } from '../../../repositories/users';
-import * as Session from '../../../lib/session';
-import * as Cookie from '../../../lib/cookie';
 
 jest.mock('../../../repositories/users');
-jest.mock('../../../lib/session');
 
 const app = express();
 app.use(i18nMiddleware);
@@ -31,13 +28,6 @@ describe('POST /auth/login', () => {
 
     it('should return 200 and user data for valid credentials', async () => {
         (UserRepository.login as jest.Mock).mockResolvedValue(validUser);
-        jest.spyOn(Session, 'generateSessionToken').mockReturnValue('session-token');
-        jest.spyOn(Session, 'createSession').mockResolvedValue({ 
-            id: "session-id",  
-            userId: 1000,
-            expiresAt: new Date(Date.now() + 3600000)
-         });
-        jest.spyOn(Cookie, 'setSessionTokenCookie').mockReturnValue(undefined);
 
         const response = await request(app)
             .post('/auth/login')

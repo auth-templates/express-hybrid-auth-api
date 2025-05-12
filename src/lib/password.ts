@@ -7,14 +7,10 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 export async function verifyPasswordHash(hash: string, password: string): Promise<boolean> {
-    console.log("password:", await verify(hash, password))
 	return await verify(hash, password);
 }
 
-export async function verifyPasswordStrength(password: string): Promise<boolean> {
-	if (password.length < 8 || password.length > 255) {
-		return false;
-	}
+export async function isPasswordPwned(password: string): Promise<boolean> {
 	const hash = encodeHexLowerCase(sha256(new TextEncoder().encode(password)));
 	const hashPrefix = hash.slice(0, 5);
 	const response = await fetch(`https://api.pwnedpasswords.com/range/${hashPrefix}`);
