@@ -18,7 +18,7 @@ const port = 3000;
 
 app.use(session({
     store: new RedisStore({ client: redisClient }),
-    secret: process.env.SESSION_SECRET,
+    secret: GlobalConfig.SESSION_SECRET,
     resave: false,
     rolling: true, // This enables automatic touch
     saveUninitialized: false,

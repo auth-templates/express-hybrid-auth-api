@@ -3,7 +3,7 @@ import { hashPassword } from "../lib/password";
 import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
-import { Role, UserStatus } from '../models/user';
+import { Role, User, UserStatus } from '../models/user';
 import { sendAccountActivationEmail, sendVerificationEmail } from '../lib/mailer';
 import { generateToken } from '../lib/token';
 import { VerificationTokensRepository } from '../repositories/verification-tokens';
@@ -14,6 +14,7 @@ import jwt from 'jsonwebtoken';
 import { RedisController } from '../lib/redis/redis-controller';
 import GlobalConfig from '../config';
 import { randomBytes } from 'node:crypto'
+import { RefreshTokenStore } from '../lib/redis/redis-token';
 
 function createSecureRandomToken(): string {
   return randomBytes(48).toString('hex'); // 96-character hex string
@@ -100,9 +101,39 @@ export const signup = async (request: Request, response: Response): Promise<void
     }
 }
 
+
+function createAccessToken(data: {userId: number, pending2FA?: boolean}) {
+    return jwt.sign(
+        data,
+        GlobalConfig.ACCESS_TOKEN_SECRET,
+        { expiresIn: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
+    );
+}
+
+function setCookieTokens(response: Response, tokens: { name: string; value: string; maxAge: number }[]) {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    tokens.forEach(({ name, value, maxAge }) => {
+        response.cookie(name, value, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: 'strict',
+            maxAge
+        });
+    });
+}
+
+function setSessionData(request: Request, user: User) {
+    request.session.user = {
+        id: user.id,
+        email: user.email,
+    };
+    request.session.pending2FA = user.enabled2FA;
+}
+
 export const login = async (request: Request, response: Response): Promise<void> => {
     const { email, password } = request.body;
-
+    
     try {
         const issues = validateLoginData(request.body);
 
@@ -114,40 +145,20 @@ export const login = async (request: Request, response: Response): Promise<void>
         }
 
         const user = await UserRepository.login(email, password);
-        
-        request.session.user = {
-            id: user.id,
-            email: user.email
-        };
-        request.session.pending2FA = user.enabled2FA;
+        setSessionData(request, user);
 
         const refreshToken = createSecureRandomToken();
+        RefreshTokenStore.storeRefreshToken(user.id, refreshToken);
 
-        response.cookie('refresh_token', refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: GlobalConfig.SESSION_MAX_AGE / 1000
-        });
-        
-        await redisController.add(`refresh:${user.id}:${refreshToken}`, refreshToken, GlobalConfig.SESSION_MAX_AGE / 1000);
+        const newAccessToken = createAccessToken({ userId: user.id, pending2FA: user.enabled2FA })
 
-        const newAccessToken = jwt.sign(
-            { userId: user.id, pending2FA: user.enabled2FA },
-            GlobalConfig.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15m' }
-        );
-
-        response.cookie('access_token', newAccessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE
-        });
+        setCookieTokens(response, [
+            { name: 'refresh_token', value: refreshToken, maxAge: GlobalConfig.SESSION_MAX_AGE },
+            { name: 'access_token', value: newAccessToken, maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
+        ]);
 
         response.status(200).send(user);
     } catch (error) {
-        console.log(error);
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
               message: request.t(error.translationKey, error.params),
@@ -187,27 +198,20 @@ export const refresh = async (request: Request, response: Response): Promise<voi
     const userId = request.session.user.id;
     const pending2FA = request.session.pending2FA;
 
-    const stored = await redisController.get(`refresh:${ssid}:${refreshToken}`);
+    const stored = await RefreshTokenStore.getStoredRefreshToken(ssid, refreshToken);
 
     if ( !refreshToken || refreshToken !== stored ) {
         response.status(403).json({ message: 'Invalid refresh token' });
         return;
     }
 
-    await redisController.resetExpiration(`refresh:${userId}:${refreshToken}`, GlobalConfig.SESSION_MAX_AGE / 1000);
+    await RefreshTokenStore.resetRefreshTokenExpiration(userId, refreshToken);
 
-    const newAccessToken = jwt.sign(
-        { userId: userId, pending2FA: pending2FA },
-        GlobalConfig.ACCESS_TOKEN_SECRET,
-        { expiresIn: '15m' }
-    );
+    const newAccessToken = createAccessToken({ userId, pending2FA })
 
-    response.cookie('access_token', newAccessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE
-    });
+    setCookieTokens(response, [
+        { name: 'access_token', value: newAccessToken, maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
+    ]);
 
     response.status(204);
 }
