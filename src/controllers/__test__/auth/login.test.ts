@@ -48,7 +48,6 @@ const validUser2FA = {
     enabled2FA: true
 };
 
-
 describe('POST /auth/login', () => {
     beforeAll(async () => {
         await i18nReady;
@@ -76,6 +75,10 @@ describe('POST /auth/login', () => {
     });
 
     it('should set correct 2FA user jwt access token payload', async () => {
+        const fakeTime = new Date('2025-05-15T00:00:00Z');
+        jest.useFakeTimers({ legacyFakeTimers: false });
+        jest.setSystemTime(fakeTime);
+
         (UserRepository.login as jest.Mock).mockResolvedValue(validUser2FA);
         (RefreshTokenStore.storeRefreshToken as jest.Mock).mockResolvedValue(undefined);
         const response = await request(app)
@@ -99,8 +102,10 @@ describe('POST /auth/login', () => {
 
         expect(decoded).toHaveProperty('userId', 2);
         expect(decoded).toHaveProperty('pending2FA', true);
-        expect(decoded).toHaveProperty('exp');
-        expect(decoded).toHaveProperty('iat');
+        expect(decoded).toHaveProperty('exp', fakeTime.getTime()/1000 + GlobalConfig.ACCESS_TOKEN_MAX_AGE);
+        expect(decoded).toHaveProperty('iat', fakeTime.getTime()/1000);
+
+        jest.useRealTimers();
     });
 
     it('should return 200 and user data for valid credentials', async () => {

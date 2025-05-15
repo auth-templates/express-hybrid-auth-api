@@ -51,7 +51,7 @@ export const disable2FA = async (request: Request, response: Response): Promise<
 
     try {
         await UserRepository.disable2FA(userId);
-        response.status(204);
+        response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
@@ -71,7 +71,7 @@ export const recover2FA = async (request: Request, response: Response): Promise<
         const user = await UserRepository.getUserByEmail(userEmail); 
         await save2FAToken(user.id, tokenFingerprint, hashedToken);
         await send2FARecoverEmail({verificationCode: token, userEmail, expiresInMinutes: 1440, t: request.t});
-        response.status(204);
+        response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
             response.status(error.statusCode).json({

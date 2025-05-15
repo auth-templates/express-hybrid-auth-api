@@ -5,20 +5,14 @@ import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
 import { Role, User, UserStatus } from '../models/user';
 import { sendAccountActivationEmail, sendVerificationEmail } from '../lib/mailer';
-import { generateToken } from '../lib/token';
+import { createAccessToken, createSecureRandomToken, generateToken } from '../lib/token';
 import { VerificationTokensRepository } from '../repositories/verification-tokens';
 import { TokenType } from '../models/verification-token';
 import { validateLoginData } from '../lib/validation-schemas/login-schema';
 import { redisClient } from '../lib/redis/client';
-import jwt from 'jsonwebtoken';
 import { RedisController } from '../lib/redis/redis-controller';
 import GlobalConfig from '../config';
-import { randomBytes } from 'node:crypto'
 import { RefreshTokenStore } from '../lib/redis/redis-token';
-
-function createSecureRandomToken(): string {
-  return randomBytes(48).toString('hex'); // 96-character hex string
-}
 
 const redisController = new RedisController(redisClient);
 
@@ -101,15 +95,6 @@ export const signup = async (request: Request, response: Response): Promise<void
     }
 }
 
-
-function createAccessToken(data: {userId: number, pending2FA?: boolean}) {
-    return jwt.sign(
-        data,
-        GlobalConfig.ACCESS_TOKEN_SECRET,
-        { expiresIn: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
-    );
-}
-
 function setCookieTokens(response: Response, tokens: { name: string; value: string; maxAge: number }[]) {
     const isProduction = process.env.NODE_ENV === 'production';
 
@@ -170,17 +155,16 @@ export const login = async (request: Request, response: Response): Promise<void>
 };
 
 export const logout = async (request: Request, response: Response): Promise<void> => {
-    const userId = request.session.user.id;
-    const refreshToken = request.cookies.refreshToken;
+    const userId = request.session?.user?.id;
+    const refreshToken = request.cookies?.refreshToken;
     try {
-        await redisController.remove(`refresh:${userId}:${refreshToken}`);
+        await RefreshTokenStore.removeRefreshToken(userId, refreshToken);
 
         request.session.destroy((err) => {
             response.clearCookie('ssid');
             response.clearCookie('refresh_token');
+            response.status(204).end();
         });
-
-        response.status(204);
     } catch (error) {
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
@@ -193,25 +177,32 @@ export const logout = async (request: Request, response: Response): Promise<void
 }
 
 export const refresh = async (request: Request, response: Response): Promise<void> => {
-    const refreshToken = request.cookies.refreshToken;
-    const ssid = request.cookies.ssid;
-    const userId = request.session.user.id;
-    const pending2FA = request.session.pending2FA;
+    const refreshToken = request.cookies?.refreshToken;
+    const ssid = request.cookies?.ssid;
+    const userId = request.session?.user?.id;
+    const pending2FA = request.session?.pending2FA;
+    try {
+        const stored = await RefreshTokenStore.getStoredRefreshToken(ssid, refreshToken);
+        if ( !refreshToken || refreshToken !== stored ) {
+            response.status(403).json({ message: 'Invalid refresh token' });
+            return;
+        }
+     
+        await RefreshTokenStore.resetRefreshTokenExpiration(userId, refreshToken);
 
-    const stored = await RefreshTokenStore.getStoredRefreshToken(ssid, refreshToken);
+        const newAccessToken = createAccessToken({ userId, pending2FA })
 
-    if ( !refreshToken || refreshToken !== stored ) {
-        response.status(403).json({ message: 'Invalid refresh token' });
-        return;
+        setCookieTokens(response, [
+            { name: 'access_token', value: newAccessToken, maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
+        ]);
+        response.status(204).end();
+    } catch (error) {
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json({
+                message: request.t(error.translationKey, error.params),
+            });
+            return
+        }
+        response.status(500).json({ message: request.t('errors.internal') });
     }
-
-    await RefreshTokenStore.resetRefreshTokenExpiration(userId, refreshToken);
-
-    const newAccessToken = createAccessToken({ userId, pending2FA })
-
-    setCookieTokens(response, [
-        { name: 'access_token', value: newAccessToken, maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
-    ]);
-
-    response.status(204);
 }
