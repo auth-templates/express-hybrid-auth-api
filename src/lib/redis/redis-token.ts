@@ -16,4 +16,8 @@ export class RefreshTokenStore {
     static async resetRefreshTokenExpiration(userId: number, refreshToken: string): Promise<void> {
         await redisController.resetExpiration(`refresh:${userId}:${refreshToken}`, GlobalConfig.SESSION_MAX_AGE);
     }
+
+    static async removeRefreshToken(userId: number, refreshToken: string): Promise<void> {
+        await redisController.remove(`refresh:${userId}:${refreshToken}`);
+    }
 }
