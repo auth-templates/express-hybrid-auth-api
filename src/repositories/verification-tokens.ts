@@ -23,7 +23,6 @@ export class VerificationTokensRepository {
                 } as Prisma.verification_tokensCreateInput
             });
       } catch (error) {
-        console.log(error);
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === PrismaErrorCode.UniqueConstraintFailed) {
             const field = (error.meta?.target as string[])[0];
@@ -76,7 +75,6 @@ export class VerificationTokensRepository {
 
             return { userId: tokenRecord.user_id };
         } catch (error) {
-            console.log(error);
             if (error instanceof AppError) {
                 throw error;
             }
@@ -127,7 +125,6 @@ export class VerificationTokensRepository {
 
             return { userId: tokenRecord.user_id };
         } catch (error) {
-            console.log(error);
             if (error instanceof AppError) {
                 throw error;
             }

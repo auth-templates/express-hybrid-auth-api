@@ -48,7 +48,6 @@ export const verifySignup = async (request: Request, response: Response): Promis
         await sendAccountActivationEmail({t: request.t});
         response.status(204).send();
     } catch (error) {
-            console.log(error);
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
               message: request.t(error.translationKey, error.params),
@@ -84,7 +83,6 @@ export const signup = async (request: Request, response: Response): Promise<void
         await sendVerificationEmail({token, t: request.t});
         response.status(204).send();
     } catch ( error ) {
-        console.log(error);
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
               message: request.t(error.translationKey, error.params),
@@ -161,7 +159,8 @@ export const logout = async (request: Request, response: Response): Promise<void
         await RefreshTokenStore.removeRefreshToken(userId, refreshToken);
 
         request.session.destroy((err) => {
-            response.clearCookie('ssid');
+            response.clearCookie('connect.sid');
+            response.clearCookie('access_token');
             response.clearCookie('refresh_token');
             response.status(204).end();
         });
@@ -178,11 +177,10 @@ export const logout = async (request: Request, response: Response): Promise<void
 
 export const refresh = async (request: Request, response: Response): Promise<void> => {
     const refreshToken = request.cookies?.refreshToken;
-    const ssid = request.cookies?.ssid;
     const userId = request.session?.user?.id;
     const pending2FA = request.session?.pending2FA;
     try {
-        const stored = await RefreshTokenStore.getStoredRefreshToken(ssid, refreshToken);
+        const stored = await RefreshTokenStore.getStoredRefreshToken(userId, refreshToken);
         if ( !refreshToken || refreshToken !== stored ) {
             response.status(403).json({ message: 'Invalid refresh token' });
             return;

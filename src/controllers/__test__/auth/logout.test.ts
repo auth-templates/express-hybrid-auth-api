@@ -54,10 +54,20 @@ describe('POST /auth/logout', () => {
         // Setup session dynamically
         await agent.post('/test/session').send(userSession);
 
-        const response = await agent.post('/auth/logout').set('Cookie', `refreshToken=${refreshToken}; ssid=session-id`)
+        const response = await agent.post('/auth/logout').set('Cookie', `refreshToken=${refreshToken}; connect.sid=session-id`)
 
         expect(RefreshTokenStore.removeRefreshToken).toHaveBeenCalledWith(userSession.user.id, refreshToken);
         expect(response.status).toBe(204);
+
+        const cookies = response.headers['set-cookie'] as unknown as string[];
+        expect(cookies).toBeDefined();
+        expect(cookies.length).toBeGreaterThanOrEqual(3);
+
+        const cookieString = cookies.join(';');
+
+        expect(cookieString).toContain('refresh_token=;');
+        expect(cookieString).toContain('access_token=;');
+        expect(cookieString).toContain('connect.sid=;');
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
@@ -70,7 +80,7 @@ describe('POST /auth/logout', () => {
             .post('/test/session')
             .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
 
-        const response = await agent.post('/auth/logout').set('Cookie', `refreshToken=token; ssid=session-id`)
+        const response = await agent.post('/auth/logout').set('Cookie', `refreshToken=token; connect.sid=session-id`)
 
         expect(response.status).toBe(500);
         expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');

@@ -61,9 +61,9 @@ describe('POST /auth/refresh', () => {
             .post('/test/session')
             .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
 
-        const response = await request(app).post('/auth/refresh').set('Cookie', 'refreshToken=bad-token; ssid=session-id')
+        const response = await agent.post('/auth/refresh').set('Cookie', 'refreshToken=bad-token; connect.sid=session-id')
 
-        expect(RefreshTokenStore.getStoredRefreshToken).toHaveBeenCalledWith('session-id', 'bad-token');
+        expect(RefreshTokenStore.getStoredRefreshToken).toHaveBeenCalledWith(1, 'bad-token');
         expect(response.status).toBe(403);
         expect(response.body).toEqual({ message: 'Invalid refresh token' });
     });
@@ -78,7 +78,7 @@ describe('POST /auth/refresh', () => {
             .post('/test/session')
             .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
 
-        const response = await request(app).post('/auth/refresh').set('Cookie', 'refreshToken=bad-token; ssid=session-id')
+        const response = await agent.post('/auth/refresh').set('Cookie', 'refreshToken=bad-token; connect.sid=session-id')
 
         expect(response.status).toBe(500);
         expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
@@ -100,7 +100,7 @@ describe('POST /auth/refresh', () => {
         // Setup session dynamically
         await agent.post('/test/session').send(userSession);
 
-        const response = await agent.post('/auth/refresh').set('Cookie', `refreshToken=${validToken}; ssid=session-id`);
+        const response = await agent.post('/auth/refresh').set('Cookie', `refreshToken=${validToken}; connect.sid=session-id`);
         expect(response.status).toBe(204);
 
         expect(RefreshTokenStore.resetRefreshTokenExpiration).toHaveBeenCalledWith(userSession.user.id, validToken);
@@ -139,7 +139,7 @@ describe('POST /auth/refresh', () => {
         // Setup session dynamically
         await agent.post('/test/session').send(userSession);
 
-        const response = await agent.post('/auth/refresh').set('Cookie', "refreshToken=good-token; ssid=session-id");
+        const response = await agent.post('/auth/refresh').set('Cookie', "refreshToken=good-token; connect.sid=session-id");
         expect(response.status).toBe(204);
 
 

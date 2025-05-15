@@ -9,8 +9,8 @@ export class RefreshTokenStore {
         await redisController.add(`refresh:${userId}:${refreshToken}`, refreshToken, GlobalConfig.SESSION_MAX_AGE);
     }
 
-    static async getStoredRefreshToken(ssid: string, refreshToken: string): Promise<string> {    
-        return await redisController.get(`refresh:${ssid}:${refreshToken}`);
+    static async getStoredRefreshToken(userId: number, refreshToken: string): Promise<string> {    
+        return await redisController.get(`refresh:${userId}:${refreshToken}`);
     }
 
     static async resetRefreshTokenExpiration(userId: number, refreshToken: string): Promise<void> {

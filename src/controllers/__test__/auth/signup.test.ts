@@ -76,7 +76,6 @@ describe('POST /signup', () => {
             password: "$Suuuuup"
         });
 
-        console.log("response.body", response.body);
         expect(response.status).toBe(400);
         expect(response.body).toStrictEqual(['Password must contain at least one digit']);
     });
@@ -87,7 +86,6 @@ describe('POST /signup', () => {
             password: "%Supdasdasdasdasdasdasdassssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssdasdasdasdasdasdasdasd123",
         });
 
-        console.log("response.body", response.body);
         expect(response.status).toBe(400);
         expect(response.body).toStrictEqual(['Password must be at most 100 characters']);
     });
