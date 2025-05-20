@@ -4,8 +4,8 @@ import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
 import session from 'express-session';
 import GlobalConfig from '../../../config';
 import cookieParser from 'cookie-parser';
-import { setup2FA } from '../../2faController';
-import * as Redis2FA from '../../../lib/redis/redis-2fa';
+import { disable2FA } from '../../2faController';
+import { UserRepository } from '../../../repositories/users';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -32,47 +32,43 @@ app.post('/test/session', (req, res) => {
     res.status(200).end();
 });
 
-app.post('/2fa/setup', setup2FA);
+app.post('/2fa/disable', disable2FA);
 
-const twoFASetupData = {    
-    qrCodeUrl: "otpauth://totp/MyApp:username@example.com?secret=ABCDEF123456&issuer=MyApp",
-    secret: "ABCDEF123456"
-}
-
-describe('POST /2fa/setup', () => {
+describe('POST /2fa/disable', () => {
     beforeAll(async () => {
         await i18nReady;
     });
 
-    it('should return 200 with 2FA setup data', async () => {
-        jest.spyOn(Redis2FA, 'get2faSetup').mockResolvedValue(twoFASetupData);
+    it('should return 204 when 2FA is successfully disabled', async () => {
+        (UserRepository.disable2FA as jest.Mock).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
+        await agent.get('/test-login');
 
         const sessionData = { user: { id: 1, email: 'test@example.com' } };
         // Setup session dynamically
         await agent.post('/test/session').send(sessionData);
 
-        const response = await agent.post('/2fa/setup').set('Cookie', 'refreshToken=token; accessToken=accesss_token; connect.sid=session-id')
+        const response = await agent.post('/2fa/disable').set('Cookie', 'refreshToken=token; accessToken=access_token; connect.sid=session-id')
     
-        expect(Redis2FA.get2faSetup).toHaveBeenCalledWith(sessionData.user.id, sessionData.user.email);
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual(twoFASetupData);
+        expect(response.status).toBe(204);
+        expect(UserRepository.disable2FA).toHaveBeenCalledWith(sessionData.user.id);
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        jest.spyOn(Redis2FA, 'get2faSetup').mockRejectedValue(new Error('internal error'));
+        (UserRepository.disable2FA as jest.Mock).mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
-
-        // Setup session dynamically
+        await agent.get('/test-login');
+ 
+         // Setup session dynamically
         await agent
-            .post('/test/session')
-            .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
-
-        const response = await agent.post('/2fa/setup').set('Cookie', 'refreshToken=token; accessToken=accesss_token; connect.sid=session-id')
-
+             .post('/test/session')
+             .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
+ 
+        const response = await agent.post('/2fa/disable').set('Cookie', 'refreshToken=token; accessToken=accesss_token; connect.sid=session-id')
+ 
         expect(response.status).toBe(500);
         expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
     });
-})
+});

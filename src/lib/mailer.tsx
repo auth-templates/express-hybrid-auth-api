@@ -16,14 +16,18 @@ export const transporter = nodemailer.createTransport({
 //   },
 });
 
-export async function sendVerificationEmail({token, t}:{token: string, t: (key: string, options?: any) => string}) {
+export async function sendVerificationEmail({token, userEmail, expiresInMinutes, t}:{token: string, userEmail: string, expiresInMinutes: number, t: (key: string, options?: any) => string}) {
     const emailHtml = await render(
-        <VerificationEmail verificationUrl={`https://yourdomain.com/verify?token=${token}`} t={t}/>
+        <VerificationEmail 
+            verificationUrl={`https://yourdomain.com/verify?token=${token}`}
+            expiresInMinutes={expiresInMinutes} 
+            t={t}
+        />
     );
 
     const options = {
         from: 'you@example.com',
-        to: 'user@gmail.com',
+        to: userEmail,
         subject: 'Email verification',
         html: emailHtml,
     };

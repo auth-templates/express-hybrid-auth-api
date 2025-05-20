@@ -3,8 +3,11 @@
     "errors": {
         "internal": "An unexpected error occurred. Please try again later or contact support.",
         "is_already_in_use": "{{item}} is already in use",
-        "invalid_credentials": "Invalid email or password. Please try again."
-    },
+        "invalid_credentials": "Invalid email or password. Please try again.",
+        "invalid_2fa_code": "The 2FA code must be a 6-digit number.",
+        "user_email_not_found": "No user found with the provided email address.",
+        "user_not_found": "User not found.",
+        "2fa_recovery_not_allowed": "Two-step verification recovery could not be initiated. Please contact support if the issue persists."    },
     "validation": {
         "firstname": {
             "min_one": "First name must be at least {{count}} character",
@@ -29,6 +32,10 @@
             "special": "Password must contain at least one special character"
         }
     },
+    "2fa": {
+        "setup_verified": "Two-factor authentication has been successfully verified.",
+        "setup_verification_failed": "Failed to verify two-factor authentication. Please try again."
+    },
     "tokens" : {
         "signup": {
             "expired": "Your verification link has expired. Please request a new one to continue.",
@@ -36,9 +43,9 @@
             "invalid": "The verification link is invalid or no longer available. Please check the link or request a new one."
         },
         "2fa": {
-            "expired": "Your 2FA recovery link has expired. Please start the recovery process again to regain access to your account.",
-            "used": "This 2FA recovery link has already been used. If you still need access, request a new recovery link.",
-            "invalid": "The 2FA recovery link is invalid or no longer available. Please request a new link to recover your account."
+            "expired": "Your two-step verification recovery link has expired. Please start the recovery process again to regain access to your account.",
+            "used": "This two-step verification recovery link has already been used. If you still need access, request a new recovery link.",
+            "invalid": "The two-step verification recovery link is invalid or no longer available. Please request a new link to recover your account."
         }
     },
     "emails": {
@@ -50,8 +57,8 @@
             "recommendation": "If you did not perform this action, we strongly recommend securing your account immediately.",
             "warning": "You are no longer protected by 2FA. Re-enabling it is recommended for your security.",
             "footer": {
-            "supportPrompt": "Need help?",
-            "supportLink": "Contact support"
+                "supportPrompt": "Need help?",
+                "supportLink": "Contact support"
             }
         },
         "2fa-code-email": {
@@ -191,6 +198,7 @@
             "message1": "Thank you for signing up! To complete your registration, please confirm your email address by clicking the button below.",
             "ctaButton": "Confirm Email",
             "message2": "If the button doesn’t work, you can also copy and paste this URL into your browser:",
+            "expirationNotice": "This verification link will expire in {{minutes}} minutes.",
             "securityTip": "If you didn’t create an account, you can safely ignore this email.",
             "footer": "This message was sent by Your Company, 123 Example St., City, Country.",
             "privacyLink": "privacy policy"

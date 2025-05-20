@@ -133,7 +133,7 @@ describe('POST /auth/login', () => {
             });
 
         expect(response.status).toBe(400);
-        expect(response.body[0]).toMatch("Invalid email address");
+        expect(response.body[0]).toEqual({message: "Invalid email address"});
     });
 
     it('should return 400 for missing fields', async () => {
@@ -143,7 +143,7 @@ describe('POST /auth/login', () => {
             .send({});
 
         expect(response.status).toBe(400);
-        expect(response.body[0]).toMatch("Invalid email or password. Please try again.");
+        expect(response.body[0]).toEqual({message: "Invalid email or password. Please try again."});
     });
 
     it('should return 400 for invalid credentials (wrong password but valid)', async () => {
@@ -160,7 +160,7 @@ describe('POST /auth/login', () => {
             });
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toMatch("Invalid email or password. Please try again.");
+        expect(response.body).toEqual({message: "Invalid email or password. Please try again."});
     });
 
     it('should return 500 for internal errors', async () => {
@@ -175,6 +175,6 @@ describe('POST /auth/login', () => {
             });
 
         expect(response.status).toBe(500);
-        expect(response.body.message).toMatch("An unexpected error occurred. Please try again later or contact support.");
+        expect(response.body).toEqual({message:"An unexpected error occurred. Please try again later or contact support."});
     });
 })

@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { CreateUserInput } from '../../models/user';
+import { UserCredentials } from '../../models/user';
 import { ValidationIssue } from './validation-issue';
 import { passwordValidationSchema } from './signup-schema';
 
@@ -10,7 +10,7 @@ export const createLoginSchema = () => {
   });
 };
 
-export const validateLoginData = (data: CreateUserInput): ValidationIssue[] => {
+export const validateLoginData = (data: UserCredentials): ValidationIssue[] => {
     try {
         v.parse(createLoginSchema(), data);
         return [];   

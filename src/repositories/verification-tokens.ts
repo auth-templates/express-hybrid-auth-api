@@ -24,9 +24,8 @@ export class VerificationTokensRepository {
             });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === PrismaErrorCode.UniqueConstraintFailed) {
-            const field = (error.meta?.target as string[])[0];
-            throw new AppError('errors.is_already_in_use', { item: field }, 409);
+          if (error.code === PrismaErrorCode.RecordNotFound) {
+            throw new AppError('errors.user_not_found', {}, 404);
           }
         }
         throw new AppError('errors.internal', {}, 500);

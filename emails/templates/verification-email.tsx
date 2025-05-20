@@ -15,6 +15,7 @@ import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface EmailVerificationProps {
     verificationUrl: string;
+    expiresInMinutes: number;
     t: (key: string, options?: any) => string;
 }
 
@@ -24,6 +25,7 @@ const baseUrl = process.env.VERCEL_URL
     
 export default function EmailVerification({
     verificationUrl,
+    expiresInMinutes,
     t
 }: EmailVerificationProps) {
     return (
@@ -56,6 +58,9 @@ export default function EmailVerification({
                             <Text style={mainText}>
                                 {t('emails.verification.message2')}
                             </Text>
+                            <Text style={mainText}>
+                                {t('emails.verification.expirationNotice', { minutes: expiresInMinutes })}
+                            </Text>
                             <Text style={linkText}>{verificationUrl}</Text>
                         </Section>
                         <Hr />
@@ -81,6 +86,7 @@ export default function EmailVerification({
 EmailVerification.PreviewProps = {
     verificationUrl: 'https://example.com/verify?token=abc123',
     t: getEmailTranslator('en'),
+    expiresInMinutes: 30
 } satisfies EmailVerificationProps;
 
 const main = {

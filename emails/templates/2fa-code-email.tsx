@@ -81,7 +81,7 @@ export default function TwoFactorAuthEmail({
 
 TwoFactorAuthEmail.PreviewProps = {
     verificationCode: '123456',
-    expiresInMinutes: 10,
+    expiresInMinutes: 30,
     t: getEmailTranslator('en'),
 } satisfies TwoFactorAuthEmailProps;
 

@@ -16,7 +16,9 @@ const GlobalConfig = {
     SESSION_SECRET: process.env.SESSION_SECRET,
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
     SESSION_MAX_AGE: parseInt(process.env.SESSION_MAX_AGE),
-    ACCESS_TOKEN_MAX_AGE: parseInt(process.env.ACCESS_TOKEN_MAX_AGE)
+    ACCESS_TOKEN_MAX_AGE: parseInt(process.env.ACCESS_TOKEN_MAX_AGE),
+    TWOFA_RECOVERY_TOKEN_MAX_AGE: parseInt(process.env.TWOFA_RECOVERY_TOKEN_MAX_AGE),
+    PASSWORD_RECOVERY_TOKEN_MAX_AGE: parseInt(process.env.PASSWORD_RECOVERY_TOKEN_MAX_AGE)
 }
 
 export default GlobalConfig;

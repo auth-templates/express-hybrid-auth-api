@@ -20,7 +20,7 @@ export async function generateToken() {
     const token = generateRandomString(random, alphabet, 64);
     const tokenFingerprint = createTokenFingerprint(token);
     const hashedToken = await hash(token);
-
+    
     return { token, tokenFingerprint, hashedToken };
 }
 

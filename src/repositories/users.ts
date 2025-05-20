@@ -149,7 +149,7 @@ export class UserRepository {
             });
             
             if ( !userRecord ) {
-                throw new AppError('errors.user_not_found', {}, 400);
+                throw new AppError('errors.user_email_not_found', {}, 404);
             }
 
             const user: User = {
@@ -164,6 +164,7 @@ export class UserRepository {
 
             return user;
         } catch (error) {
+            console.log("error");
             if ( error instanceof AppError ) {
                 throw error
             }
@@ -192,7 +193,6 @@ export class UserRepository {
                 data: { twofa_secret: null },
             });
         } catch (error) {
-            console.log(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
