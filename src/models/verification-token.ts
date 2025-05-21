@@ -1,3 +1,5 @@
+import { resetPassword } from "../controllers/authController";
+
 export interface VerificationToken {
     id: number,
     userId: number,
@@ -10,5 +12,6 @@ export interface VerificationToken {
 
 export enum TokenType {
     SignUp = 'signup',
-    TwoFA = 'twofa'
+    TwoFA = 'twofa',
+    ResetPassword = 'reset_password'
 }

@@ -24,8 +24,8 @@ const baseUrl = process.env.VERCEL_URL
     : '';
 
 export default function TwoFactorAuthEmail({
-    verificationCode = '123456',
-    expiresInMinutes = 10,
+    verificationCode,
+    expiresInMinutes,
     t
 }: TwoFactorAuthEmailProps) {
     return (

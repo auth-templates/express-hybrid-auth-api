@@ -7,7 +7,9 @@
         "invalid_2fa_code": "The 2FA code must be a 6-digit number.",
         "user_email_not_found": "No user found with the provided email address.",
         "user_not_found": "User not found.",
-        "2fa_recovery_not_allowed": "Two-step verification recovery could not be initiated. Please contact support if the issue persists."    },
+        "2fa_recovery_not_allowed": "Two-step verification recovery could not be initiated. Please contact support if the issue persists.",
+        "password_reset_not_allowed": "Password reset could not be initiated. Please contact support if the issue persists."
+    },
     "validation": {
         "firstname": {
             "min_one": "First name must be at least {{count}} character",
@@ -184,6 +186,7 @@
             "preview": "Reset your password",
             "logoAlt": "Company Logo",
             "heading": "Reset your password",
+            "instruction": "The password reset link is valid for {{expiresInMinutes}} minutes.",
             "message1": "We received a request to reset the password for your account. If you made this request, click the button below to reset your password.",
             "ctaButton": "Reset Password",
             "message2": "If you didn’t request a password reset, you can ignore this email. Your password will remain unchanged.",

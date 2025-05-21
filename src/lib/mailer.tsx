@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer';
 import AccountActivationEmail from '../../emails/templates/account-activation-email';
 import TwoFactorAuthEmail from '../../emails/templates/2fa-code-email';
 import TwoFactorDisabledEmail from '../../emails/templates/2fa-disabled-email';
+import PasswordResetEmail from '../../emails/templates/password-reset-email';
 
 export const transporter = nodemailer.createTransport({
   host: 'localhost',
@@ -69,7 +70,6 @@ export async function send2FARecoverEmail({verificationCode, userEmail, expiresI
     await transporter.sendMail(options);
 }
 
-
 export async function send2FADisabledEmail({t}:{t: (key: string, options?: any) => string}) {
     const emailHtml = await render(
         <TwoFactorDisabledEmail
@@ -80,6 +80,25 @@ export async function send2FADisabledEmail({t}:{t: (key: string, options?: any) 
     const options = {
         from: 'you@example.com',
         to: 'user@gmail.com',
+        subject: 'Account activated',
+        html: emailHtml,
+    };
+    
+    await transporter.sendMail(options);
+}
+
+export async function sendPasswordResetEmail({t, userEmail, expiresInMinutes, verificationCode}:{t: (key: string, options?: any) => string, userEmail: string, expiresInMinutes: number, verificationCode: string}) {
+    const emailHtml = await render(
+        <PasswordResetEmail
+            resetUrl={`url?token=${verificationCode}`}
+            expiresInMinutes={expiresInMinutes}
+            t={t}
+        />
+    );
+
+    const options = {
+        from: 'you@example.com',
+        to: userEmail,
         subject: 'Account activated',
         html: emailHtml,
     };

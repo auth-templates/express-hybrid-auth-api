@@ -7,7 +7,8 @@
         "invalid_2fa_code": "Codul 2FA trebuie să fie un număr din 6 cifre.",
         "user_email_not_found": "Nu a fost găsit niciun utilizator cu adresa de email furnizată.",
         "user_not_found": "Utilizatorul nu a fost găsit.",
-        "2fa_recovery_not_allowed": "Recuperarea verificării în doi pași nu a putut fi inițiată. Contactați suportul dacă problema persistă."
+        "2fa_recovery_not_allowed": "Recuperarea verificării în doi pași nu a putut fi inițiată. Contactați suportul dacă problema persistă.",
+        "password_reset_not_allowed": "Resetarea parolei nu a putut fi inițiată. Te rugăm să contactezi suportul dacă problema persistă."
     },
     "validation": {
         "firstname": {
@@ -185,6 +186,7 @@
             "preview": "Resetează-ți parola",
             "logoAlt": "Sigla companiei",
             "heading": "Resetează-ți parola",
+            "instruction": "Linkul pentru resetarea parolei este valabil timp de {{expiresInMinutes}} minute.",
             "message1": "Am primit o solicitare de resetare a parolei contului tău. Dacă tu ai făcut această solicitare, apasă butonul de mai jos pentru a-ți reseta parola.",
             "ctaButton": "Resetează parola",
             "message2": "Dacă nu ai solicitat o resetare a parolei, poți ignora acest e-mail. Parola ta va rămâne neschimbată.",

@@ -14,6 +14,7 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface PasswordResetEmailProps {
+    expiresInMinutes?: number;
     resetUrl?: string;
     t: (key: string, options?: any) => string;
 }
@@ -23,6 +24,7 @@ const baseUrl = process.env.VERCEL_URL
     : '';
     
 export default function PasswordResetEmail({
+    expiresInMinutes,
     resetUrl,
     t
 }: PasswordResetEmailProps) {
@@ -45,6 +47,9 @@ export default function PasswordResetEmail({
                             <Heading style={h1}>
                                 {t('emails.password-reset-email.heading')}
                             </Heading>
+                            <Text style={mainText}>
+                                {t('emails.password-reset-email.instruction', { expiresInMinutes })}
+                            </Text>
                             <Text style={mainText}>
                                 {t('emails.password-reset-email.message1')}
                             </Text>
@@ -81,6 +86,7 @@ export default function PasswordResetEmail({
     
 
 PasswordResetEmail.PreviewProps = {
+    expiresInMinutes: 30,
     resetUrl: 'https://example.com/reset-password?token=abc123',
     t: getEmailTranslator('en'),
 } satisfies PasswordResetEmailProps;

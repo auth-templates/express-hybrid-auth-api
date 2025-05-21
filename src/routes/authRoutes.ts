@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { login, logout, signup, verifySignup, refresh } from '../controllers/authController';
+import { login, logout, signup, verifySignup, refresh, resetPassword } from '../controllers/authController';
 import { authenticate } from '../middlewares/authenticate';
 
 const router = express.Router();
@@ -149,6 +149,80 @@ router.post('/login', login);
 */
 router.post('/logout', authenticate, logout);
 
+/**
+ * @swagger
+ * /auth/refresh:
+ *   post:
+ *     summary: Refresh Access Token
+ *     description: Refreshes the access token using a valid refresh token stored in cookies. Requires authentication.
+ *     responses:
+ *       204:
+ *         description: Access token refreshed successfully. No content returned.
+ *       403:
+ *         description: Invalid or missing refresh token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid refresh token
+ *       500:
+ *         description: Server error during token refresh.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
 router.post('/refresh', authenticate, refresh);
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Initiate Password Reset
+ *     description: Sends a password reset email to the given email address. Always responds with 204 to avoid revealing user existence.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userEmail
+ *             properties:
+ *               userEmail:
+ *                 type: string
+ *                 example: user@example.com
+ *     responses:
+ *       204:
+ *         description: Password reset email sent if user exists and is active.
+ *       200:
+ *         description: Password reset not allowed (e.g., user inactive). Response used to avoid user enumeration.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password reset not allowed
+ *       500:
+ *         description: Server error during password reset.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.post('/reset-password', resetPassword);
 
 export default router;

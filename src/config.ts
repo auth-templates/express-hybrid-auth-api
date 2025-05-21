@@ -18,7 +18,8 @@ const GlobalConfig = {
     SESSION_MAX_AGE: parseInt(process.env.SESSION_MAX_AGE),
     ACCESS_TOKEN_MAX_AGE: parseInt(process.env.ACCESS_TOKEN_MAX_AGE),
     TWOFA_RECOVERY_TOKEN_MAX_AGE: parseInt(process.env.TWOFA_RECOVERY_TOKEN_MAX_AGE),
-    PASSWORD_RECOVERY_TOKEN_MAX_AGE: parseInt(process.env.PASSWORD_RECOVERY_TOKEN_MAX_AGE)
+    SIGNUP_TOKEN_MAX_AGE: parseInt(process.env.SIGNUP_TOKEN_MAX_AGE),
+    PASSWORD_RESET_TOKEN_MAX_AGE: parseInt(process.env.PASSWORD_RESET_TOKEN_MAX_AGE),
 }
 
 export default GlobalConfig;

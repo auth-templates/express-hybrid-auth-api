@@ -4,13 +4,25 @@ import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
 import { Role, User, UserStatus } from '../models/user';
-import { sendAccountActivationEmail, sendVerificationEmail } from '../lib/mailer';
+import { sendAccountActivationEmail, sendPasswordResetEmail, sendVerificationEmail } from '../lib/mailer';
 import { createAccessToken, createSecureRandomToken, generateToken } from '../lib/token';
 import { VerificationTokensRepository } from '../repositories/verification-tokens';
 import { TokenType } from '../models/verification-token';
 import { validateLoginData } from '../lib/validation-schemas/login-schema';
 import GlobalConfig from '../config';
 import { RefreshTokenStore } from '../lib/redis/redis-token';
+
+export async function savePassswordResetToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + expiresInMinutes);
+    await VerificationTokensRepository.createToken({
+        userId: userId,
+        tokenHash: hashedToken,
+        tokenFingerprint: tokenFingerprint,
+        type: TokenType.ResetPassword,
+        expiresAt: expiresAt
+    })
+}
 
 export async function saveSignupToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
@@ -62,7 +74,7 @@ export const signup = async (request: Request, response: Response): Promise<void
             passwordHash: await hashPassword(password),
             role: role as Role
         });
-        const expiresInMinutes = GlobalConfig.PASSWORD_RECOVERY_TOKEN_MAX_AGE / 1000 / 60;
+        const expiresInMinutes = GlobalConfig.SIGNUP_TOKEN_MAX_AGE / 1000 / 60;
         const {token, tokenFingerprint, hashedToken} = await generateToken();
         await saveSignupToken(id, tokenFingerprint, hashedToken, expiresInMinutes);
         await sendVerificationEmail({token, userEmail: email, expiresInMinutes, t: request.t});
@@ -178,6 +190,32 @@ export const refresh = async (request: Request, response: Response): Promise<voi
         setCookieTokens(response, [
             { name: 'access_token', value: newAccessToken, maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
         ]);
+        response.status(204).end();
+    } catch (error) {
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json({
+                message: request.t(error.translationKey, error.params),
+            });
+            return
+        }
+        response.status(500).json({ message: request.t('errors.internal') });
+    }
+}
+
+export const resetPassword = async (request: Request, response: Response): Promise<void> => {
+    const { userEmail } = request.body;
+    
+    try {
+        const { token, tokenFingerprint, hashedToken } = await generateToken();
+        const user = await UserRepository.getUserByEmail(userEmail); 
+
+        if( user.status !== UserStatus.Active ) {
+            throw new AppError('errors.password_reset_not_allowed', {}, 200) // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
+        }
+
+        const expiresInMinutes = GlobalConfig.PASSWORD_RESET_TOKEN_MAX_AGE / 1000 / 60;
+        await savePassswordResetToken(user.id, tokenFingerprint, hashedToken, expiresInMinutes);
+        await sendPasswordResetEmail({verificationCode: token, userEmail, expiresInMinutes, t: request.t});
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
