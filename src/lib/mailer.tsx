@@ -105,3 +105,20 @@ export async function sendPasswordResetEmail({t, userEmail, expiresInMinutes, ve
     
     await transporter.sendMail(options);
 }
+
+export async function sendPasswordChangedEmail({t, userEmail}:{t: (key: string, options?: any) => string, userEmail: string}) {
+    const emailHtml = await render(
+        <PasswordResetEmail
+            t={t}
+        />
+    );
+
+    const options = {
+        from: 'you@example.com',
+        to: userEmail,
+        subject: 'Account activated',
+        html: emailHtml,
+    };
+    
+    await transporter.sendMail(options);
+}

@@ -4,13 +4,14 @@ import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
 import { Role, User, UserStatus } from '../models/user';
-import { sendAccountActivationEmail, sendPasswordResetEmail, sendVerificationEmail } from '../lib/mailer';
+import { sendAccountActivationEmail, sendPasswordChangedEmail, sendPasswordResetEmail, sendVerificationEmail } from '../lib/mailer';
 import { createAccessToken, createSecureRandomToken, generateToken } from '../lib/token';
 import { VerificationTokensRepository } from '../repositories/verification-tokens';
 import { TokenType } from '../models/verification-token';
 import { validateLoginData } from '../lib/validation-schemas/login-schema';
 import GlobalConfig from '../config';
 import { RefreshTokenStore } from '../lib/redis/redis-token';
+import { validatePassword } from '../lib/validation-schemas/password-schema';
 
 export async function savePassswordResetToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
@@ -19,7 +20,7 @@ export async function savePassswordResetToken(userId: number, tokenFingerprint: 
         userId: userId,
         tokenHash: hashedToken,
         tokenFingerprint: tokenFingerprint,
-        type: TokenType.ResetPassword,
+        type: TokenType.PasswordReset,
         expiresAt: expiresAt
     })
 }
@@ -216,6 +217,40 @@ export const resetPassword = async (request: Request, response: Response): Promi
         const expiresInMinutes = GlobalConfig.PASSWORD_RESET_TOKEN_MAX_AGE / 1000 / 60;
         await savePassswordResetToken(user.id, tokenFingerprint, hashedToken, expiresInMinutes);
         await sendPasswordResetEmail({verificationCode: token, userEmail, expiresInMinutes, t: request.t});
+        response.status(204).end();
+    } catch (error) {
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json({
+                message: request.t(error.translationKey, error.params),
+            });
+            return
+        }
+        response.status(500).json({ message: request.t('errors.internal') });
+    }
+}
+
+export const confirmResetPassword = async (request: Request, response: Response): Promise<void> => {
+    const { password, token } = request.body;
+    
+    try {
+        const issues = validatePassword(password);
+
+        if ( issues.length > 0 ) {
+            response.status(400).json(
+               issues.map(({message, items}) => request.t(message, items))
+            );
+            return
+        }
+
+        const { userId } = await VerificationTokensRepository.verifyPasswordResetToken(token);
+        const user = await UserRepository.getUserById(userId); 
+
+        if( user.status !== UserStatus.Active ) {
+            throw new AppError('errors.password_reset_not_allowed', {}, 200) // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
+        }
+
+        await UserRepository.updatePassword(userId, await hashPassword(password)); 
+        await sendPasswordChangedEmail({userEmail: user.email, t: request.t});
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {

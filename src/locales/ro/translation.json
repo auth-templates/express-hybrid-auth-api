@@ -45,9 +45,14 @@
             "invalid": "Linkul de verificare este invalid sau nu mai este valabil. Verifică linkul sau solicită unul nou."
         },
         "2fa": {
-        "expired": "Linkul de recuperare pentru verificarea în doi pași a expirat. Vă rugăm să reluați procesul de recuperare pentru a recăpăta accesul la cont.",
-        "used": "Acest link de recuperare pentru verificarea în doi pași a fost deja folosit. Dacă aveți în continuare nevoie de acces, solicitați un nou link de recuperare.",
-        "invalid": "Linkul de recuperare pentru verificarea în doi pași este invalid sau nu mai este disponibil. Vă rugăm să solicitați un link nou pentru a vă recupera contul."
+            "expired": "Linkul de recuperare pentru verificarea în doi pași a expirat. Vă rugăm să reluați procesul de recuperare pentru a recăpăta accesul la cont.",
+            "used": "Acest link de recuperare pentru verificarea în doi pași a fost deja folosit. Dacă aveți în continuare nevoie de acces, solicitați un nou link de recuperare.",
+            "invalid": "Linkul de recuperare pentru verificarea în doi pași este invalid sau nu mai este disponibil. Vă rugăm să solicitați un link nou pentru a vă recupera contul."
+        },
+        "password-reset": {
+            "expired": "Linkul de resetare a parolei a expirat. Te rugăm să soliciți unul nou pentru a-ți reseta parola.",
+            "used": "Acest link de resetare a parolei a fost deja folosit. Dacă încă ai nevoie să-ți resetezi parola, solicită un link nou.",
+            "invalid": "Linkul de resetare a parolei este invalid sau nu mai este disponibil. Te rugăm să soliciți un link nou pentru a-ți reseta parola."
         }
     },
     "emails": {

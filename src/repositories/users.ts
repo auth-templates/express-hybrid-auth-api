@@ -31,6 +31,20 @@ export class UserRepository {
         throw new AppError('errors.internal', {}, 500);
       }
     }
+
+    static async updatePassword(userId: number, password_hash: string): Promise<void> {
+        try {
+            await prismaClient.users.update({
+                where: { id: userId },
+                data: {
+                    password_hash,
+                },
+            });
+        } catch (error) {
+            console.log(error);
+            throw new AppError('errors.internal', {}, 500);
+        }
+    }
     
     static async updateUserStatus(userId: number, status: UserStatus): Promise<void> {
         try {

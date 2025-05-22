@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 import { UserCredentials } from '../../models/user';
 import { ValidationIssue } from './validation-issue';
-import { passwordValidationSchema } from './signup-schema';
+import { passwordValidationSchema } from './password-schema';
 
 export const createLoginSchema = () => {
   return v.object({

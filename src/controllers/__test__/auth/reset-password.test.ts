@@ -71,7 +71,7 @@ describe('POST /auth/reset-password', () => {
             expiresAt: new Date("2025-05-15T00:30:00.000Z"),
             tokenFingerprint: "ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5",
             tokenHash: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo",
-            type: "reset_password",
+            type: "password_reset",
             userId: 2
         });
 

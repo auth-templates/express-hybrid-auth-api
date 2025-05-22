@@ -48,6 +48,11 @@
             "expired": "Your two-step verification recovery link has expired. Please start the recovery process again to regain access to your account.",
             "used": "This two-step verification recovery link has already been used. If you still need access, request a new recovery link.",
             "invalid": "The two-step verification recovery link is invalid or no longer available. Please request a new link to recover your account."
+        },
+        "password-reset": {
+            "expired": "Your password reset link has expired. Please request a new one to reset your password.",
+            "used": "This password reset link has already been used. If you still need to reset your password, request a new link.",
+            "invalid": "The password reset link is invalid or no longer available. Please request a new link to reset your password."
         }
     },
     "emails": {

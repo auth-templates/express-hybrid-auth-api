@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { login, logout, signup, verifySignup, refresh, resetPassword } from '../controllers/authController';
+import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword } from '../controllers/authController';
 import { authenticate } from '../middlewares/authenticate';
 
 const router = express.Router();
@@ -183,7 +183,7 @@ router.post('/refresh', authenticate, refresh);
 
 /**
  * @swagger
- * /auth/reset-password:
+ * /auth/reset-password/request:
  *   post:
  *     summary: Initiate Password Reset
  *     description: Sends a password reset email to the given email address. Always responds with 204 to avoid revealing user existence.
@@ -223,6 +223,54 @@ router.post('/refresh', authenticate, refresh);
  *                   type: string
  *                   example: Internal server error
  */
-router.post('/reset-password', resetPassword);
+router.post('/reset-password/request', resetPassword);
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Complete Password Reset
+ *     description: Resets the user's password using a valid reset token and a new password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - newPassword
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *               newPassword:
+ *                 type: string
+ *                 example: StrongNewPassword!2025
+ *     responses:
+ *       204:
+ *         description: Password successfully reset.
+ *       400:
+ *         description: Invalid or expired token, or invalid password format.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid or expired token
+ *       500:
+ *         description: Server error during password reset.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.post('/reset-password', confirmResetPassword);
 
 export default router;

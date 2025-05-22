@@ -50,12 +50,6 @@ export class VerificationTokensRepository {
                 throw new AppError('tokens.signup.invalid', {}, 400);
             }
     
-            // const isMatch = await verifyToken(token, tokenRecord.token);
-            // if (!isMatch) {
-            //     // Provided token doesn't match the hashed one in DB
-            //     throw new AppError('tokens.invalid', {}, 400);
-            // }
-    
             // Check if token is expired
             if (tokenRecord.expires_at < now) {
                 throw new AppError('tokens.signup.expired', {}, 400);
@@ -100,12 +94,6 @@ export class VerificationTokensRepository {
                 throw new AppError('tokens.2fa.invalid', {}, 400);
             }
     
-            // const isMatch = await verifyToken(token, tokenRecord.token);
-            // if (!isMatch) {
-            //     // Provided token doesn't match the hashed one in DB
-            //     throw new AppError('tokens.invalid', {}, 400);
-            // }
-    
             // Check if token is expired
             if (tokenRecord.expires_at < now) {
                 throw new AppError('tokens.2fa.expired', {}, 400);
@@ -130,17 +118,48 @@ export class VerificationTokensRepository {
             throw new AppError('errors.internal', {}, 500);
         }
     }
-}
+    
+    static async verifyPasswordResetToken(token: string): Promise<{userId: number}> {
+        try {
+            const now = new Date();
+    
+            // Find the most recently created signup token, regardless of status
+            const tokenRecord = await prismaClient.verification_tokens.findFirst({
+                where: {
+                    type: TokenType.PasswordReset,
+                    token_fingerprint: createTokenFingerprint(token)
+                },
+                orderBy: { created_at: 'desc' },
+            });
 
+            console.log("TOKEN RECORD", await hash(token), tokenRecord);
+            
+            if ( !tokenRecord ) {
+                throw new AppError('tokens.reset-password.invalid', {}, 400);
+            }
+    
+            // Check if token is expired
+            if (tokenRecord.expires_at < now) {
+                throw new AppError('tokens.reset-password.expired', {}, 400);
+            }
+    
+            // Check if token has already been used
+            if (tokenRecord.used_at !== null) {
+                throw new AppError('tokens.reset-password.used', {}, 400);
+            }
+    
+            // Token is valid — mark as used and activate user
+            await prismaClient.verification_tokens.update({
+                where: { id: tokenRecord.id },
+                data: { used_at: now },
+            });
 
-
-
-
-
-
-
-
-
-export class TwoFactorRepository {
-
+            return { userId: tokenRecord.user_id };
+        } catch (error) {
+            if (error instanceof AppError) {
+                throw error;
+            }
+            throw new AppError('errors.internal', {}, 500);
+        }
+    }
 }

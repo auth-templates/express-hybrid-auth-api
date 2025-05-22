@@ -13,5 +13,5 @@ export interface VerificationToken {
 export enum TokenType {
     SignUp = 'signup',
     TwoFA = 'twofa',
-    ResetPassword = 'reset_password'
+    PasswordReset = 'password_reset'
 }
