@@ -69,8 +69,7 @@ describe('POST /signup', () => {
         expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
     });
 
-    it('should return 400 if password is missing', async () => {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+    it('should return 400 if password is missing one digit', async () => {
         const response = await request(app).post('/signup').set('Accept-Language', 'en').send({
             ...signupData,
             password: "$Suuuuup"

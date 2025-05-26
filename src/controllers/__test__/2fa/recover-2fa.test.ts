@@ -9,7 +9,7 @@ import GlobalConfig from '../../../config';
 import { VerificationTokensRepository } from '../../../repositories/verification-tokens';
 import * as emailService from '../../../lib/mailer';
 import * as Token from '../../../lib/token';
-import { UserStatus } from '../../../models/user';
+import { Role, UserStatus } from '../../../models/user';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -37,7 +37,7 @@ const validUser2FA = {
     firstName: 'Dev',
     lastName: 'Tester',
     email: 'dev@mail.com',
-    role: 'admin',
+    role: Role.Admin,
     createdAt: new Date(),
     enabled2FA: true,
     status: UserStatus.Active

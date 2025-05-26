@@ -135,17 +135,17 @@ export class VerificationTokensRepository {
             console.log("TOKEN RECORD", await hash(token), tokenRecord);
             
             if ( !tokenRecord ) {
-                throw new AppError('tokens.reset-password.invalid', {}, 400);
+                throw new AppError('tokens.password-reset.invalid', {}, 400);
             }
     
             // Check if token is expired
             if (tokenRecord.expires_at < now) {
-                throw new AppError('tokens.reset-password.expired', {}, 400);
+                throw new AppError('tokens.password-reset.expired', {}, 400);
             }
     
             // Check if token has already been used
             if (tokenRecord.used_at !== null) {
-                throw new AppError('tokens.reset-password.used', {}, 400);
+                throw new AppError('tokens.password-reset.used', {}, 400);
             }
     
             // Token is valid — mark as used and activate user
