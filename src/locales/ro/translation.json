@@ -8,7 +8,8 @@
         "user_email_not_found": "Nu a fost găsit niciun utilizator cu adresa de email furnizată.",
         "user_not_found": "Utilizatorul nu a fost găsit.",
         "2fa_recovery_not_allowed": "Recuperarea verificării în doi pași nu a putut fi inițiată. Contactați suportul dacă problema persistă.",
-        "password_reset_not_allowed": "Resetarea parolei nu a putut fi inițiată. Te rugăm să contactezi suportul dacă problema persistă."
+        "password_reset_not_allowed": "Resetarea parolei nu a putut fi inițiată. Te rugăm să contactezi suportul dacă problema persistă.",
+        "social_login_required": "Se pare că v-ați înregistrat folosind un cont social. Vă rugăm să vă autentificați folosind acel furnizor."
     },
     "validation": {
         "firstname": {

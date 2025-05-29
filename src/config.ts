@@ -1,11 +1,14 @@
 import dotenv from 'dotenv';
 
+// Load default .env first
+dotenv.config();
+
 dotenv.config({path: `.env.${process.env.NODE_ENV || 'development'}`});
 
 const GlobalConfig = {
     env: process.env.NODE_ENV,
     port: process.env.PORT,
-    dbUrl: process.env.DB_URL,
+    dbUrl: process.env.DATABASE_URL,
     REDIS_PORT: parseInt(process.env.REDIS_PORT),
     REDIS_HOST: process.env.REDIS_HOST,
     POSTGRES_USER: process.env.POSTGRES_USER,
@@ -20,6 +23,9 @@ const GlobalConfig = {
     TWOFA_RECOVERY_TOKEN_MAX_AGE: parseInt(process.env.TWOFA_RECOVERY_TOKEN_MAX_AGE),
     SIGNUP_TOKEN_MAX_AGE: parseInt(process.env.SIGNUP_TOKEN_MAX_AGE),
     PASSWORD_RESET_TOKEN_MAX_AGE: parseInt(process.env.PASSWORD_RESET_TOKEN_MAX_AGE),
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL
 }
 
 export default GlobalConfig;

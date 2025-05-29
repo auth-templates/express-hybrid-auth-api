@@ -12,6 +12,9 @@ import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import { redisClient } from './lib/redis/client';
 import GlobalConfig from './config';
+import { Request, Response } from 'express';
+import passport from './strategies/googleAuthStrategy';
+import googleAuthRoutes from './routes/googleAuthRoutes';
 
 const app = express();
 const port = 3000;
@@ -29,6 +32,16 @@ app.use(session({
     }
 }));
 
+app.use(passport.initialize());
+app.use(passport.session()); // <-- This integrates Passport with Redis-backed sessions
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+passport.deserializeUser((obj, done) => {
+  done(null, obj);
+});
+
 app.use(i18nMiddleware);
 app.use(cookieParser());
 app.use(express.json());
@@ -43,9 +56,22 @@ if ( process.env.NODE_ENV === 'development' ) {
     }));
 }
 
+app.get('/', (req, res) => {
+  res.send('<a href="/auth/google">Login with Google</a>');
+});
+
+app.get('/profile', (request: Request, response: Response) => {
+  if ( !request.isAuthenticated() ) {
+    return response.redirect('/');
+  }
+  response.send(`<h1>Hello ${JSON.stringify(request.user)}</h1><a href="/auth/logout">Logout</a>`);
+});
+
 app.use('/2fa', twofaRoutes);
+app.use('/auth', googleAuthRoutes);
 app.use('/auth', authRouter);
 app.use('/items', itemRouter);
+
 
 const listeningUrl = `http://localhost:${port}${process.env.NODE_ENV === 'development' ? '/api-docs' : ''}`;
 app.listen(port, () => {

@@ -8,7 +8,8 @@
         "user_email_not_found": "No user found with the provided email address.",
         "user_not_found": "User not found.",
         "2fa_recovery_not_allowed": "Two-step verification recovery could not be initiated. Please contact support if the issue persists.",
-        "password_reset_not_allowed": "Password reset could not be initiated. Please contact support if the issue persists."
+        "password_reset_not_allowed": "Password reset could not be initiated. Please contact support if the issue persists.",
+        "social_login_required": "It looks like you signed up using a social login. Please use that provider to log in."
     },
     "validation": {
         "firstname": {

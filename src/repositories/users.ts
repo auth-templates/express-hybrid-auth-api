@@ -82,6 +82,10 @@ export class UserRepository {
                 throw new AppError('errors.invalid_credentials', {}, 400);
             }
 
+            if ( userRecord.password_hash === '__OAUTH__' ) {
+                throw new AppError('errors.social_login_required', {}, 401);
+            }
+
             const isMatch = await verifyPasswordHash(userRecord.password_hash, password);
 
             if ( !isMatch ) {

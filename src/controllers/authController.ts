@@ -3,15 +3,16 @@ import { hashPassword } from "../lib/password";
 import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
 import { AppError } from '../lib/error';
-import { Role, User, UserStatus } from '../models/user';
+import { Role, UserStatus } from '../models/user';
 import { sendAccountActivationEmail, sendPasswordChangedEmail, sendPasswordResetEmail, sendVerificationEmail } from '../lib/mailer';
-import { createAccessToken, createSecureRandomToken, generateToken } from '../lib/token';
+import { createAccessToken, generateToken } from '../lib/token';
 import { VerificationTokensRepository } from '../repositories/verification-tokens';
 import { TokenType } from '../models/verification-token';
 import { validateLoginData } from '../lib/validation-schemas/login-schema';
 import GlobalConfig from '../config';
 import { RefreshTokenStore } from '../lib/redis/redis-token';
 import { validatePassword } from '../lib/validation-schemas/password-schema';
+import { destroyUserSession, initializeUserSession, setCookieTokens } from '../lib/session';
 
 export async function savePassswordResetToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
@@ -91,27 +92,6 @@ export const signup = async (request: Request, response: Response): Promise<void
     }
 }
 
-function setCookieTokens(response: Response, tokens: { name: string; value: string; maxAge: number }[]) {
-    const isProduction = process.env.NODE_ENV === 'production';
-
-    tokens.forEach(({ name, value, maxAge }) => {
-        response.cookie(name, value, {
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: 'strict',
-            maxAge
-        });
-    });
-}
-
-function setSessionData(request: Request, user: User) {
-    request.session.user = {
-        id: user.id,
-        email: user.email,
-    };
-    request.session.pending2FA = user.enabled2FA;
-}
-
 export const login = async (request: Request, response: Response): Promise<void> => {
     const { email, password } = request.body;
     
@@ -125,18 +105,8 @@ export const login = async (request: Request, response: Response): Promise<void>
             return
         }
 
-        const user = await UserRepository.login(email, password);
-        setSessionData(request, user);
-
-        const refreshToken = createSecureRandomToken();
-        await RefreshTokenStore.storeRefreshToken(user.id, refreshToken);
-
-        const newAccessToken = createAccessToken({ userId: user.id, pending2FA: user.enabled2FA })
-
-        setCookieTokens(response, [
-            { name: 'refresh_token', value: refreshToken, maxAge: GlobalConfig.SESSION_MAX_AGE },
-            { name: 'access_token', value: newAccessToken, maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
-        ]);
+        const user = await UserRepository.login(email, password)
+        await initializeUserSession(request, response, user)
 
         response.status(200).send(user);
     } catch (error) {
@@ -155,13 +125,7 @@ export const logout = async (request: Request, response: Response): Promise<void
     const refreshToken = request.cookies?.refreshToken;
     try {
         await RefreshTokenStore.removeRefreshToken(userId, refreshToken);
-
-        request.session.destroy((err) => {
-            response.clearCookie('connect.sid');
-            response.clearCookie('access_token');
-            response.clearCookie('refresh_token');
-            response.status(204).end();
-        });
+        destroyUserSession(request, response);
     } catch (error) {
         if (error instanceof AppError) {
             response.status(error.statusCode).json({

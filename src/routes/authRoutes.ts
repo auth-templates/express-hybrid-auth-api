@@ -104,12 +104,28 @@ router.post('/verify-signup', verifySignup);
  *                 example: "$SuperSecurePassword45"
  *     responses:
  *       200:
- *         description: Login successful, session token set in cookie.
+ *         description: Login successful, session token set in cookie and user info returned.
  *         headers:
  *           Set-Cookie:
  *             description: HTTP-only session cookie containing the session token.
  *             schema:
  *               type: string
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Validation errors in login data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     example: "Invalid email format"
  *       500:
  *         description: Server error during login.
  *         content:
@@ -272,5 +288,45 @@ router.post('/reset-password/request', resetPassword);
  *                   example: Internal server error
  */
 router.post('/reset-password', confirmResetPassword);
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 123
+ *         firstName:
+ *           type: string
+ *           example: "John"
+ *         lastName:
+ *           type: string
+ *           example: "Doe"
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "john.doe@example.com"
+ *         role:
+ *           type: string
+ *           description: Role of the user
+ *           example: "admin"  # adjust example based on your Role enum values
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2023-01-01T12:00:00Z"
+ *         enabled2FA:
+ *           type: boolean
+ *           nullable: true
+ *           example: true
+ *         status:
+ *           type: string
+ *           nullable: true
+ *           description: Status of the user
+ *           example: "active"  # adjust example based on your UserStatus enum values
+ */
+
 
 export default router;
