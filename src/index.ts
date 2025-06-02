@@ -1,7 +1,6 @@
 import express from 'express';
 import swaggerUI from 'swagger-ui-express';
 import swaggerSpec from './swagger-config';
-import itemRouter from './routes/itemRoutes';
 import authRouter from './routes/authRoutes';
 import twofaRoutes from './routes/2faRoutes';
 import cookieParser from 'cookie-parser';
@@ -14,8 +13,7 @@ import { redisClient } from './lib/redis/client';
 import GlobalConfig from './config';
 import { Request, Response } from 'express';
 import passport from 'passport';
-import './strategies/googleAuthStrategy';
-import './strategies/githubAuthStrategy';
+import './strategies';
 import googleAuthRoutes from './routes/googleAuthRoutes';
 import githubAuthRoutes from './routes/githubAuthRoutes';
 
@@ -74,7 +72,6 @@ app.use('/2fa', twofaRoutes);
 app.use('/auth', googleAuthRoutes);
 app.use('/auth', githubAuthRoutes);
 app.use('/auth', authRouter);
-app.use('/items', itemRouter);
 
 
 const listeningUrl = `http://localhost:${port}${process.env.NODE_ENV === 'development' ? '/api-docs' : ''}`;

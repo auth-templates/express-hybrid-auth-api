@@ -1,8 +1,5 @@
-import { Prisma } from '../../generated/prisma';
 import { AppError } from '../lib/error';
-import { verifyPasswordHash } from '../lib/password';
 import { prismaClient } from '../lib/prisma-client';
-import { PrismaErrorCode } from '../lib/prisma-error-codes';
 import { Role, User, UserStatus } from '../models/user';
 
 export type createAccountInput = {
@@ -67,9 +64,6 @@ export class AccountsRepository {
                 enabled2FA: user.twofa_enabled,
             };
         } catch (error) {
-            if ( error instanceof AppError ) {
-                throw error
-            }
             throw new AppError('errors.internal', {}, 500);
         }
     }

@@ -26,6 +26,14 @@ export default {
         '!src/**/*.d.ts',             // ignore type declarations
         '!src/**/index.{ts,tsx}',     // optional: ignore index.ts re-export files
     ],
+    coveragePathIgnorePatterns: [
+        "/node_modules/",
+        "src/swagger-config.ts",
+        "src/swagger-generate.ts",
+        "src/routes/",         // ✅ Ignore route files
+        "/main.ts",         // (Optional) ignore entry point
+        "/index.ts",        // (Optional) if it's just exporting
+    ],
     coverageReporters: ['text', 'lcov'], // text for console, lcov for HTML
 };
   

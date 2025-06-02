@@ -9,7 +9,8 @@
         "user_not_found": "Utilizatorul nu a fost găsit.",
         "2fa_recovery_not_allowed": "Recuperarea verificării în doi pași nu a putut fi inițiată. Contactați suportul dacă problema persistă.",
         "password_reset_not_allowed": "Resetarea parolei nu a putut fi inițiată. Te rugăm să contactezi suportul dacă problema persistă.",
-        "social_login_required": "Se pare că v-ați înregistrat folosind un cont social. Vă rugăm să vă autentificați folosind acel furnizor."
+        "social_login_required": "Se pare că v-ați înregistrat folosind un cont social. Vă rugăm să vă autentificați folosind acel furnizor.",
+        "2fa_setup_invalid": "Configurarea 2FA a expirat sau nu mai este valabilă. Vă rugăm să încercați din nou."
     },
     "validation": {
         "firstname": {

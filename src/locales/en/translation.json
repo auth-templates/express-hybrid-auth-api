@@ -9,7 +9,8 @@
         "user_not_found": "User not found.",
         "2fa_recovery_not_allowed": "Two-step verification recovery could not be initiated. Please contact support if the issue persists.",
         "password_reset_not_allowed": "Password reset could not be initiated. Please contact support if the issue persists.",
-        "social_login_required": "It looks like you signed up using a social login. Please use that provider to log in."
+        "social_login_required": "It looks like you signed up using a social login. Please use that provider to log in.",
+        "2fa_setup_invalid": "Your 2FA setup has expired or is no longer valid. Please try setting it up again."
     },
     "validation": {
         "firstname": {
