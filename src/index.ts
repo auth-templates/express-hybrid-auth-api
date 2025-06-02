@@ -13,8 +13,11 @@ import { RedisStore } from 'connect-redis';
 import { redisClient } from './lib/redis/client';
 import GlobalConfig from './config';
 import { Request, Response } from 'express';
-import passport from './strategies/googleAuthStrategy';
+import passport from 'passport';
+import './strategies/googleAuthStrategy';
+import './strategies/githubAuthStrategy';
 import googleAuthRoutes from './routes/googleAuthRoutes';
+import githubAuthRoutes from './routes/githubAuthRoutes';
 
 const app = express();
 const port = 3000;
@@ -57,7 +60,7 @@ if ( process.env.NODE_ENV === 'development' ) {
 }
 
 app.get('/', (req, res) => {
-  res.send('<a href="/auth/google">Login with Google</a>');
+  res.send('<a href="/auth/google">Login with Google</a> --- <a href="/auth/github">Login with Github</a>');
 });
 
 app.get('/profile', (request: Request, response: Response) => {
@@ -69,6 +72,7 @@ app.get('/profile', (request: Request, response: Response) => {
 
 app.use('/2fa', twofaRoutes);
 app.use('/auth', googleAuthRoutes);
+app.use('/auth', githubAuthRoutes);
 app.use('/auth', authRouter);
 app.use('/items', itemRouter);
 
