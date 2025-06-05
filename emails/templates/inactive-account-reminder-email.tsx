@@ -145,7 +145,7 @@ const ctaSection = {
     marginTop: '20px',
 };
 
-const ctaButton = {
+const ctaButton:React.CSSProperties = {
     backgroundColor: '#2754C5',
     color: '#fff',
     padding: '12px 20px',
