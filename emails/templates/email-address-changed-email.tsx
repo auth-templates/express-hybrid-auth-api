@@ -14,20 +14,20 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface EmailAddressChangedEmailProps {
+    assetsUrl: string,
+    frontendUrl: string, 
     oldEmail?: string;
     newEmail?: string;
     confirmLink?: string;
     t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-
 export default function EmailAddressChangedEmail({
-    oldEmail = 'old@example.com',
-    newEmail = 'new@example.com',
-    confirmLink = 'https://example.com/confirm-email-change',
+    assetsUrl,
+    frontendUrl,
+    oldEmail,
+    newEmail,
+    confirmLink,
     t,
 }: EmailAddressChangedEmailProps) {
     return (
@@ -39,7 +39,7 @@ export default function EmailAddressChangedEmail({
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.email-address-changed-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -76,7 +76,7 @@ export default function EmailAddressChangedEmail({
                     </Section>
                     <Text style={footerText}>
                         {t('emails.email-address-changed-email.footerBeforeLink')}{' '}
-                        <Link href="https://example.com/support" target="_blank" style={link}>
+                        <Link href={`${frontendUrl}/support`} target="_blank" style={link}>
                             {t('emails.email-address-changed-email.supportCenter')}
                         </Link>.
                     </Text>
@@ -88,10 +88,12 @@ export default function EmailAddressChangedEmail({
     
 
 EmailAddressChangedEmail.PreviewProps = {
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     oldEmail: 'old@example.com',
     newEmail: 'new@example.com',
-    confirmLink: 'https://example.com/confirm-email-change',
-    t: getEmailTranslator('en'),
+    confirmLink: 'http://localhost:3000/confirm-email-change',
+    t: getEmailTranslator(),
 } satisfies EmailAddressChangedEmailProps;
 
 const main = {

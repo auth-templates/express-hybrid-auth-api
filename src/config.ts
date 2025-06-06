@@ -9,6 +9,8 @@ const GlobalConfig = {
     env: process.env.NODE_ENV,
     port: process.env.PORT,
     dbUrl: process.env.DATABASE_URL,
+    SMTP_HOST: process.env.SMTP_HOST,
+    SMTP_PORT: parseInt(process.env.SMTP_PORT),
     REDIS_PORT: parseInt(process.env.REDIS_PORT),
     REDIS_HOST: process.env.REDIS_HOST,
     POSTGRES_USER: process.env.POSTGRES_USER,
@@ -32,7 +34,11 @@ const GlobalConfig = {
     AZURE_CALLBACK_URL: process.env.AZURE_CALLBACK_URL,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-    GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL
+    GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
+    SUPPORT_EMAIL: process.env.SUPPORT_EMAIL,
+    EMAIL_FRONTEND_BASE_URL: process.env.EMAIL_FRONTEND_BASE_URL,
+    EMAIL_BACKEND_BASE_URL: process.env.EMAIL_BACKEND_BASE_URL,
+    EMAIL_ASSETS_BASE_URL: process.env.EMAIL_ASSETS_BASE_URL
 }
 
 export default GlobalConfig;

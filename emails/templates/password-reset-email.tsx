@@ -14,16 +14,16 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface PasswordResetEmailProps {
+    assetsUrl: string,
+    frontendUrl: string,
     expiresInMinutes?: number;
     resetUrl?: string;
     t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-    
 export default function PasswordResetEmail({
+    assetsUrl,
+    frontendUrl,
     expiresInMinutes,
     resetUrl,
     t
@@ -37,7 +37,7 @@ export default function PasswordResetEmail({
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.password-reset-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -73,7 +73,7 @@ export default function PasswordResetEmail({
                     </Section>
                     <Text style={footerText}>
                         {t('emails.password-reset-email.footer')}{' '}
-                        <Link href="https://example.com/privacy" target="_blank" style={link}>
+                        <Link href={`${frontendUrl}/privacy`} target="_blank" style={link}>
                             {t('emails.password-reset-email.privacyLink')}
                         </Link>
                         .
@@ -86,9 +86,11 @@ export default function PasswordResetEmail({
     
 
 PasswordResetEmail.PreviewProps = {
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     expiresInMinutes: 30,
-    resetUrl: 'https://example.com/reset-password?token=abc123',
-    t: getEmailTranslator('en'),
+    resetUrl: 'http://localhost:3000/reset-password?token=abc123',
+    t: getEmailTranslator(),
 } satisfies PasswordResetEmailProps;
 
 const main = {

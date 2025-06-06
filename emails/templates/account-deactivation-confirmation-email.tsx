@@ -14,14 +14,16 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface AccountDeactivationConfirmationEmailProps {
+    assetsUrl: string,
+    frontendUrl: string,
     t: (key: string, options?: any) => string
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-    
-export default function AccountDeactivationConfirmationEmail({ t }: AccountDeactivationConfirmationEmailProps) {
+export default function AccountDeactivationConfirmationEmail({ 
+    assetsUrl,
+    t, 
+    frontendUrl 
+}: AccountDeactivationConfirmationEmailProps) {
     return (
         <Html>
             <Head />
@@ -31,7 +33,7 @@ export default function AccountDeactivationConfirmationEmail({ t }: AccountDeact
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.account-deactivation-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -55,7 +57,7 @@ export default function AccountDeactivationConfirmationEmail({ t }: AccountDeact
                         <Section style={lowerSection}>
                             <Text style={cautionText}>
                                 {t('emails.account-deactivation-email.supportPrompt')}{' '}
-                                <Link href="https://example.com/support" target="_blank" style={link}>
+                                <Link href={`${frontendUrl}/support`} target="_blank" style={link}>
                                     {t('emails.account-deactivation-email.supportLink')}
                                 </Link>.
                             </Text>
@@ -72,7 +74,9 @@ export default function AccountDeactivationConfirmationEmail({ t }: AccountDeact
 
 
 AccountDeactivationConfirmationEmail.PreviewProps = {
-     t: getEmailTranslator('en'),
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
+    t: getEmailTranslator(),
 } satisfies AccountDeactivationConfirmationEmailProps;
 
 const main = {

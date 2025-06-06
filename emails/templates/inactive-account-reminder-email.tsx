@@ -15,14 +15,16 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface InactiveAccountReminderEmailProps {
+    assetsUrl: string,
+    frontendUrl: string,
     t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-
-export default function InactiveAccountReminderEmail({ t }: InactiveAccountReminderEmailProps) {
+export default function InactiveAccountReminderEmail({ 
+    assetsUrl,
+    t, 
+    frontendUrl 
+}: InactiveAccountReminderEmailProps) {
     return (
         <Html>
             <Head />
@@ -32,7 +34,7 @@ export default function InactiveAccountReminderEmail({ t }: InactiveAccountRemin
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.inactive-account-reminder-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -49,7 +51,7 @@ export default function InactiveAccountReminderEmail({ t }: InactiveAccountRemin
                                 {t('emails.inactive-account-reminder-email.message2')}
                             </Text>
                             <Section style={ctaSection}>
-                                <Link href="https://example.com/login" target="_blank" style={ctaButton}>
+                                <Link href={`${frontendUrl}/login`} target="_blank" style={ctaButton}>
                                     {t('emails.inactive-account-reminder-email.ctaButton')}
                                 </Link>
                             </Section>
@@ -58,7 +60,7 @@ export default function InactiveAccountReminderEmail({ t }: InactiveAccountRemin
                         <Section style={lowerSection}>
                             <Text style={cautionText}>
                                 {t('emails.inactive-account-reminder-email.unsubscribeText')}{' '}
-                                <Link href="https://example.com/unsubscribe" target="_blank" style={link}>
+                                <Link href={`${frontendUrl}/unsubscribe`} target="_blank" style={link}>
                                     {t('emails.inactive-account-reminder-email.unsubscribeLink')}
                                 </Link>.
                             </Text>
@@ -74,7 +76,9 @@ export default function InactiveAccountReminderEmail({ t }: InactiveAccountRemin
 }    
 
 InactiveAccountReminderEmail.PreviewProps = {
-    t: getEmailTranslator('en'),
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
+    t: getEmailTranslator(),
 } satisfies InactiveAccountReminderEmailProps;
 
 const main = {
@@ -145,7 +149,7 @@ const ctaSection = {
     marginTop: '20px',
 };
 
-const ctaButton:React.CSSProperties = {
+const ctaButton: React.CSSProperties = {
     backgroundColor: '#2754C5',
     color: '#fff',
     padding: '12px 20px',

@@ -14,18 +14,16 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface PasswordChangedEmailProps {
+    assetsUrl: string,
+    frontendUrl: string;
     userEmail?: string;
-    supportUrl?: string;
     t: (key: string, options?: any) => string;
 }
-
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
     
 export default function PasswordChangedEmail({
+    assetsUrl,
+    frontendUrl,
     userEmail,
-    supportUrl = 'https://example.com/support',
     t
 }: PasswordChangedEmailProps) {
     return (
@@ -37,7 +35,7 @@ export default function PasswordChangedEmail({
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.password-changed-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -54,7 +52,7 @@ export default function PasswordChangedEmail({
                                 {t('emails.password-changed-email.message2')}
                             </Text>
                             <Section style={buttonSection}>
-                                <Link href={supportUrl} style={button}>
+                                <Link href={`${frontendUrl}/support`} style={button}>
                                     {t('emails.password-changed-email.ctaButton')}
                                 </Link>
                             </Section>
@@ -68,7 +66,7 @@ export default function PasswordChangedEmail({
                     </Section>
                     <Text style={footerText}>
                         {t('emails.password-changed-email.footer')}{' '}
-                        <Link href={supportUrl} target="_blank" style={link}>
+                        <Link href={`${frontendUrl}/support`} target="_blank" style={link}>
                             {t('emails.password-changed-email.supportLink')}
                         </Link>.
                     </Text>
@@ -79,9 +77,10 @@ export default function PasswordChangedEmail({
 }    
 
 PasswordChangedEmail.PreviewProps = {
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     userEmail: 'user@example.com',
-    supportUrl: 'https://example.com/support',
-    t: getEmailTranslator('en'),
+    t: getEmailTranslator(),
 } satisfies PasswordChangedEmailProps;
 
 const main = {

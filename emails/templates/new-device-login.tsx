@@ -14,26 +14,24 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface NewDeviceLoginEmailProps {
+    assetsUrl: string,
+    frontendUrl: string,
     userEmail?: string;
     location?: string;
     device?: string;
     ipAddress?: string;
     loginTime?: string;
-    supportUrl?: string;
     t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-
 export default function NewDeviceLoginEmail({
-    userEmail = 'user@example.com',
-    location = 'San Francisco, CA, USA',
-    device = 'Chrome on Windows',
-    ipAddress = '192.168.1.1',
-    loginTime = 'May 1, 2025 at 10:22 AM',
-    supportUrl = 'https://example.com/security',
+    assetsUrl,
+    frontendUrl,
+    userEmail,
+    location,
+    device,
+    ipAddress,
+    loginTime,
     t
 }: NewDeviceLoginEmailProps) {
     return (
@@ -45,7 +43,7 @@ export default function NewDeviceLoginEmail({
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.new-device-login-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -71,7 +69,7 @@ export default function NewDeviceLoginEmail({
                                 {t('emails.new-device-login-email.message2')}
                             </Text>
                             <Section style={buttonSection}>
-                                <Link href={supportUrl} style={button}>
+                                <Link href={`${frontendUrl}/support`} style={button}>
                                     {t('emails.new-device-login-email.ctaButton')}
                                 </Link>
                             </Section>
@@ -85,7 +83,7 @@ export default function NewDeviceLoginEmail({
                     </Section>
                     <Text style={footerText}>
                         {t('emails.new-device-login-email.footer')}{" "}
-                        <Link href={supportUrl} target="_blank" style={link}>
+                        <Link href={`${frontendUrl}/support`} target="_blank" style={link}>
                             {t('emails.new-device-login-email.supportLink')}
                         </Link>.
                     </Text>
@@ -97,13 +95,14 @@ export default function NewDeviceLoginEmail({
     
 
 NewDeviceLoginEmail.PreviewProps = {
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     userEmail: 'user@example.com',
     location: 'San Francisco, CA, USA',
     device: 'Chrome on Windows',
     ipAddress: '192.168.1.1',
     loginTime: 'May 1, 2025 at 10:22 AM',
-    supportUrl: 'https://example.com/security',
-    t: getEmailTranslator('en'),
+    t: getEmailTranslator(),
 } satisfies NewDeviceLoginEmailProps;
 
 const main = {

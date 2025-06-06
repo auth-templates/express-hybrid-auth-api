@@ -14,15 +14,15 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface AccountDetailsUpdatedEmailProps {
+    assetsUrl: string,
+    frontendUrl: string,
     updatedFields?: string[];
     t: (key: string, options?: any) => string;
 }
-
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
     
 export default function AccountDetailsUpdatedEmail({
+    assetsUrl,
+    frontendUrl, 
     updatedFields = ['email address'],
     t
 }: AccountDetailsUpdatedEmailProps) {
@@ -37,7 +37,7 @@ export default function AccountDetailsUpdatedEmail({
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.account-details-updated-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -60,7 +60,7 @@ export default function AccountDetailsUpdatedEmail({
                             </Text>
                             <Text style={secondaryText}>
                                 {t('emails.account-details-updated-email.message4')}{' '}
-                                <Link href="https://example.com/account" target="_blank" style={link}>
+                                <Link href={`${frontendUrl}/account`} target="_blank" style={link}>
                                     {t('emails.account-details-updated-email.dashboardLink')}
                                 </Link>.
                             </Text>
@@ -74,7 +74,7 @@ export default function AccountDetailsUpdatedEmail({
                     </Section>
                     <Text style={footerText}>
                         {t('emails.account-details-updated-email.footer')}{' '}
-                        <Link href="https://example.com/support" target="_blank" style={link}>
+                        <Link href={`${frontendUrl}/support`} target="_blank" style={link}>
                             {t('emails.account-details-updated-email.supportLink')}
                         </Link>.
                     </Text>
@@ -86,8 +86,10 @@ export default function AccountDetailsUpdatedEmail({
 
 
 AccountDetailsUpdatedEmail.PreviewProps = {
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     updatedFields: ['name', 'email address'],
-    t: getEmailTranslator('en'),
+    t: getEmailTranslator(),
 } satisfies AccountDetailsUpdatedEmailProps;
 
 const main = {

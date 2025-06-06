@@ -14,14 +14,16 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface AccountDeletionConfirmationEmailProps {
+    assetsUrl: string,
+    frontendUrl: string,
     t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-
-export default function AccountDeletionConfirmationEmail({ t }: AccountDeletionConfirmationEmailProps) {
+export default function AccountDeletionConfirmationEmail({ 
+    assetsUrl,
+    t, 
+    frontendUrl 
+}: AccountDeletionConfirmationEmailProps) {
     return (
         <Html>
             <Head />
@@ -31,7 +33,7 @@ export default function AccountDeletionConfirmationEmail({ t }: AccountDeletionC
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.account-deletion-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -55,7 +57,7 @@ export default function AccountDeletionConfirmationEmail({ t }: AccountDeletionC
                         <Section style={lowerSection}>
                             <Text style={cautionText}>
                                 {t('emails.account-deletion-email.supportPrompt')}{' '}
-                                <Link href="https://example.com/support" target="_blank" style={link}>
+                                <Link href={`${frontendUrl}/support`} target="_blank" style={link}>
                                     {t('emails.account-deletion-email.supportLink')}
                                 </Link>.
                             </Text>
@@ -71,7 +73,9 @@ export default function AccountDeletionConfirmationEmail({ t }: AccountDeletionC
 }
 
 AccountDeletionConfirmationEmail.PreviewProps = {
-    t: getEmailTranslator('en'),
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
+    t: getEmailTranslator(),
 } satisfies AccountDeletionConfirmationEmailProps;
 
 const main = {

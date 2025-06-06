@@ -14,14 +14,16 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface AccountReactivationEmailProps {
+    assetsUrl: string,
+    frontendUrl: string,
     t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-
-export default function AccountReactivationEmail({ t }: AccountReactivationEmailProps) {
+export default function AccountReactivationEmail({
+    assetsUrl,
+    frontendUrl, 
+    t 
+}: AccountReactivationEmailProps) {
     return (
         <Html>
             <Head />
@@ -31,7 +33,7 @@ export default function AccountReactivationEmail({ t }: AccountReactivationEmail
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.account-reactivation-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -48,7 +50,7 @@ export default function AccountReactivationEmail({ t }: AccountReactivationEmail
                                 {t('emails.account-reactivation-email.message2')}
                             </Text>
                             <Section style={ctaSection}>
-                                <Link href="https://example.com/reactivate" target="_blank" style={ctaButton}>
+                                <Link href={`${frontendUrl}/reactivate`} target="_blank" style={ctaButton}>
                                     {t('emails.account-reactivation-email.reactivateButton')}
                                 </Link>
                             </Section>
@@ -57,7 +59,7 @@ export default function AccountReactivationEmail({ t }: AccountReactivationEmail
                         <Section style={lowerSection}>
                             <Text style={cautionText}>
                                 {t('emails.account-reactivation-email.caution')}{' '}
-                                <Link href="https://example.com/contact-us" target="_blank" style={link}>
+                                <Link href={`${frontendUrl}/contact-us`} target="_blank" style={link}>
                                     {t('emails.account-reactivation-email.contactLink')}
                                 </Link>.
                             </Text>
@@ -71,10 +73,11 @@ export default function AccountReactivationEmail({ t }: AccountReactivationEmail
         </Html>
     );
 }
-    
 
 AccountReactivationEmail.PreviewProps = {
-    t: getEmailTranslator('en'),
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
+    t: getEmailTranslator(),
 } satisfies AccountReactivationEmailProps;
 
 const main = {

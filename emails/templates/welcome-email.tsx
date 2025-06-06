@@ -13,15 +13,17 @@ import {
 } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-
 interface WelcomeEmailProps {
+    assetsUrl: string,
+    frontendUrl: string,
     t: (key: string, options?: any) => string;
 }
 
-export default function WelcomeEmail({ t }: WelcomeEmailProps) {
+export default function WelcomeEmail({ 
+    assetsUrl,
+    frontendUrl,
+    t 
+}: WelcomeEmailProps) {
     return (
         <Html>
             <Head />
@@ -31,7 +33,7 @@ export default function WelcomeEmail({ t }: WelcomeEmailProps) {
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.welcome-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -58,7 +60,7 @@ export default function WelcomeEmail({ t }: WelcomeEmailProps) {
                     </Section>
                     <Text style={footerText}>
                         {t('emails.welcome-email.footer')}{' '}
-                        <Link href="https://example.com/privacy" target="_blank" style={link}>
+                        <Link href={`${frontendUrl}/security`} target="_blank" style={link}>
                             {t('emails.welcome-email.privacyLink')}
                         </Link>
                         .
@@ -70,7 +72,9 @@ export default function WelcomeEmail({ t }: WelcomeEmailProps) {
 }
 
 WelcomeEmail.PreviewProps = {
-    t: getEmailTranslator('en'),
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
+    t: getEmailTranslator(),
 } satisfies WelcomeEmailProps;
 
 const main = {

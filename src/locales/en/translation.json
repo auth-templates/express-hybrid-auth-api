@@ -59,6 +59,7 @@
     },
     "emails": {
         "2fa-disabled": {
+            "subject": "Two-Factor Authentication Disabled",
             "preview": "Two-Factor Authentication was disabled",
             "logoAlt": "Company Logo",
             "heading": "Two-Factor Authentication Disabled",
@@ -71,6 +72,7 @@
             }
         },
         "2fa-code-email": {
+            "subject": "Your Two-Factor Authentication Code",
             "preview": "Your 2FA verification code",
             "heading": "Your Two-Factor Authentication Code",
             "instruction": "Please use the code below to complete your login. This code is valid for {{expiresInMinutes}} minutes.",
@@ -83,6 +85,7 @@
             }
         },
         "account-activation-email": {
+            "subject": "Account Activated",
             "preview": "Your account is now active",
             "logoAlt": "Company Logo",
             "heading": "Welcome! Your account is now active",
@@ -95,6 +98,7 @@
             }
         },
         "account-deactivation-email": {
+            "subject": "Account Deactivated",
             "preview": "Your Account Has Been Deactivated",
             "logoAlt": "Company Logo",
             "heading": "Your Account Has Been Deactivated",
@@ -106,6 +110,7 @@
             "footer": "Thank you for being a valued customer. We’re here if you need us."
         },
         "account-deletion-email": {
+            "subject": "Account Deleted",
             "preview": "Your Account Has Been Deleted",
             "logoAlt": "Company Logo",
             "heading": "Your Account Has Been Deleted",
@@ -117,6 +122,7 @@
             "footer": "We appreciate your time with us. If you ever decide to return, we'll be happy to welcome you back."
         },
         "account-details-updated-email": {
+            "subject": "Account Details Updated",
             "preview": "Your account details were updated",
             "logoAlt": "Company Logo",
             "heading": "Your Account Information Was Updated",
@@ -130,6 +136,7 @@
             "supportLink": "support center"
         },
         "account-reactivation-email": {
+            "subject": "Reactivate Your Account",
             "preview": "Welcome Back! Reactivate Your Account",
             "logoAlt": "Company Logo",
             "heading": "Welcome Back! Reactivate Your Account",
@@ -141,6 +148,7 @@
             "footer": "We look forward to having you back! If you need assistance, don’t hesitate to reach out to our team."
         },
         "email-address-changed-email": {
+            "subject": "Email Address Changed",
             "preview": "Email address change notification",
             "logoAlt": "Company Logo",
             "heading": "Your Email Address Was Changed",
@@ -153,6 +161,7 @@
             "supportCenter": "support center"
         },
         "inactive-account-reminder-email": {
+            "subject": "We Miss You!",
             "preview": "We Miss You! Come Back to Your Account",
             "logoAlt": "Company Logo",
             "heading": "We Miss You!",
@@ -164,6 +173,7 @@
             "footer": "We hope to see you back soon! If you need any assistance, feel free to reach out to our support team."
         },
         "new-device-login-email": {
+            "subject": "New Login Detected",
             "preview": "New login detected",
             "logoAlt": "Company Logo",
             "heading": "New Login Detected",
@@ -179,6 +189,7 @@
             "supportLink": "support center"
         },
         "password-changed-email": {
+            "subject": "Password Changed",
             "preview": "Your password was changed",
             "logoAlt": "Company Logo",
             "heading": "Your password was changed",
@@ -190,6 +201,7 @@
             "supportLink": "support center"
         },
         "password-reset-email": {
+            "subject": "Reset Your Password",
             "preview": "Reset your password",
             "logoAlt": "Company Logo",
             "heading": "Reset your password",
@@ -202,6 +214,7 @@
             "privacyLink": "privacy policy"
         },
         "verification": {
+            "subject": "Email Verification",
             "preview": "Confirm your email to get started",
             "logoAlt": "Company Logo",
             "heading": "Confirm your email address",
@@ -214,6 +227,7 @@
             "privacyLink": "privacy policy"
         },
         "welcome-email": {
+            "subject": "Welcome to Our Platform",
             "preview": "Welcome to our platform!",
             "logoAlt": "Company Logo",
             "heading": "Welcome aboard!",

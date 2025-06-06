@@ -1,72 +1,76 @@
 import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Img,
-  Link,
-  Preview,
-  Section,
-  Text,
+    Body,
+    Container,
+    Head,
+    Heading,
+    Hr,
+    Html,
+    Img,
+    Link,
+    Preview,
+    Section,
+    Text,
 } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface TwoFactorDisabledEmailProps {
-  t: (key: string, options?: any) => string;
+    assetsUrl: string,
+    frontendUrl: string,
+    t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : '';
-
-export default function TwoFactorDisabledEmail({ t }: TwoFactorDisabledEmailProps) {
-  return (
-    <Html>
-      <Head />
-      <Body style={main}>
-        <Preview>{t('emails.2fa-disabled.preview')}</Preview>
-        <Container style={container}>
-          <Section style={coverSection}>
-            <Section style={imageSection}>
-              <Img
-                src={`${baseUrl}/static/logo.png`}
-                width="75"
-                height="45"
-                alt={t('emails.2fa-disabled.logoAlt', { defaultValue: 'Company Logo' })}
-              />
-            </Section>
-            <Section style={upperSection}>
-              <Heading style={h1}>{t('emails.2fa-disabled.heading')}</Heading>
-              <Text style={mainText}>
-                {t('emails.2fa-disabled.body')}
-              </Text>
-              <Text style={secondaryText}>
-                {t('emails.2fa-disabled.recommendation')}
-              </Text>
-            </Section>
-            <Hr />
-            <Section style={lowerSection}>
-              <Text style={cautionText}>
-                {t('emails.2fa-disabled.warning')}
-              </Text>
-            </Section>
-          </Section>
-          <Text style={footerText}>
-            {t('emails.2fa-disabled.footer.supportPrompt')}{' '}
-            <Link href="https://example.com/support" target="_blank" style={link}>
-              {t('emails.2fa-disabled.footer.supportLink')}
-            </Link>.
-          </Text>
-        </Container>
-      </Body>
-    </Html>
-  );
+export default function TwoFactorDisabledEmail({ 
+    assetsUrl,
+    t, 
+    frontendUrl 
+}: TwoFactorDisabledEmailProps) {
+    return (
+        <Html>
+            <Head />
+            <Body style={main}>
+                <Preview>{t('emails.2fa-disabled.preview')}</Preview>
+                <Container style={container}>
+                    <Section style={coverSection}>
+                        <Section style={imageSection}>
+                            <Img
+                                src={`${assetsUrl}/static/logo.png`}
+                                width="75"
+                                height="45"
+                                alt={t('emails.2fa-disabled.logoAlt', { defaultValue: 'Company Logo' })}
+                            />
+                        </Section>
+                        <Section style={upperSection}>
+                            <Heading style={h1}>{t('emails.2fa-disabled.heading')}</Heading>
+                            <Text style={mainText}>
+                                {t('emails.2fa-disabled.body')}
+                            </Text>
+                            <Text style={secondaryText}>
+                                {t('emails.2fa-disabled.recommendation')}
+                            </Text>
+                        </Section>
+                        <Hr />
+                        <Section style={lowerSection}>
+                            <Text style={cautionText}>
+                                {t('emails.2fa-disabled.warning')}
+                            </Text>
+                        </Section>
+                    </Section>
+                    <Text style={footerText}>
+                        {t('emails.2fa-disabled.footer.supportPrompt')}{' '}
+                        <Link href={`${frontendUrl}/support`} target="_blank" style={link}>
+                            {t('emails.2fa-disabled.footer.supportLink')}
+                        </Link>.
+                    </Text>
+                </Container>
+            </Body>
+        </Html>
+    );
 }
 
 TwoFactorDisabledEmail.PreviewProps = {
-  t: getEmailTranslator('en'),
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
+    t: getEmailTranslator(),
 } satisfies TwoFactorDisabledEmailProps;
 
 const main = {

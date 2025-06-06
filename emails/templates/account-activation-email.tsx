@@ -14,15 +14,16 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface AccountActivationEmailProps {
-    loginUrl?: string;
+    assetsUrl: string,
+    frontendUrl: string,
     t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-
-export default function AccountActivationEmail({ loginUrl, t }: AccountActivationEmailProps) {
+export default function AccountActivationEmail({ 
+    assetsUrl,
+    frontendUrl, 
+    t
+}: AccountActivationEmailProps) {
     return (
         <Html>
             <Head />
@@ -32,7 +33,7 @@ export default function AccountActivationEmail({ loginUrl, t }: AccountActivatio
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.account-activation-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -45,13 +46,11 @@ export default function AccountActivationEmail({ loginUrl, t }: AccountActivatio
                             <Text style={mainText}>
                                 {t('emails.account-activation-email.intro')}
                             </Text>
-                            {loginUrl && (
-                                <Section style={buttonSection}>
-                                    <Link href={loginUrl} style={button}>
-                                        {t('emails.account-activation-email.cta')}
-                                    </Link>
-                                </Section>
-                            )}
+                            <Section style={buttonSection}>
+                                <Link href={`${frontendUrl}/login`} style={button}>
+                                    {t('emails.account-activation-email.cta')}
+                                </Link>
+                            </Section>
                         </Section>
                         <Hr />
                         <Section style={lowerSection}>
@@ -62,7 +61,7 @@ export default function AccountActivationEmail({ loginUrl, t }: AccountActivatio
                     </Section>
                     <Text style={footerText}>
                         {t('emails.account-activation-email.footer.notice')}{' '}
-                        <Link href="https://example.com/privacy" target="_blank" style={link}>
+                        <Link href={`${frontendUrl}/privacy`} target="_blank" style={link}>
                             {t('emails.account-activation-email.footer.privacyLink')}
                         </Link>.
                     </Text>
@@ -73,8 +72,9 @@ export default function AccountActivationEmail({ loginUrl, t }: AccountActivatio
 }    
 
 AccountActivationEmail.PreviewProps = {
-    loginUrl: 'https://example.com/login',
-    t: getEmailTranslator('en'),
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
+    t: getEmailTranslator(),
 } satisfies AccountActivationEmailProps;
 
 const main = {

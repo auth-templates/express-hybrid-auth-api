@@ -5,10 +5,11 @@ import AccountActivationEmail from '../../emails/templates/account-activation-em
 import TwoFactorAuthEmail from '../../emails/templates/2fa-code-email';
 import TwoFactorDisabledEmail from '../../emails/templates/2fa-disabled-email';
 import PasswordResetEmail from '../../emails/templates/password-reset-email';
+import GlobalConfig from '../config';
 
 export const transporter = nodemailer.createTransport({
-  host: 'localhost',
-  port: 2525,
+  host: GlobalConfig.SMTP_HOST,
+  port: GlobalConfig.SMTP_PORT,
   secure: false, // smtp4dev does not use TLS by default
   auth: undefined,
 //   auth: {
@@ -20,31 +21,37 @@ export const transporter = nodemailer.createTransport({
 export async function sendVerificationEmail({token, userEmail, expiresInMinutes, t}:{token: string, userEmail: string, expiresInMinutes: number, t: (key: string, options?: any) => string}) {
     const emailHtml = await render(
         <VerificationEmail 
-            verificationUrl={`https://yourdomain.com/verify?token=${token}`}
-            expiresInMinutes={expiresInMinutes} 
-            t={t}
+            verificationUrl={`${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/verify?token=${token}`}
+            expiresInMinutes={expiresInMinutes}
+            t={t} 
+            frontendUrl={GlobalConfig.EMAIL_FRONTEND_BASE_URL}   
+            assetsUrl={GlobalConfig.EMAIL_ASSETS_BASE_URL}       
         />
     );
 
     const options = {
-        from: 'you@example.com',
+        from: GlobalConfig.SUPPORT_EMAIL,
         to: userEmail,
-        subject: 'Email verification',
+        subject: t("emails.verification.subject"),
         html: emailHtml,
     };
     
     await transporter.sendMail(options);
 }
 
-export async function sendAccountActivationEmail({t}:{t: (key: string, options?: any) => string}) {
+export async function sendAccountActivationEmail({t, userEmail}:{userEmail: string, t: (key: string, options?: any) => string}) {
     const emailHtml = await render(
-        <AccountActivationEmail loginUrl={`https://yourdomain.com/login`} t={t}/>
+        <AccountActivationEmail
+            t={t}
+            frontendUrl={GlobalConfig.EMAIL_FRONTEND_BASE_URL}   
+            assetsUrl={GlobalConfig.EMAIL_ASSETS_BASE_URL}              
+        />
     );
 
     const options = {
-        from: 'you@example.com',
-        to: 'user@gmail.com',
-        subject: 'Account activated',
+        from: GlobalConfig.SUPPORT_EMAIL,
+        to: userEmail,
+        subject: t('emails.account-activation-email.subject'),
         html: emailHtml,
     };
     
@@ -56,14 +63,16 @@ export async function send2FARecoverEmail({verificationCode, userEmail, expiresI
         <TwoFactorAuthEmail 
             expiresInMinutes={expiresInMinutes}
             verificationCode={verificationCode}
-            t={t}
+            t={t} 
+            frontendUrl={GlobalConfig.EMAIL_FRONTEND_BASE_URL}   
+            assetsUrl={GlobalConfig.EMAIL_ASSETS_BASE_URL}            
         />
     );
 
     const options = {
-        from: 'you@example.com',
-        to: 'user@gmail.com',
-        subject: 'Account activated',
+        from: GlobalConfig.SUPPORT_EMAIL,
+        to: userEmail,
+        subject: t("emails.2fa-code-email.subject"),
         html: emailHtml,
     };
     
@@ -73,14 +82,16 @@ export async function send2FARecoverEmail({verificationCode, userEmail, expiresI
 export async function send2FADisabledEmail({t}:{t: (key: string, options?: any) => string}) {
     const emailHtml = await render(
         <TwoFactorDisabledEmail
-            t={t}
+            t={t} 
+            frontendUrl={GlobalConfig.EMAIL_FRONTEND_BASE_URL}   
+            assetsUrl={GlobalConfig.EMAIL_ASSETS_BASE_URL}              
         />
     );
 
     const options = {
-        from: 'you@example.com',
+        from: GlobalConfig.SUPPORT_EMAIL,
         to: 'user@gmail.com',
-        subject: 'Account activated',
+        subject: t("emails.2fa-disabled.subject"),
         html: emailHtml,
     };
     
@@ -90,16 +101,18 @@ export async function send2FADisabledEmail({t}:{t: (key: string, options?: any) 
 export async function sendPasswordResetEmail({t, userEmail, expiresInMinutes, verificationCode}:{t: (key: string, options?: any) => string, userEmail: string, expiresInMinutes: number, verificationCode: string}) {
     const emailHtml = await render(
         <PasswordResetEmail
-            resetUrl={`url?token=${verificationCode}`}
+            resetUrl={`${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/reset-password?token=${verificationCode}`}
             expiresInMinutes={expiresInMinutes}
-            t={t}
+            t={t} 
+            frontendUrl={GlobalConfig.EMAIL_FRONTEND_BASE_URL}   
+            assetsUrl={GlobalConfig.EMAIL_ASSETS_BASE_URL}            
         />
     );
 
     const options = {
-        from: 'you@example.com',
+        from: GlobalConfig.SUPPORT_EMAIL,
         to: userEmail,
-        subject: 'Account activated',
+        subject: t("emails.password-reset-email.subject"),
         html: emailHtml,
     };
     
@@ -109,14 +122,16 @@ export async function sendPasswordResetEmail({t, userEmail, expiresInMinutes, ve
 export async function sendPasswordChangedEmail({t, userEmail}:{t: (key: string, options?: any) => string, userEmail: string}) {
     const emailHtml = await render(
         <PasswordResetEmail
-            t={t}
+            t={t} 
+            frontendUrl={GlobalConfig.EMAIL_FRONTEND_BASE_URL}   
+            assetsUrl={GlobalConfig.EMAIL_ASSETS_BASE_URL}       
         />
     );
 
     const options = {
-        from: 'you@example.com',
+        from: GlobalConfig.SUPPORT_EMAIL,
         to: userEmail,
-        subject: 'Account activated',
+        subject: t("emails.password-changed-email.subject"),
         html: emailHtml,
     };
     

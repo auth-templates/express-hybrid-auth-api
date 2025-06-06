@@ -14,16 +14,16 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface EmailVerificationProps {
+    assetsUrl: string,
+    frontendUrl: string,
     verificationUrl: string;
     expiresInMinutes: number;
     t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-    
 export default function EmailVerification({
+    assetsUrl,
+    frontendUrl,
     verificationUrl,
     expiresInMinutes,
     t
@@ -37,7 +37,7 @@ export default function EmailVerification({
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.verification.logoAlt', { defaultValue: 'Company Logo' })}
@@ -72,7 +72,7 @@ export default function EmailVerification({
                     </Section>
                     <Text style={footerText}>
                         {t('emails.verification.footer')}{' '}
-                        <Link href="https://example.com/privacy" target="_blank" style={link}>
+                        <Link href={`${frontendUrl}/privacy`} target="_blank" style={link}>
                             {t('emails.verification.privacyLink')}
                         </Link>
                         .
@@ -84,8 +84,10 @@ export default function EmailVerification({
 }
 
 EmailVerification.PreviewProps = {
-    verificationUrl: 'https://example.com/verify?token=abc123',
-    t: getEmailTranslator('en'),
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
+    verificationUrl: 'http://localhost:3000/verify?token=abc123',
+    t: getEmailTranslator(),
     expiresInMinutes: 30
 } satisfies EmailVerificationProps;
 

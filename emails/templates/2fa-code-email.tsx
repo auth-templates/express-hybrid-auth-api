@@ -14,16 +14,16 @@ import {
 import { getEmailTranslator } from '../utils/getEmailTranslator';
 
 interface TwoFactorAuthEmailProps {
+    assetsUrl: string,
+    frontendUrl: string,
     verificationCode?: string;
     expiresInMinutes?: number;
     t: (key: string, options?: any) => string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : '';
-
 export default function TwoFactorAuthEmail({
+    assetsUrl,
+    frontendUrl,
     verificationCode,
     expiresInMinutes,
     t
@@ -37,7 +37,7 @@ export default function TwoFactorAuthEmail({
                     <Section style={coverSection}>
                         <Section style={imageSection}>
                             <Img
-                                src={`${baseUrl}/static/logo.png`}
+                                src={`${assetsUrl}/static/logo.png`}
                                 width="75"
                                 height="45"
                                 alt={t('emails.2fa-code-email.logoAlt', { defaultValue: 'Company Logo' })}
@@ -69,7 +69,7 @@ export default function TwoFactorAuthEmail({
                     </Section>
                     <Text style={footerText}>
                         {t('emails.2fa-code-email.footer.supportPrompt')}{' '}
-                        <Link href="https://example.com/support" target="_blank" style={link}>
+                        <Link href={`${frontendUrl}/support`} target="_blank" style={link}>
                             {t('emails.2fa-code-email.footer.supportLink')}
                         </Link>.
                     </Text>
@@ -80,9 +80,11 @@ export default function TwoFactorAuthEmail({
 }
 
 TwoFactorAuthEmail.PreviewProps = {
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     verificationCode: '123456',
     expiresInMinutes: 30,
-    t: getEmailTranslator('en'),
+    t: getEmailTranslator(),
 } satisfies TwoFactorAuthEmailProps;
 
 const main = {

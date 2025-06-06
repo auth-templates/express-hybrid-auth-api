@@ -59,6 +59,7 @@
     },
     "emails": {
         "2fa-disabled": {
+            "subject": "Autentificarea cu doi factori a fost dezactivată",
             "preview": "Autentificarea cu doi factori a fost dezactivată",
             "logoAlt": "Sigla companiei",
             "heading": "Autentificare cu doi factori dezactivată",
@@ -71,6 +72,7 @@
             }
         },
         "2fa-code-email": {
+            "subject": "Codul tău de autentificare 2FA",
             "preview": "Codul tău de verificare 2FA",
             "heading": "Codul tău de autentificare cu doi factori",
             "instruction": "Te rugăm să folosești codul de mai jos pentru a finaliza autentificarea. Acest cod este valabil timp de {{expiresInMinutes}} minute.",
@@ -83,6 +85,7 @@
             }
         },
         "account-activation-email": {
+            "subject": "Cont activat",
             "preview": "Contul tău este acum activ",
             "logoAlt": "Sigla companiei",
             "heading": "Bun venit! Contul tău este acum activ",
@@ -95,6 +98,7 @@
             }
         },
         "account-deactivation-email": {
+            "subject": "Cont dezactivat",
             "preview": "Contul tău a fost dezactivat",
             "logoAlt": "Sigla companiei",
             "heading": "Contul tău a fost dezactivat",
@@ -106,6 +110,7 @@
             "footer": "Îți mulțumim că ai fost clientul nostru. Suntem aici dacă ai nevoie de noi."
         },
         "account-deletion-email": {
+            "subject": "Cont șters",
             "preview": "Contul tău a fost șters",
             "logoAlt": "Sigla companiei",
             "heading": "Contul tău a fost șters",
@@ -117,6 +122,7 @@
             "footer": "Îți mulțumim pentru timpul petrecut cu noi. Dacă te vei întoarce, te vom primi cu brațele deschise."
         },
         "account-details-updated-email": {
+            "subject": "Detaliile contului au fost actualizate",
             "preview": "Detaliile contului tău au fost actualizate",
             "logoAlt": "Sigla companiei",
             "heading": "Informațiile contului tău au fost actualizate",
@@ -130,6 +136,7 @@
             "supportLink": "centrul de suport"
         },
         "account-reactivation-email": {
+            "subject": "Reactivarea contului tău",
             "preview": "Bun venit din nou! Reactivează-ți contul",
             "logoAlt": "Sigla companiei",
             "heading": "Bun venit din nou! Reactivează-ți contul",
@@ -141,6 +148,7 @@
             "footer": "Așteptăm cu nerăbdare să revii! Dacă ai nevoie de ajutor, contactează echipa noastră."
         },
         "email-address-changed-email": {
+            "subject": "Adresa de email a fost schimbată",
             "preview": "Notificare schimbare adresă de e-mail",
             "logoAlt": "Sigla companiei",
             "heading": "Adresa ta de e-mail a fost schimbată",
@@ -153,6 +161,7 @@
             "supportCenter": "centrul de suport"
         },
         "inactive-account-reminder-email": {
+            "subject": "Ne e dor de tine!",
             "preview": "Ne este dor de tine! Revino în contul tău",
             "logoAlt": "Sigla companiei",
             "heading": "Ne este dor de tine!",
@@ -164,6 +173,7 @@
             "footer": "Sperăm să te revedem curând! Dacă ai nevoie de ajutor, contactează echipa noastră de suport."
         },
         "new-device-login-email": {
+            "subject": "Autentificare nouă detectată",
             "preview": "S-a detectat o nouă autentificare",
             "logoAlt": "Sigla companiei",
             "heading": "S-a detectat o nouă autentificare",
@@ -179,6 +189,7 @@
             "supportLink": "centrul de suport"
         },
         "password-changed-email": {
+            "subject": "Parola a fost schimbată",
             "preview": "Parola ta a fost schimbată",
             "logoAlt": "Sigla companiei",
             "heading": "Parola ta a fost schimbată",
@@ -190,6 +201,7 @@
             "supportLink": "centrul de suport"
         },
         "password-reset-email": {
+            "subject": "Resetează-ți parola",
             "preview": "Resetează-ți parola",
             "logoAlt": "Sigla companiei",
             "heading": "Resetează-ți parola",
@@ -202,6 +214,7 @@
             "privacyLink": "politica de confidențialitate"
         },
         "verification": {
+            "subject": "Verificarea adresei de email",
             "preview": "Confirmă-ți adresa de e-mail pentru a începe",
             "logoAlt": "Sigla companiei",
             "heading": "Confirmă-ți adresa de e-mail",
@@ -214,6 +227,7 @@
             "privacyLink": "politica de confidențialitate"
         },
         "welcome-email": {
+            "subject": "Bun venit pe platforma noastră",
             "preview": "Bine ai venit pe platforma noastră!",
             "logoAlt": "Sigla companiei",
             "heading": "Bine ai venit!",
