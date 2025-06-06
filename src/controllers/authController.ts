@@ -42,8 +42,9 @@ export const verifySignup = async (request: Request, response: Response): Promis
     const { token } = request.body;
     try {
         const { userId } = await VerificationTokensRepository.verifySignupToken(token);
-        await UserRepository.updateUserStatus(userId, UserStatus.Active)
-        await sendAccountActivationEmail({t: request.t});
+        await UserRepository.updateUserStatus(userId, UserStatus.Active);
+        const user = await UserRepository.getUserById(userId);
+        await sendAccountActivationEmail({t: request.t, userEmail: user.email});
         response.status(204).send();
     } catch (error) {
         if (error instanceof AppError) {

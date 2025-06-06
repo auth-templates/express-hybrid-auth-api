@@ -53,16 +53,17 @@ describe('POST /auth/reset-password', () => {
         jest.useFakeTimers({ legacyFakeTimers: false });
         jest.setSystemTime(fakeTime);
 
+        const token = "ijklmnopqrstuvwxyz0123";
         (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue(validUser2FA);
         jest.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
         jest.spyOn(emailService, 'sendPasswordResetEmail').mockResolvedValue(undefined);
         jest.spyOn(Token, 'generateToken').mockResolvedValue({
-            token: "ijklmnopqrstuvwxyz0123",
+            token: token,
             tokenFingerprint: "ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5",
             hashedToken: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo"
         });
 
-        const userEmail = "user@mail.com"
+        const userEmail = "dev@mail.com"
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(204);
@@ -73,6 +74,11 @@ describe('POST /auth/reset-password', () => {
             tokenHash: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo",
             type: "password_reset",
             userId: 2
+        });
+        expect(emailService.sendPasswordResetEmail).toHaveBeenCalledWith({t: expect.anything(), 
+            userEmail, 
+            expiresInMinutes: 30, 
+            verificationCode: token 
         });
 
         jest.useRealTimers();

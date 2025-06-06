@@ -53,16 +53,17 @@ describe('POST /2fa/recover', () => {
         jest.useFakeTimers({ legacyFakeTimers: false });
         jest.setSystemTime(fakeTime);
 
+        const token = "ijklmnopqrstuvwxyz0123";
         (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue(validUser2FA);
         jest.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
         jest.spyOn(emailService, 'send2FARecoverEmail').mockResolvedValue(undefined);
         jest.spyOn(Token, 'generateToken').mockResolvedValue({
-            token: "ijklmnopqrstuvwxyz0123",
+            token,
             tokenFingerprint: "ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5",
             hashedToken: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo"
         });
 
-        const userEmail = "user@mail.com"
+        const userEmail = "dev@mail.com"
         const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(204);
@@ -73,6 +74,12 @@ describe('POST /2fa/recover', () => {
             tokenHash: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo",
             type: "twofa",
             userId: 2
+        });
+        expect(emailService.send2FARecoverEmail).toHaveBeenCalledWith({t: 
+            expect.anything(), 
+            userEmail: validUser2FA.email,
+            expiresInMinutes: 30,
+            verificationCode: token,
         });
 
         jest.useRealTimers();

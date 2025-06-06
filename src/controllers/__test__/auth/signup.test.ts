@@ -45,6 +45,14 @@ describe('POST /signup', () => {
             password: undefined,
             passwordHash: "hashedPassword123"
         });
+
+        expect(emailService.sendVerificationEmail).toHaveBeenCalledWith({
+            t: expect.anything(), 
+            userEmail: signupData.email, 
+            expiresInMinutes: 30, 
+            token: expect.stringMatching(/^[A-Za-z0-9]{64}$/),
+     
+        });
     });
 
     it('should return 409 if email is already in use', async () => {

@@ -48,6 +48,7 @@ describe('POST /auth/reset-password', () => {
         expect(VerificationTokensRepository.verifyPasswordResetToken).toHaveBeenCalledWith('reset-password-valid');
         expect(UserRepository.getUserById).toHaveBeenCalledWith(1);
         expect(UserRepository.updatePassword).toHaveBeenCalledWith(1, 'hashedPassword123');
+        expect(emailService.sendPasswordChangedEmail).toHaveBeenCalledWith({t: expect.anything(), userEmail: validUser.email});
     });
 
     it('should return 400 if password is invalid', async () => {

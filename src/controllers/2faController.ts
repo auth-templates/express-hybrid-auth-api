@@ -119,7 +119,8 @@ export const confirm2FARecover = async (request: Request, response: Response): P
     try {
         const { userId } = await VerificationTokensRepository.verify2FAToken(token);
         await UserRepository.disable2FA(userId);
-        await send2FADisabledEmail({t: request.t});
+        const user = await UserRepository.getUserById(userId);
+        await send2FADisabledEmail({t: request.t, userEmail: user.email });
         response.status(204).send();
     } catch (error) {
         if (error instanceof AppError) {

@@ -6,6 +6,7 @@ import { AppError } from '../../../lib/error';
 import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
 import { UserRepository } from '../../../repositories/users';
 import * as emailService from '../../../lib/mailer';
+import { Role, UserStatus } from '../../../models/user';
 
 jest.mock('../../../repositories/verification-tokens');
 
@@ -14,14 +15,26 @@ app.use(i18nMiddleware);
 app.use(express.json());
 app.post('/auth/verify-signup', verifySignup);
 
+const activeUser = {
+    id: 1,
+    firstName: 'Dev',
+    lastName: 'Tester',
+    email: 'dev@mail.com',
+    role: Role.Admin,
+    status: UserStatus.Active,
+    createdAt: new Date(),
+};
+
 describe('POST /auth/verify-signup', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
+        jest.clearAllMocks();
         await i18nReady;
     });
 
     it('should return 204 for a valid token', async () => {
         (VerificationTokensRepository.verifySignupToken as jest.Mock).mockResolvedValue({ userId: 1 });
         jest.spyOn(UserRepository, 'updateUserStatus').mockResolvedValue(undefined); // Since it's void
+        jest.spyOn(UserRepository, 'getUserById').mockResolvedValue(activeUser); // Since it's void
         jest.spyOn(emailService, 'sendAccountActivationEmail').mockResolvedValue(undefined); // because it returns void
 
         const response = await request(app)
@@ -31,6 +44,7 @@ describe('POST /auth/verify-signup', () => {
         expect(response.status).toBe(204);
         expect(VerificationTokensRepository.verifySignupToken).toHaveBeenCalledWith('signup-valid-1');
         expect(UserRepository.updateUserStatus).toHaveBeenCalledWith(1, 'active');
+        expect(emailService.sendAccountActivationEmail).toHaveBeenCalledWith({t: expect.anything(), userEmail: activeUser.email });
     });
 
     it('should return 400 for a used token', async () => {

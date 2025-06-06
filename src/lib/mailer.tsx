@@ -1,22 +1,12 @@
 import { render } from '@react-email/components';
 import VerificationEmail from '../../emails/templates/verification-email'
-import nodemailer from 'nodemailer';
+
 import AccountActivationEmail from '../../emails/templates/account-activation-email';
 import TwoFactorAuthEmail from '../../emails/templates/2fa-code-email';
 import TwoFactorDisabledEmail from '../../emails/templates/2fa-disabled-email';
 import PasswordResetEmail from '../../emails/templates/password-reset-email';
 import GlobalConfig from '../config';
-
-export const transporter = nodemailer.createTransport({
-  host: GlobalConfig.SMTP_HOST,
-  port: GlobalConfig.SMTP_PORT,
-  secure: false, // smtp4dev does not use TLS by default
-  auth: undefined,
-//   auth: {
-//     user: '', // Leave empty for smtp4dev (no auth by default)
-//     pass: '',
-//   },
-});
+import { transporter } from './mail-transporter';
 
 export async function sendVerificationEmail({token, userEmail, expiresInMinutes, t}:{token: string, userEmail: string, expiresInMinutes: number, t: (key: string, options?: any) => string}) {
     const emailHtml = await render(
@@ -79,7 +69,7 @@ export async function send2FARecoverEmail({verificationCode, userEmail, expiresI
     await transporter.sendMail(options);
 }
 
-export async function send2FADisabledEmail({t}:{t: (key: string, options?: any) => string}) {
+export async function send2FADisabledEmail({t, userEmail}:{userEmail: string, t: (key: string, options?: any) => string}) {
     const emailHtml = await render(
         <TwoFactorDisabledEmail
             t={t} 
@@ -90,7 +80,7 @@ export async function send2FADisabledEmail({t}:{t: (key: string, options?: any) 
 
     const options = {
         from: GlobalConfig.SUPPORT_EMAIL,
-        to: 'user@gmail.com',
+        to: userEmail,
         subject: t("emails.2fa-disabled.subject"),
         html: emailHtml,
     };

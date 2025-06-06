@@ -34,6 +34,7 @@ export default {
         "/main.ts",         // (Optional) ignore entry point
         "/index.ts",        // (Optional) if it's just exporting
     ],
+    modulePathIgnorePatterns: ['<rootDir>/dist/'],
     coverageReporters: ['text', 'lcov'], // text for console, lcov for HTML
 };
   

@@ -8,6 +8,7 @@ import session from 'express-session';
 import GlobalConfig from '../../../config';
 import { VerificationTokensRepository } from '../../../repositories/verification-tokens';
 import * as emailService from '../../../lib/mailer';
+import { Role, UserStatus } from '../../../models/user';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -30,15 +31,26 @@ app.use(i18nMiddleware);
 app.use(express.json());
 app.post('/2fa/confirm-recover', confirm2FARecover);
 
+const validUser = {
+    id: 10,
+    firstName: 'Dev',
+    lastName: 'Tester',
+    email: 'dev@mail.com',
+    role: Role.Admin,
+    createdAt: new Date(),
+    enabled2FA: false,
+    status: UserStatus.Active
+};
+
 describe('POST /2fa/confirm-recover', () => {
     beforeAll(async () => {
         await i18nReady;
     });
 
     it('should return 204 when 2FA token is valid', async () => {
-        const userId = 10;
-        jest.spyOn(VerificationTokensRepository, 'verify2FAToken').mockResolvedValue({userId});
+        jest.spyOn(VerificationTokensRepository, 'verify2FAToken').mockResolvedValue({userId: validUser.id});
         (UserRepository.disable2FA as jest.Mock).mockResolvedValue(undefined);
+        (UserRepository.getUserById as jest.Mock).mockResolvedValue(validUser);
         jest.spyOn(emailService, 'send2FADisabledEmail').mockResolvedValue(undefined);
 
         const token = "ijklmnopqrstuvwxyz0123"
@@ -48,8 +60,10 @@ describe('POST /2fa/confirm-recover', () => {
                 .send({ token });
 
         expect(response.status).toBe(204);
-        expect(UserRepository.disable2FA).toHaveBeenCalledWith(userId);
+        expect(UserRepository.disable2FA).toHaveBeenCalledWith(validUser.id);
         expect(VerificationTokensRepository.verify2FAToken).toHaveBeenCalledWith(token);
+        expect(UserRepository.getUserById).toHaveBeenCalledWith(validUser.id);
+        expect(emailService.send2FADisabledEmail).toHaveBeenCalledWith({t: expect.anything(), userEmail: validUser.email });
     });
 
     it('should return 400 when token is invalid', async () => {
