@@ -6,6 +6,46 @@ const router = express.Router();
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     TwoFASetupResponse:
+ *       type: object
+ *       properties:
+ *         qrCodeUrl:
+ *           type: string
+ *           format: uri
+ *           example: "otpauth://totp/MyApp:username@example.com?secret=ABCDEF123456&issuer=MyApp"
+ *         secret:
+ *           type: string
+ *           example: "ABCDEF123456"
+ *     Verify2FACodeRequest:
+ *       type: object
+ *       required:
+ *         - code
+ *       properties:
+ *         code:
+ *           type: string
+ *           example: "123456"
+ *     Recover2FARequest:
+ *       type: object
+ *       required:
+ *         - email
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: "user@example.com"
+ *     ConfirmRecover2FARequest:
+ *       type: object
+ *       required:
+ *         - token
+ *       properties:
+ *         token:
+ *           type: string
+ *           example: "abc123def456"
+ */
+
+/**
+ * @swagger
  * /2fa/setup:
  *   post:
  *     summary: Generates QR code and temporary secret for 2FA setup
@@ -18,15 +58,7 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 qrCodeUrl:
- *                   type: string
- *                   format: uri
- *                   example: "otpauth://totp/MyApp:username@example.com?secret=ABCDEF123456&issuer=MyApp"
- *                 secret:
- *                   type: string
- *                   example: "ABCDEF123456"
+ *               $ref: '#/components/schemas/TwoFASetupResponse'
  *       401:
  *         description: Unauthorized - missing or invalid token
  */
@@ -45,13 +77,7 @@ router.post('/setup', authenticate, setup2FA);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - code
- *             properties:
- *               code:
- *                 type: string
- *                 example: "123456"
+ *             $ref: '#/components/schemas/Verify2FACodeRequest'
  *     responses:
  *       200:
  *         description: Verification successful, 2FA enabled
@@ -91,13 +117,7 @@ router.delete('/disable', authenticate, disable2FA);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - email
- *             properties:
- *               email:
- *                 type: string
- *                 example: "user@example.com"
+ *             $ref: '#/components/schemas/Recover2FARequest'
  *     responses:
  *       200:
  *         description: 2FA reset request sent successfully
@@ -119,13 +139,7 @@ router.post('/recover', recover2FA);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - token
- *             properties:
- *               token:
- *                 type: string
- *                 example: "abc123def456"
+ *             $ref: '#/components/schemas/ConfirmRecover2FARequest'
  *     responses:
  *       200:
  *         description: 2FA successfully disabled and reset
@@ -135,5 +149,6 @@ router.post('/recover', recover2FA);
  *         description: Unauthorized - missing or invalid token
  */
 router.post('/confirm-recover', confirm2FARecover);
+
 
 export default router;

@@ -3,6 +3,8 @@
 
 .vscode
 
+openapi
+
 ### Node ###
 # Logs
 logs

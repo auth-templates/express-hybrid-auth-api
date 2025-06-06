@@ -31,7 +31,7 @@ describe('csrf middleware', () => {
   });
 
   it('should call next() for non-GET requests with valid origin', () => {
-    const req = mockRequest('POST', 'https://example.com');
+    const req = mockRequest('POST', 'http://localhost:3000');
     const res = mockResponse();
 
     csrf(req, res, next);

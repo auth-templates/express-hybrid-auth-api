@@ -7,6 +7,117 @@ const router = express.Router();
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     SignupRequest:
+ *       type: object
+ *       required:
+ *         - firstName
+ *         - lastName
+ *         - email
+ *         - password
+ *       properties:
+ *         firstName:
+ *           type: string
+ *           example: "John"
+ *         lastName:
+ *           type: string
+ *           example: "Doe"
+ *         email:
+ *           type: string
+ *           example: "john.doe@example.com"
+ *         password:
+ *           type: string
+ *           example: "$SuperSecurePassword123"
+ *     LoginRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: "dev@mail.com"
+ *         password:
+ *           type: string
+ *           example: "$SuperSecurePassword45"
+ *     VerifyTokenRequest:
+ *       type: object
+ *       required:
+ *         - token
+ *       properties:
+ *         token:
+ *           type: string
+ *           example: "signup-verification-token-here"
+ *     ResetPasswordRequest:
+ *       type: object
+ *       required:
+ *         - userEmail
+ *       properties:
+ *         userEmail:
+ *           type: string
+ *           example: "user@example.com"
+ *     ConfirmResetPasswordRequest:
+ *       type: object
+ *       required:
+ *         - token
+ *         - newPassword
+ *       properties:
+ *         token:
+ *           type: string
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *         newPassword:
+ *           type: string
+ *           example: "StrongNewPassword!2025"
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "Internal server error"
+ *         error:
+ *           type: string
+ *     ValidationErrorItem:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "Invalid email format"
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 123
+ *         firstName:
+ *           type: string
+ *           example: "John"
+ *         lastName:
+ *           type: string
+ *           example: "Doe"
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "john.doe@example.com"
+ *         role:
+ *           type: string
+ *           example: "admin"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2023-01-01T12:00:00Z"
+ *         enabled2FA:
+ *           type: boolean
+ *           nullable: true
+ *           example: true
+ *         status:
+ *           type: string
+ *           nullable: true
+ *           example: "active"
+ */
+
+/**
+ * @swagger
  * /auth/signup:
  *   post:
  *     summary: User Signup
@@ -16,25 +127,7 @@ const router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - firstName
- *               - lastName
- *               - email
- *               - password
- *             properties:
- *               firstName:
- *                 type: string
- *                 example: "John"
- *               lastName:
- *                 type: string
- *                 example: "Doe"
- *               email:
- *                 type: string
- *                 example: "john.doe@example.com"
- *               password:
- *                 type: string
- *                 example: "$SuperSecurePassword123"
+ *             $ref: '#/components/schemas/SignupRequest'
  *     responses:
  *       200:
  *         description: User successfully registered.
@@ -43,13 +136,7 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Error retrieving items
- *                 error:
- *                   type: string
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/signup', signup);
 
@@ -64,13 +151,7 @@ router.post('/signup', signup);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - token
- *             properties:
- *               token:
- *                 type: string
- *                 example: "signup-verification-token-here"
+ *             $ref: '#/components/schemas/VerifyTokenRequest'
  *     responses:
  *       200:
  *         description: Token verified and user activated.
@@ -94,14 +175,7 @@ router.post('/verify-signup', verifySignup);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: "dev@mail.com"
- *               password:
- *                 type: string
- *                 example: "$SuperSecurePassword45"
+ *             $ref: '#/components/schemas/LoginRequest'
  *     responses:
  *       200:
  *         description: Login successful, session token set in cookie and user info returned.
@@ -121,23 +195,13 @@ router.post('/verify-signup', verifySignup);
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Invalid email format"
+ *                 $ref: '#/components/schemas/ValidationErrorItem'
  *       500:
  *         description: Server error during login.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Error retrieving items
- *                 error:
- *                   type: string
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/login', login);
 
@@ -148,21 +212,15 @@ router.post('/login', login);
  *     summary: User Logout
  *     description: Logs out the user by deleting the session cookie.
  *     responses:
- *       '204':
+ *       204:
  *         description: Logout successful, session cookie deleted.
- *       '500':
+ *       500:
  *         description: Server error during logout.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Error retrieving items
- *                 error:
- *                   type: string
-*/
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post('/logout', authenticate, logout);
 
 /**
@@ -179,21 +237,13 @@ router.post('/logout', authenticate, logout);
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid refresh token
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Server error during token refresh.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Internal server error
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/refresh', authenticate, refresh);
 
@@ -208,18 +258,12 @@ router.post('/refresh', authenticate, refresh);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - userEmail
- *             properties:
- *               userEmail:
- *                 type: string
- *                 example: user@example.com
+ *             $ref: '#/components/schemas/ResetPasswordRequest'
  *     responses:
  *       204:
  *         description: Password reset email sent if user exists and is active.
  *       200:
- *         description: Password reset not allowed (e.g., user inactive). Response used to avoid user enumeration.
+ *         description: Password reset not allowed (e.g., user inactive).
  *         content:
  *           application/json:
  *             schema:
@@ -233,11 +277,7 @@ router.post('/refresh', authenticate, refresh);
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Internal server error
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/reset-password/request', resetPassword);
 
@@ -252,17 +292,7 @@ router.post('/reset-password/request', resetPassword);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - token
- *               - newPassword
- *             properties:
- *               token:
- *                 type: string
- *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *               newPassword:
- *                 type: string
- *                 example: StrongNewPassword!2025
+ *             $ref: '#/components/schemas/ConfirmResetPasswordRequest'
  *     responses:
  *       204:
  *         description: Password successfully reset.
@@ -271,62 +301,15 @@ router.post('/reset-password/request', resetPassword);
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid or expired token
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Server error during password reset.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Internal server error
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/reset-password', confirmResetPassword);
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           example: 123
- *         firstName:
- *           type: string
- *           example: "John"
- *         lastName:
- *           type: string
- *           example: "Doe"
- *         email:
- *           type: string
- *           format: email
- *           example: "john.doe@example.com"
- *         role:
- *           type: string
- *           description: Role of the user
- *           example: "admin"  # adjust example based on your Role enum values
- *         createdAt:
- *           type: string
- *           format: date-time
- *           example: "2023-01-01T12:00:00Z"
- *         enabled2FA:
- *           type: boolean
- *           nullable: true
- *           example: true
- *         status:
- *           type: string
- *           nullable: true
- *           description: Status of the user
- *           example: "active"  # adjust example based on your UserStatus enum values
- */
 
 
 export default router;

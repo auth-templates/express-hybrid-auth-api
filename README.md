@@ -47,3 +47,4 @@ Follow these steps to get the project up and running with Prisma and ensure the 
 - [How To Set Up a Node Project With Typescript](https://www.digitalocean.com/community/tutorials/setting-up-a-node-project-with-typescript)
 - [How to Setup a TypeScript + Node.js Project](https://khalilstemmler.com/blogs/typescript/node-starter-project/)
 - [Creating a basic REST API with TypeScript, Node.js, Swagger MVC](https://blog.devgenius.io/creating-a-basic-rest-api-with-typescript-node-js-swagger-mvc-42852ae5b52f)
+- [OpenAPI React Query Codegen](https://openapi-react-query-codegen.vercel.app/examples/nextjs/)
