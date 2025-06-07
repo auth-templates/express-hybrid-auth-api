@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set +e 
+
+# Capture commitlint output and status
+commitlint_output=$(npx --no -- commitlint --edit "$1" 2>&1)
+ret=$?
+
+# Check exit code of commitlint
+if [  $ret -ne 0 ]; then
+    echo ""
+    echo "❌ Commit message does not follow Conventional Commits format."
+    echo ""
+    echo "🔧 Allowed commit types:"
+    echo "  - build:    Changes that affect the build system or dependencies"
+    echo "  - chore:    Routine tasks and maintenance"
+    echo "  - ci:       Continuous integration changes"
+    echo "  - docs:     Documentation only"
+    echo "  - feat:     A new feature"
+    echo "  - fix:      A bug fix"
+    echo "  - perf:     Performance improvements"
+    echo "  - refactor: Code change that neither fixes a bug nor adds a feature"
+    echo "  - revert:   Reverts a previous commit"
+    echo "  - style:    Code formatting, no logic change"
+    echo "  - test:     Adding or updating tests"
+    echo ""
+    echo "💡 Example: feat(login): add password visibility toggle"
+    echo ""
+    echo "$commitlint_output" | sed 's/^/ /'
+    echo ""
+    exit $ret
+fi
