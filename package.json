@@ -10,6 +10,7 @@
   "scripts": {
     "codegen": "openapi-rq -i ./dist/swagger.yml",
     "email:dev": "npx react-email dev --dir emails/templates",
+    "prisma:generate": "prisma generate",
     "reset-and-seed": "npx prisma db push && npx prisma db seed",
     "coverage": "jest --coverage && node -e \"console.log('📄 Coverage report: file:///' + require('path').resolve('coverage/lcov-report/index.html'))\"",
     "predev": "npm run init-database && sleep 3 && npm run reset-and-seed",
@@ -20,7 +21,7 @@
     "test": "cross-env NODE_ENV=testing jest",
     "swagger": "tsx src/swagger-generate.ts",
     "init-database": "docker-compose -f .devcontainer/docker-compose.yml down -v && docker-compose -f .devcontainer/docker-compose.yml pull && docker-compose -f .devcontainer/docker-compose.yml up --detach --remove-orphans",
-    "prepare": "husky"
+    "prepare": "npx husky && npm run prisma:generate"
   },
   "keywords": [],
   "author": "",
