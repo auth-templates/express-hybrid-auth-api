@@ -14,8 +14,11 @@ import GlobalConfig from './config';
 import { Request, Response } from 'express';
 import passport from 'passport';
 import './strategies';
+import csrfRoutes from './routes/csrfRoutes';
 import googleAuthRoutes from './routes/googleAuthRoutes';
 import githubAuthRoutes from './routes/githubAuthRoutes';
+import { errorHandler } from './middlewares/error-handler';
+import { csrfProtection, csrfTokenHandler } from './middlewares/csrf';
 
 const app = express();
 const port = 3000;
@@ -47,6 +50,10 @@ app.use(i18nMiddleware);
 app.use(cookieParser());
 app.use(express.json());
 
+app.get('/', csrfRoutes);
+
+app.use(csrfProtection);
+
 console.log("env:", process.env.NODE_ENV)
 
 if ( process.env.NODE_ENV === 'development' ) {
@@ -72,6 +79,8 @@ app.use('/2fa', twofaRoutes);
 app.use('/auth', googleAuthRoutes);
 app.use('/auth', githubAuthRoutes);
 app.use('/auth', authRouter);
+
+app.use(errorHandler);
 
 
 const listeningUrl = `http://localhost:${port}${process.env.NODE_ENV === 'development' ? '/api-docs' : ''}`;

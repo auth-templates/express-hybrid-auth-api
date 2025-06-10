@@ -1,62 +1,55 @@
 import { Request, Response } from 'express';
-import { csrf } from '../csrf';
 
-describe('csrf middleware', () => {
-  const mockRequest = (method: string, origin?: string): Request =>
-    ({
-      method,
-      headers: origin ? { Origin: origin } : {},
-    } as unknown as Request);
-
-  const mockResponse = () => {
-    const res: Partial<Response> = {};
-    res.status = jest.fn().mockReturnValue(res);
-    return res as Response;
+jest.mock('csrf-sync', () => {
+  return {
+    csrfSync: () => ({
+      csrfSynchronisedProtection: jest.fn(),
+      generateToken: jest.fn(() => 'fixed-token-123'),
+    }),
   };
+});
 
-  const next = jest.fn();
+// Now import after mocking
+import { csrfTokenHandler, csrfProtection } from '../csrf';
+
+describe('csrfTokenHandler', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+  let cookieMock: jest.Mock;
+  let jsonMock: jest.Mock;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    jsonMock = jest.fn();
+    cookieMock = jest.fn().mockReturnValue({ json: jsonMock });
+
+    req = {} as Partial<Request>;
+    res = {
+      cookie: cookieMock,
+      json: jsonMock,
+    };
   });
 
-  it('should call next() for GET requests regardless of Origin', () => {
-    const req = mockRequest('GET');
-    const res = mockResponse();
+  test('should generate a CSRF token, set cookie, and respond with token JSON', () => {
+    csrfTokenHandler(req as Request, res as Response);
 
-    csrf(req, res, next);
+    expect(cookieMock).toHaveBeenCalledWith(
+      'XSRF-TOKEN',
+      'fixed-token-123',
+      expect.objectContaining({
+        httpOnly: false,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+      })
+    );
 
-    expect(next).toHaveBeenCalled();
-    expect(res.status).not.toHaveBeenCalled();
+    expect(jsonMock).toHaveBeenCalledWith({
+      csrfToken: 'fixed-token-123',
+    });
   });
+});
 
-  it('should call next() for non-GET requests with valid origin', () => {
-    const req = mockRequest('POST', 'http://localhost:3000');
-    const res = mockResponse();
-
-    csrf(req, res, next);
-
-    expect(next).toHaveBeenCalled();
-    expect(res.status).not.toHaveBeenCalled();
-  });
-
-  it('should return 403 for non-GET requests with no origin', () => {
-    const req = mockRequest('POST');
-    const res = mockResponse();
-
-    csrf(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(next).not.toHaveBeenCalled();
-  });
-
-  it('should return 403 for non-GET requests with invalid origin', () => {
-    const req = mockRequest('POST', 'https://malicious.com');
-    const res = mockResponse();
-
-    csrf(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(next).not.toHaveBeenCalled();
+describe('csrfProtection', () => {
+  test('should be defined as a function (middleware)', () => {
+    expect(typeof csrfProtection).toBe('function');
   });
 });

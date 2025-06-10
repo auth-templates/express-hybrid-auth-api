@@ -7,7 +7,16 @@ export type SessionUser = {
 
 declare module 'express-session' {
   interface SessionData {
+    csrfToken?: string;     
     user?: SessionUser
     pending2FA?: boolean,
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      csrfToken(overwrite?: boolean): string; // added by csrf-sync
+    }
   }
 }
