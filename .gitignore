@@ -3,6 +3,8 @@
 
 .vscode
 
+.swagger
+
 openapi
 
 ### Node ###

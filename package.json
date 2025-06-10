@@ -8,7 +8,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
-    "codegen": "openapi-rq -i ./dist/swagger.yml",
+    "codegen": "openapi-rq -i ./.swagger/flexible-leaves-api.yml",
     "email:dev": "npx react-email dev --dir emails/templates",
     "prisma:generate": "prisma generate",
     "reset-and-seed": "npx prisma db push && npx prisma db seed",
