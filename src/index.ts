@@ -19,6 +19,7 @@ import googleAuthRoutes from './routes/googleAuthRoutes';
 import githubAuthRoutes from './routes/githubAuthRoutes';
 import { errorHandler } from './middlewares/error-handler';
 import { csrfProtection, csrfTokenHandler } from './middlewares/csrf';
+import { requireTermsAcceptance } from './middlewares/require-terms-acceptance';
 
 const app = express();
 const port = 3000;
@@ -79,6 +80,7 @@ app.use('/2fa', twofaRoutes);
 app.use('/auth', googleAuthRoutes);
 app.use('/auth', githubAuthRoutes);
 app.use('/auth', authRouter);
+app.use(requireTermsAcceptance)
 
 app.use(errorHandler);
 

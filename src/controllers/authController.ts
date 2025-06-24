@@ -68,14 +68,22 @@ export const signup = async (request: Request, response: Response): Promise<void
             return
         }
 
-        const { firstName, lastName, email, password, role } = request.body; 
+        const { firstName, lastName, email, password, role, termsAccepted } = request.body;
+        
+        if ( !termsAccepted ) {
+             response.status(400).json(
+                issues.map(({message, items}) => request.t(message, items))
+            );
+            return
+        }
 
         const id = await UserRepository.createUser({
             firstName,
             lastName,
             email,
             passwordHash: await hashPassword(password),
-            role: role as Role
+            role: role as Role,
+            termsAccepted,
         });
         const expiresInMinutes = GlobalConfig.SIGNUP_TOKEN_MAX_AGE / 1000 / 60;
         const {token, tokenFingerprint, hashedToken} = await generateToken();
@@ -138,24 +146,30 @@ export const logout = async (request: Request, response: Response): Promise<void
     }
 }
 
+async function issueNewAccessToken(req: Request, res: Response): Promise<void> {
+    const refreshToken = req.cookies?.refreshToken;
+    const userId = req.session?.user?.id;
+    const pending2FA = req.session?.pending2FA;
+    const termsAccepted = req.session?.termsAccepted;
+
+    const stored = await RefreshTokenStore.getStoredRefreshToken(userId, refreshToken);
+    if ( !refreshToken || refreshToken !== stored ) {
+        throw new AppError('errors.invalid_refresh_token', {}, 403);
+    }
+
+    await RefreshTokenStore.resetRefreshTokenExpiration(userId, refreshToken);
+
+    const newAccessToken = createAccessToken({ userId, pending2FA, termsAccepted });
+
+    setCookieTokens(res, [
+        { name: 'access_token', value: newAccessToken, maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
+    ]);
+}
+
+
 export const refresh = async (request: Request, response: Response): Promise<void> => {
-    const refreshToken = request.cookies?.refreshToken;
-    const userId = request.session?.user?.id;
-    const pending2FA = request.session?.pending2FA;
     try {
-        const stored = await RefreshTokenStore.getStoredRefreshToken(userId, refreshToken);
-        if ( !refreshToken || refreshToken !== stored ) {
-            response.status(403).json({ message: 'Invalid refresh token' });
-            return;
-        }
-     
-        await RefreshTokenStore.resetRefreshTokenExpiration(userId, refreshToken);
-
-        const newAccessToken = createAccessToken({ userId, pending2FA })
-
-        setCookieTokens(response, [
-            { name: 'access_token', value: newAccessToken, maxAge: GlobalConfig.ACCESS_TOKEN_MAX_AGE }
-        ]);
+        await issueNewAccessToken(request, response);
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
@@ -216,6 +230,29 @@ export const confirmResetPassword = async (request: Request, response: Response)
 
         await UserRepository.updatePassword(userId, await hashPassword(password)); 
         await sendPasswordChangedEmail({userEmail: user.email, t: request.t});
+        response.status(204).end();
+    } catch (error) {
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json({
+                message: request.t(error.translationKey, error.params),
+            });
+            return
+        }
+        response.status(500).json({ message: request.t('errors.internal') });
+    }
+}
+
+export const acceptTerms = async (request: Request, response: Response): Promise<void> => {
+    const userId = request.session?.user?.id;
+
+    try {
+        await UserRepository.acceptTerms(userId, true); 
+
+        // This change will be automatically persisted in Redis at the end of the request
+        request.session.termsAccepted = true;
+
+        await issueNewAccessToken(request, response); // Re-issue updated token
+        
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {

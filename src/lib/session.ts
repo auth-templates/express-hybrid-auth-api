@@ -24,6 +24,7 @@ function setSessionData(request: Request, user: User) {
         email: user.email,
     };
     request.session.pending2FA = user.enabled2FA;
+    request.session.termsAccepted = user.termsAccepted;
 }
 
 export async function initializeUserSession(request: Request, response: Response, user: User) {
@@ -32,7 +33,7 @@ export async function initializeUserSession(request: Request, response: Response
     const refreshToken = createSecureRandomToken();
     await RefreshTokenStore.storeRefreshToken(user.id, refreshToken);
 
-    const newAccessToken = createAccessToken({ userId: user.id, pending2FA: user.enabled2FA })
+    const newAccessToken = createAccessToken({ userId: user.id, pending2FA: user.enabled2FA, termsAccepted: user.termsAccepted })
 
     setCookieTokens(response, [
         { name: 'refresh_token', value: refreshToken, maxAge: GlobalConfig.SESSION_MAX_AGE },

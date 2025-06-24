@@ -28,7 +28,7 @@ export async function verifyToken(token: string, hashedToken: string) {
     return await verify(hashedToken, token);
 }
 
-export function createAccessToken(data: {userId: number, pending2FA?: boolean}) {
+export function createAccessToken(data: {userId: number, pending2FA?: boolean, termsAccepted?: boolean}) {
     return jwt.sign(
         data,
         GlobalConfig.ACCESS_TOKEN_SECRET,

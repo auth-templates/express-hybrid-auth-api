@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword } from '../controllers/authController';
+import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword, acceptTerms } from '../controllers/authController';
 import { authenticate } from '../middlewares/authenticate';
 
 const router = express.Router();
@@ -12,10 +12,9 @@ const router = express.Router();
  *     SignupRequest:
  *       type: object
  *       required:
- *         - firstName
- *         - lastName
  *         - email
  *         - password
+ *         - termsAccepted
  *       properties:
  *         firstName:
  *           type: string
@@ -29,6 +28,9 @@ const router = express.Router();
  *         password:
  *           type: string
  *           example: "$SuperSecurePassword123"
+ *         termsAccepted:
+ *           type: boolean
+ *           example: true
  *     LoginRequest:
  *       type: object
  *       required:
@@ -311,5 +313,42 @@ router.post('/reset-password/request', resetPassword);
  */
 router.post('/reset-password', confirmResetPassword);
 
+
+/**
+ * @swagger
+ * /auth/accept-terms:
+ *   post:
+ *     summary: Accept Terms of Service
+ *     description: >-
+ *       Marks the user's Terms of Service as accepted. Requires a valid session and refresh token.
+ *       A new access token is issued with updated claims and sent via an HTTP-only cookie.
+ *     responses:
+ *       '204':
+ *         description: Terms accepted successfully. New access token set in cookie.
+ *         headers:
+ *           Set-Cookie:
+ *             description: HTTP-only cookie containing a new access token.
+ *             schema:
+ *               type: string
+ *       '401':
+ *         description: Unauthorized - session missing or expired.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       '403':
+ *         description: Invalid or missing refresh token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       '500':
+ *         description: Server error during terms acceptance or token generation.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.post('/accept-terms', acceptTerms);
 
 export default router;

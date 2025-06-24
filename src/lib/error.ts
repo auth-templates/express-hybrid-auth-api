@@ -9,5 +9,4 @@ export class AppError extends Error {
       this.params = params;
       this.statusCode = statusCode;
     }
-  }
-  
+}

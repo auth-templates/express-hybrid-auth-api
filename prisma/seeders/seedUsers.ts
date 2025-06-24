@@ -12,6 +12,7 @@ export async function seedUsers(prisma: PrismaClient) {
                 status: 'active',
                 created_at: new Date('2023-10-04 02:42:19'),
                 status_changed_at: new Date('2023-10-05 02:42:19'),
+                terms_accepted: true
             },
             {
                 first_name: 'Zachary',
@@ -19,7 +20,8 @@ export async function seedUsers(prisma: PrismaClient) {
                 email: 'michael41@walker.info',
                 password_hash: '1FTbyFaG(smq',
                 role: 'manager',
-                created_at: new Date('2022-02-27 05:33:21')
+                created_at: new Date('2022-02-27 05:33:21'),
+                terms_accepted: true
             },
             {
                 first_name: 'Anthony',
@@ -30,6 +32,7 @@ export async function seedUsers(prisma: PrismaClient) {
                 status: 'active',
                 created_at: new Date('2023-06-19 12:52:13'),
                 status_changed_at: new Date('2023-06-19 18:52:13'),
+                terms_accepted: true
             },
             {
                 first_name: 'Johnathan',
@@ -37,7 +40,8 @@ export async function seedUsers(prisma: PrismaClient) {
                 email: 'jesse79@gross-good.info',
                 password_hash: '49TNlk!T^eT2',
                 role: 'employee',
-                created_at: new Date('2024-04-03 02:36:10')
+                created_at: new Date('2024-04-03 02:36:10'),
+                terms_accepted: true
             },
             {
                 first_name: 'Dawn',
@@ -47,7 +51,8 @@ export async function seedUsers(prisma: PrismaClient) {
                 role: 'manager',
                 status: 'active',
                 created_at: new Date('2022-08-16 18:00:17'),
-                status_changed_at: new Date('2022-08-16 19:00:17')
+                status_changed_at: new Date('2022-08-16 19:00:17'),
+                terms_accepted: true
             },
             {
                 first_name: 'Donald',
@@ -57,7 +62,8 @@ export async function seedUsers(prisma: PrismaClient) {
                 role: 'employee',
                 status: 'active',
                 created_at: new Date('2022-06-28 15:51:43'),
-                status_changed_at: new Date('2022-06-28 16:00:43')
+                status_changed_at: new Date('2022-06-28 16:00:43'),
+                terms_accepted: true
             },
             {
                 first_name: 'Joseph',
@@ -67,7 +73,8 @@ export async function seedUsers(prisma: PrismaClient) {
                 role: 'employee',
                 status: 'active',
                 created_at: new Date('2024-09-20 09:34:04'),
-                status_changed_at: new Date('2024-09-21 09:34:04')
+                status_changed_at: new Date('2024-09-21 09:34:04'),
+                terms_accepted: true
             },
             {
                 first_name: 'Ryan',
@@ -78,6 +85,7 @@ export async function seedUsers(prisma: PrismaClient) {
                 status: 'suspended',
                 created_at: new Date('2020-02-26 03:56:33'),
                 status_changed_at: new Date('2020-05-30 03:00:33'),
+                terms_accepted: true
             },
             {
                 first_name: 'Lisa',
@@ -87,7 +95,8 @@ export async function seedUsers(prisma: PrismaClient) {
                 role: 'admin',
                 status: 'active',
                 created_at: new Date('2023-10-14 17:04:36'),
-                status_changed_at: new Date('2023-10-15 17:04:36')
+                status_changed_at: new Date('2023-10-15 17:04:36'),
+                terms_accepted: true
             },
             {
                 first_name: 'Amy',
@@ -97,7 +106,8 @@ export async function seedUsers(prisma: PrismaClient) {
                 role: 'admin',
                 status: 'active',
                 created_at: new Date('2020-06-17 10:14:17'),
-                status_changed_at: new Date('2020-06-17 10:34:17')
+                status_changed_at: new Date('2020-06-17 10:34:17'),
+                terms_accepted: true
             }
         ],
     });

@@ -10,6 +10,7 @@ declare module 'express-session' {
     csrfToken?: string;     
     user?: SessionUser
     pending2FA?: boolean,
+    termsAccepted?: boolean
   }
 }
 

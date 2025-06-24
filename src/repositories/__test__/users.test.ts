@@ -23,6 +23,32 @@ describe('UserRepository', () => {
         jest.clearAllMocks();
     });
 
+    describe('UserRepository.acceptTerms', () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+
+        it('should update terms_accepted field for the user', async () => {
+            (prismaClient.users.update as jest.Mock).mockResolvedValue({});
+
+            await UserRepository.acceptTerms(42, true);
+
+            expect(prismaClient.users.update).toHaveBeenCalledWith({
+            where: { id: 42 },
+            data: { terms_accepted: true },
+            });
+        });
+
+        it('should throw AppError on failure', async () => {
+            (prismaClient.users.update as jest.Mock).mockRejectedValue(new Error('DB error'));
+
+            await expect(UserRepository.acceptTerms(42, true)).rejects.toMatchObject({
+            translationKey: 'errors.internal',
+            statusCode: 500,
+            });
+        });
+    });
+
     describe('createUser', () => {
         const userData = {
             firstName: 'John',

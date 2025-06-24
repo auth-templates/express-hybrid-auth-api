@@ -17,6 +17,7 @@ export const createSignupSchema = () => {
     email: v.pipe(v.string(), v.email('validation.email')),
     password: passwordValidationSchema(),
     role: v.enum(Role),
+    termsAccepted: v.literal(true, 'validation.accept_terms')
   });
 };
 

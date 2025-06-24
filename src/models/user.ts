@@ -6,6 +6,7 @@ export interface User {
     role: Role;
     createdAt: Date;
     enabled2FA?: boolean; 
+    termsAccepted?: boolean;
     status?: UserStatus 
 }
   

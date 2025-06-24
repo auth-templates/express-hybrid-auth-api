@@ -23,7 +23,8 @@ const signupData: CreateUserInput = {
     lastName: "Doe",
     email: "john.doe@example.com",
     password: "$SuperSecurePasswod123",
-    role: Role.Admin
+    role: Role.Admin,
+    termsAccepted: true
 }
 
 describe('POST /signup', () => {
@@ -51,7 +52,6 @@ describe('POST /signup', () => {
             userEmail: signupData.email, 
             expiresInMinutes: 30, 
             token: expect.stringMatching(/^[A-Za-z0-9]{64}$/),
-     
         });
     });
 
@@ -175,6 +175,16 @@ describe('POST /signup', () => {
       
         expect(response.status).toBe(400);
         expect(response.body).toStrictEqual([ "Invalid type: Expected (\"employee\" | \"manager\" | \"admin\") but received \"ds\""]);
+    });
+
+    it('should return 400 if terms and conditions is not accepted', async () => {
+        const response = await request(app).post('/signup').set('Accept-Language', 'en').send({
+          ...signupData,
+          termsAccepted: false 
+        });
+      
+        expect(response.status).toBe(400);
+        expect(response.body).toStrictEqual([ "You must accept the terms and conditions."]);
     });
 });
 

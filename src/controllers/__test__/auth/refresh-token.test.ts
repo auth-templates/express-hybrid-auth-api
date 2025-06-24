@@ -1,12 +1,11 @@
-import request, { Request } from 'supertest';
+import request from 'supertest';
 import express from 'express';
-import { login, refresh } from '../../authController';
+import { refresh } from '../../authController';
 import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
-import session, { Session, SessionData } from 'express-session';
+import session from 'express-session';
 import GlobalConfig from '../../../config';
 import { RefreshTokenStore } from '../../../lib/redis/redis-token';
 import cookieParser from 'cookie-parser';
-import { createAccessToken } from '../../../lib/token';
 import jwt from 'jsonwebtoken';
 
 jest.mock('../../../lib/redis/redis-token');
@@ -48,7 +47,7 @@ describe('POST /auth/refresh', () => {
     it('should 403 when no refreshToken cookie', async () => {
         const res = await request(app).post('/auth/refresh');
         expect(res.status).toBe(403);
-        expect(res.body).toEqual({ message: 'Invalid refresh token' });
+        expect(res.body).toEqual({ message: 'An unexpected error occurred. Please retry to log in.' });
     });
 
     it('should 403 when refreshToken does not match stored', async () => {
@@ -65,7 +64,7 @@ describe('POST /auth/refresh', () => {
 
         expect(RefreshTokenStore.getStoredRefreshToken).toHaveBeenCalledWith(1, 'bad-token');
         expect(response.status).toBe(403);
-        expect(response.body).toEqual({ message: 'Invalid refresh token' });
+        expect(response.body).toEqual({ message: 'An unexpected error occurred. Please retry to log in.' });
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
