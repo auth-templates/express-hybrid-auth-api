@@ -4,14 +4,16 @@
         "internal": "An unexpected error occurred. Please try again later or contact support.",
         "is_already_in_use": "{{item}} is already in use",
         "invalid_credentials": "Invalid email or password. Please try again.",
-        "invalid_2fa_code": "The 2FA code must be a 6-digit number.",
+        "invalid_2fa_code_format": "The 2FA code must be a 6-digit number.",
         "user_email_not_found": "No user found with the provided email address.",
         "user_not_found": "User not found.",
         "2fa_recovery_not_allowed": "Two-step verification recovery could not be initiated. Please contact support if the issue persists.",
         "password_reset_not_allowed": "Password reset could not be initiated. Please contact support if the issue persists.",
         "social_login_required": "It looks like you signed up using a social login. Please use that provider to log in.",
         "2fa_setup_invalid": "Your 2FA setup has expired or is no longer valid. Please try setting it up again.",
-        "invalid_refresh_token": "An unexpected error occurred. Please retry to log in."
+        "invalid_refresh_token": "An unexpected error occurred. Please retry to log in.",
+        "invalid_2fa_verification_code": "The verification code you entered is incorrect. Please try again.",
+        "2fa_required": "Finalizing two-step authentication is required to access this resource."
     },
     "validation": {
         "accept_terms": "You must accept the terms and conditions.",

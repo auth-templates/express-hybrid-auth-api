@@ -8,6 +8,28 @@ import { Role, User, UserStatus } from '../models/user';
 type CreateUserInput = Omit<User, 'id' | 'createdAt'> & { passwordHash: string }
 
 export class UserRepository {
+    static async getUser2FASecretById(userId: number): Promise<string> {
+        try {
+            const result = await prismaClient.users.findUnique({
+                where: { id: userId },
+                select: {
+                    twofa_secret: true
+                }
+            });
+
+            if (!result || !result.twofa_secret) {
+                throw new AppError('errors.user_2fa_secret_not_found', {}, 404);
+            }
+
+            return result.twofa_secret;
+        } catch (error) {
+            if (error instanceof AppError) {
+                throw error;
+            }
+            throw new AppError('errors.internal', {}, 500);
+        }
+    }
+
     static async acceptTerms(userId: number, acceptTerms: boolean): Promise<void> {
         try {
             await prismaClient.users.update({

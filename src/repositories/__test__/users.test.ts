@@ -23,6 +23,49 @@ describe('UserRepository', () => {
         jest.clearAllMocks();
     });
 
+    describe('getUser2FASecretById', () => {
+        it('should return 2FA secret if user is found and secret exists', async () => {
+            const mockSecret = 'SECRET123';
+            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue({ twofa_secret: mockSecret });
+
+            const result = await UserRepository.getUser2FASecretById(42);
+
+            expect(prismaClient.users.findUnique).toHaveBeenCalledWith({
+                where: { id: 42 },
+                select: { twofa_secret: true },
+            });
+
+            expect(result).toBe(mockSecret);
+        });
+
+        it('should throw 404 AppError if user not found', async () => {
+            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(null);
+
+            await expect(UserRepository.getUser2FASecretById(42)).rejects.toMatchObject({
+                translationKey: 'errors.user_2fa_secret_not_found',
+                statusCode: 404,
+            });
+        });
+
+        it('should throw 404 AppError if twofa_secret is missing', async () => {
+            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue({ twofa_secret: null });
+
+            await expect(UserRepository.getUser2FASecretById(42)).rejects.toMatchObject({
+                translationKey: 'errors.user_2fa_secret_not_found',
+                statusCode: 404,
+            });
+        });
+
+        it('should throw internal AppError on unknown error', async () => {
+            (prismaClient.users.findUnique as jest.Mock).mockRejectedValue(new Error('DB exploded'));
+
+            await expect(UserRepository.getUser2FASecretById(42)).rejects.toMatchObject({
+                translationKey: 'errors.internal',
+                statusCode: 500,
+            });
+        });
+    });
+
     describe('UserRepository.acceptTerms', () => {
         beforeEach(() => {
             jest.clearAllMocks();

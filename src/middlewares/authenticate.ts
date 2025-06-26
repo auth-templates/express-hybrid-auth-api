@@ -20,7 +20,7 @@ export function authenticate(request: Request, response: Response, next: NextFun
 
     next();
   } catch (err) {
-    console.error('Authentication error:', err);
+    // console.error('Authentication error:', err);
 
     // Token expired or invalid
     if (err instanceof jwt.TokenExpiredError) {

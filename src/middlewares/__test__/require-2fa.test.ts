@@ -1,6 +1,6 @@
-import { requireTermsAcceptance } from "../require-terms-acceptance";
+import { require2FA } from "../require-2fa";
 
-describe('requireTermsAcceptance middleware', () => {
+describe('require2FA middleware', () => {
   let req: any;
   let res: any;
   let next: jest.Mock;
@@ -13,40 +13,40 @@ describe('requireTermsAcceptance middleware', () => {
     };
   });
 
-  test('calls next if session.termsAccepted is falsy', () => {
+  test('calls next if session.pending2FA is falsy', () => {
     req = {
-      session: { termsAccepted: false },
+      session: { pending2FA: false },
       path: '/dashboard',
       t: jest.fn().mockImplementation((key) => key),
     };
 
-    requireTermsAcceptance(req, res, next);
+    require2FA(req, res, next);
 
     expect(next).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
   });
 
-  test('allows /auth/accept-terms route even if termsAccepted is true', () => {
+  test('allows /auth/verify-2fa route even if pending2FA is true', () => {
     req = {
-      session: { termsAccepted: true },
-      path: '/auth/accept-terms',
+      session: { pending2FA: true },
+      path: '/auth/verify-2fa',
       t: jest.fn().mockImplementation((key) => key),
     };
 
-    requireTermsAcceptance(req, res, next);
+    require2FA(req, res, next);
 
     expect(next).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
   });
 
-  test('blocks access with 403 if termsAccepted is true and path is not /auth/accept-terms', () => {
+  test('blocks access with 403 if pending2FA is true and path is not /auth/verify-2fa', () => {
     req = {
-      session: { termsAccepted: true },
+      session: { pending2FA: true },
       path: '/dashboard',
       t: jest.fn().mockImplementation((key) => `Translated: ${key}`),
     };
 
-    requireTermsAcceptance(req, res, next);
+    require2FA(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({ message: 'Translated: validation.terms' });
@@ -59,7 +59,7 @@ describe('requireTermsAcceptance middleware', () => {
       t: jest.fn().mockImplementation((key) => key),
     };
 
-    requireTermsAcceptance(req, res, next);
+    require2FA(req, res, next);
 
     expect(next).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();

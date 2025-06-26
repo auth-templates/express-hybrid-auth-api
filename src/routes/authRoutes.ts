@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword, acceptTerms } from '../controllers/authController';
+import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword, acceptTerms, verifyLogin2FA } from '../controllers/authController';
 import { authenticate } from '../middlewares/authenticate';
 
 const router = express.Router();
@@ -43,6 +43,14 @@ const router = express.Router();
  *         password:
  *           type: string
  *           example: "$SuperSecurePassword45"
+ *     Verify2FARequest:
+ *       type: object
+ *       required:
+ *         - code
+ *       properties:
+ *         code:
+ *           type: string
+ *           example: "123456"  
  *     VerifyTokenRequest:
  *       type: object
  *       required:
@@ -349,6 +357,54 @@ router.post('/reset-password', confirmResetPassword);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/accept-terms', acceptTerms);
+router.post('/accept-terms', authenticate, acceptTerms);
+
+/**
+ * @swagger
+ * /auth/verify-2fa:
+ *   post:
+ *     summary: Verify Two-Factor Authentication Code
+ *     description: Verifies a 2FA code provided by the user during login. Requires an active session.
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Verify2FARequest'
+ *     responses:
+ *       200:
+ *         description: 2FA verification successful. Session updated and access token issued.
+ *         headers:
+ *           Set-Cookie:
+ *             description: HTTP-only cookie containing the access token.
+ *             schema:
+ *               type: string
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid or expired 2FA code.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized - session missing or expired.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error during 2FA verification.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
+router.post('/verify-2fa', authenticate, verifyLogin2FA);
 
 export default router;

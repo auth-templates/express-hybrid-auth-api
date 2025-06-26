@@ -55,7 +55,7 @@ describe('POST /auth/accept-terms', () => {
         jest.setSystemTime(fakeTime);
 
         const validToken = 'good-token';
-        (UserRepository.acceptTerms as jest.Mock).mockResolvedValue(validToken);
+        (UserRepository.acceptTerms as jest.Mock).mockResolvedValue(undefined);
         (RefreshTokenStore.getStoredRefreshToken as jest.Mock).mockResolvedValue('good-token');
         (RefreshTokenStore.resetRefreshTokenExpiration as jest.Mock).mockResolvedValue(undefined);
 
@@ -64,7 +64,7 @@ describe('POST /auth/accept-terms', () => {
         const userSession = { user: { id: 1, email: 'test@example.com' }, termsAccepted: false };
         await agent.post('/test/session').send(userSession);
 
-        const response = await agent.post('/auth/accept-terms').set('Cookie', `refreshToken=${validToken}; connect.sid=session-id`);
+        const response = await agent.post('/auth/accept-terms').send({acceptTerms: true}).set('Cookie', `refreshToken=${validToken}; connect.sid=session-id`);
 
         expect(UserRepository.acceptTerms).toHaveBeenCalledWith(userSession.user.id, true);
         expect(response.status).toBe(204);
@@ -88,6 +88,22 @@ describe('POST /auth/accept-terms', () => {
         expect(sessionCheck.body.termsAccepted).toBe(true);
 
         jest.useRealTimers();
+    });
+
+    it('should return 403 if terms already accepted', async () => {
+        const agent = request.agent(app);
+
+        const userSession = {
+            user: { id: 1, email: 'test@example.com' },
+            termsAccepted: true
+        };
+
+        await agent.post('/test/session').send(userSession);
+
+        const response = await agent.post('/auth/accept-terms');
+
+        expect(response.status).toBe(403);
+        expect(UserRepository.acceptTerms).not.toHaveBeenCalled();
     });
 
     it('should return 500 if an unexpected error occurs', async () => {

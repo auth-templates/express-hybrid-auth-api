@@ -4,14 +4,16 @@
         "internal": "A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu sau contactează suportul.",
         "is_already_in_use": "{{item}} este deja folosit",
         "invalid_credentials": "Email sau parolă incorectă. Te rugăm să încerci din nou.",
-        "invalid_2fa_code": "Codul 2FA trebuie să fie un număr din 6 cifre.",
+        "invalid_2fa_code_format": "Codul 2FA trebuie să fie un număr din 6 cifre.",
         "user_email_not_found": "Nu a fost găsit niciun utilizator cu adresa de email furnizată.",
         "user_not_found": "Utilizatorul nu a fost găsit.",
         "2fa_recovery_not_allowed": "Recuperarea verificării în doi pași nu a putut fi inițiată. Contactați suportul dacă problema persistă.",
         "password_reset_not_allowed": "Resetarea parolei nu a putut fi inițiată. Te rugăm să contactezi suportul dacă problema persistă.",
         "social_login_required": "Se pare că v-ați înregistrat folosind un cont social. Vă rugăm să vă autentificați folosind acel furnizor.",
         "2fa_setup_invalid": "Configurarea 2FA a expirat sau nu mai este valabilă. Vă rugăm să încercați din nou.",
-        "invalid_refresh_token": "A apărut o eroare neașteptată. Vă rugăm să încercați să vă conectați din nou."
+        "invalid_refresh_token": "A apărut o eroare neașteptată. Vă rugăm să încercați să vă conectați din nou.",
+        "invalid_2fa_verification_code": "Codul de verificare introdus este incorect. Vă rugăm să încercați din nou.",
+        "2fa_required": "Finalizarea autentificării în doi pași este necesară pentru a accesa această resursă."
     },
     "validation": {
         "accept_terms": "Trebuie să accepți termenii și condițiile.",

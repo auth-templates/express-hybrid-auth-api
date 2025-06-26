@@ -20,6 +20,8 @@ import githubAuthRoutes from './routes/githubAuthRoutes';
 import { errorHandler } from './middlewares/error-handler';
 import { csrfProtection, csrfTokenHandler } from './middlewares/csrf';
 import { requireTermsAcceptance } from './middlewares/require-terms-acceptance';
+import { require2FA } from './middlewares/require-2fa';
+import { authenticate } from './middlewares/authenticate';
 
 const app = express();
 const port = 3000;
@@ -76,11 +78,13 @@ app.get('/profile', (request: Request, response: Response) => {
   response.send(`<h1>Hello ${JSON.stringify(request.user)}</h1><a href="/auth/logout">Logout</a>`);
 });
 
+app.use(require2FA);
+app.use(requireTermsAcceptance);
 app.use('/2fa', twofaRoutes);
 app.use('/auth', googleAuthRoutes);
 app.use('/auth', githubAuthRoutes);
 app.use('/auth', authRouter);
-app.use(requireTermsAcceptance)
+app.use(authenticate);
 
 app.use(errorHandler);
 

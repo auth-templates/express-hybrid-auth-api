@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { request, Request, Response } from 'express';
 import { hashPassword } from "../lib/password";
 import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
@@ -13,6 +13,7 @@ import GlobalConfig from '../config';
 import { RefreshTokenStore } from '../lib/redis/redis-token';
 import { validatePassword } from '../lib/validation-schemas/password-schema';
 import { destroyUserSession, initializeUserSession, setCookieTokens } from '../lib/session';
+import { authenticator } from 'otplib';
 
 export async function savePassswordResetToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
@@ -243,17 +244,61 @@ export const confirmResetPassword = async (request: Request, response: Response)
 }
 
 export const acceptTerms = async (request: Request, response: Response): Promise<void> => {
+    const { acceptTerms } = request.body;
     const userId = request.session?.user?.id;
-
+    const termsAccepted =  request.session?.termsAccepted 
+    
     try {
-        await UserRepository.acceptTerms(userId, true); 
+        if ( termsAccepted === true ) {
+            response.status(403).end();
+            return
+        }
+
+        await UserRepository.acceptTerms(userId, acceptTerms); 
 
         // This change will be automatically persisted in Redis at the end of the request
-        request.session.termsAccepted = true;
+        request.session.termsAccepted = acceptTerms;
 
         await issueNewAccessToken(request, response); // Re-issue updated token
         
         response.status(204).end();
+    } catch (error) {
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json({
+                message: request.t(error.translationKey, error.params),
+            });
+            return
+        }
+        response.status(500).json({ message: request.t('errors.internal') });
+    }
+}
+
+export const verifyLogin2FA = async (request: Request, response: Response): Promise<void> => {
+    const userId = request.session?.user?.id;
+    const pending2FA = request.session?.pending2FA 
+
+    try {
+        const { code } = request.body;
+
+        if ( !pending2FA ) {
+            response.status(401).end();
+            return
+        }
+
+        const twofaSecret = await UserRepository.getUser2FASecretById(userId);
+
+        const isValid = authenticator.verify({ token: code, secret: twofaSecret });
+        if ( !isValid ) {
+           throw new AppError('errors.invalid_2fa_verification_code', {}, 400);
+        }
+
+        // Clear pending2FA flag
+        request.session.pending2FA = false;
+
+        await issueNewAccessToken(request, response);
+
+        const user = await UserRepository.getUserById(userId);
+        response.status(200).json(user);
     } catch (error) {
         if (error instanceof AppError) {
             response.status(error.statusCode).json({
