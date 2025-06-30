@@ -92,7 +92,7 @@ describe('POST /auth/reset-password', () => {
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({ message: "Password reset could not be initiated. Please contact support if the issue persists." });
+        expect(response.body).toEqual({ messages:[{text:"Password reset could not be initiated. Please contact support if the issue persists.",  severity: "error"}]});
     });
 
     it('should return 404 for user\'s email is not found in database', async () => {
@@ -103,7 +103,7 @@ describe('POST /auth/reset-password', () => {
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: "No user found with the provided email address." });
+        expect(response.body).toEqual({ messages:[{text:"No user found with the provided email address.", severity: "error"}]});
     });
     
     it('should return 404 if user id is not found when saving the token in database', async () => {
@@ -114,7 +114,7 @@ describe('POST /auth/reset-password', () => {
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: "User not found." });
+        expect(response.body).toEqual({ messages: [{text: "User not found.", severity: "error"}]});
     });
 
     it('should return 500 for internal errors', async () => {
@@ -125,6 +125,6 @@ describe('POST /auth/reset-password', () => {
 
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({ message: "An unexpected error occurred. Please try again later or contact support." });
+        expect(response.body).toEqual({ messages: [{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error" }]});
     });
 })

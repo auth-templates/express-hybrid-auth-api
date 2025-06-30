@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+import { createMessageResponse } from '../lib/response';
 
 /**
  * Blocks access to protected routes if session has termsAccepted = true.
@@ -9,7 +10,7 @@ export function requireTermsAcceptance(request: Request, response: Response, nex
     const termsAccepted = request.session?.termsAccepted;
 
     if ( termsAccepted && request.path !== '/auth/accept-terms' ) {
-        response.status(403).json({ message: request.t('validation.terms')});
+        response.status(403).json(createMessageResponse(request.t('validation.terms'), 'error'));
         return
     }
 

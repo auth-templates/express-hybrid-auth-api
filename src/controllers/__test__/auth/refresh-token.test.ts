@@ -45,9 +45,9 @@ describe('POST /auth/refresh', () => {
     });
 
     it('should 403 when no refreshToken cookie', async () => {
-        const res = await request(app).post('/auth/refresh');
-        expect(res.status).toBe(403);
-        expect(res.body).toEqual({ message: 'An unexpected error occurred. Please retry to log in.' });
+        const response = await request(app).post('/auth/refresh');
+        expect(response.status).toBe(403);
+        expect(response.body).toEqual({ messages: [{text:'An unexpected error occurred. Please retry to log in.', severity: "error"}]});
     });
 
     it('should 403 when refreshToken does not match stored', async () => {
@@ -64,7 +64,7 @@ describe('POST /auth/refresh', () => {
 
         expect(RefreshTokenStore.getStoredRefreshToken).toHaveBeenCalledWith(1, 'bad-token');
         expect(response.status).toBe(403);
-        expect(response.body).toEqual({ message: 'An unexpected error occurred. Please retry to log in.' });
+        expect(response.body).toEqual({ messages: [{text:'An unexpected error occurred. Please retry to log in.', severity: "error"}]});
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
@@ -80,7 +80,7 @@ describe('POST /auth/refresh', () => {
         const response = await agent.post('/auth/refresh').set('Cookie', 'refreshToken=bad-token; connect.sid=session-id')
 
         expect(response.status).toBe(500);
-        expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
+        expect(response.body).toEqual({ messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
     });
 
     it('should 204 and set new access_token cookie when valid', async () => {

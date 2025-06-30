@@ -138,7 +138,7 @@ describe('POST /auth/verify-2fa', () => {
         const response = await agent.post('/auth/verify-2fa').send({ code: 'invalid-code' });
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('The verification code you entered is incorrect. Please try again.');
+        expect(response.body).toEqual({messages: [{text:'The verification code you entered is incorrect. Please try again.', severity: "error"}]});
     });
 
     it('should return 500 if unexpected error occurs', async () => {
@@ -151,6 +151,6 @@ describe('POST /auth/verify-2fa', () => {
         const response = await agent.post('/auth/verify-2fa').send({ code: '123456' });
 
         expect(response.status).toBe(500);
-        expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
+        expect(response.body).toEqual({messages:[{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
     });
 });

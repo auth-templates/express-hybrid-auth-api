@@ -83,6 +83,6 @@ describe('POST /auth/logout', () => {
         const response = await agent.post('/auth/logout').set('Cookie', `refreshToken=token; connect.sid=session-id`)
 
         expect(response.status).toBe(500);
-        expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
+        expect(response.body).toEqual({messages: [{ text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
     });
 });

@@ -47,7 +47,7 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Session invalid or expired' });
+    expect(res.json).toHaveBeenCalledWith({ messages:[{text:'Session invalid or expired', severity: "error"}]});
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -58,7 +58,7 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Access token missing' });
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text: 'Access token missing', severity: "error"}]});
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -73,7 +73,7 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Access token expired' });
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text: 'Access token expired', severity: "error"}]});
   });
 
   it('should return 403 if token is invalid', () => {
@@ -87,7 +87,7 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Invalid access token' });
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text: 'Invalid access token', severity: "error"}]});
   });
 
   it('should return 500 for unexpected errors', () => {
@@ -101,6 +101,6 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Internal server error' });
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text:'Internal server error', severity: "error"}]});
   });
 });

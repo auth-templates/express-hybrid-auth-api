@@ -57,7 +57,7 @@ describe('POST /auth/reset-password', () => {
             .send({ password: '$Suuuuup', token: 'reset-password-valid' });
 
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['Password must contain at least one digit']);
+        expect(response.body).toEqual({messages: [{text:'Password must contain at least one digit', severity: "error"}]});
     });
 
     it('should return 400 for a used token', async () => {
@@ -70,7 +70,7 @@ describe('POST /auth/reset-password', () => {
                 .send({ password: '$SuperSecurePassword45', token: 'reset-password-used' });
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('This password reset link has already been used. If you still need to reset your password, request a new link.');
+        expect(response.body).toEqual({messages: [{text:'This password reset link has already been used. If you still need to reset your password, request a new link.', severity: "error"}]});
     });
 
     it('should return 400 for an expired token', async () => {
@@ -83,7 +83,7 @@ describe('POST /auth/reset-password', () => {
                 .send({ password: '$SuperSecurePassword45', token: 'reset-password-expired' });
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('Your password reset link has expired. Please request a new one to reset your password.');
+        expect(response.body).toEqual({messages: [{text:'Your password reset link has expired. Please request a new one to reset your password.', severity: "error"}]});
     });
 
     it('should return 400 for a non-existent token or invalid token', async () => {
@@ -97,7 +97,7 @@ describe('POST /auth/reset-password', () => {
            .send({ password: '$SuperSecurePassword45', token: 'reset-password-expired' });
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('The password reset link is invalid or no longer available. Please request a new link to reset your password.');
+        expect(response.body).toEqual({messages: [{text: 'The password reset link is invalid or no longer available. Please request a new link to reset your password.', severity: "error"}]});
     });
 
     it('should return 200 when user status is not active', async () => {
@@ -110,7 +110,7 @@ describe('POST /auth/reset-password', () => {
            .send({ password: '$SuperSecurePassword45', token: 'reset-password-expired' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({ message: "Password reset could not be initiated. Please contact support if the issue persists." });
+        expect(response.body).toEqual({ messages: [{text:"Password reset could not be initiated. Please contact support if the issue persists.", severity: "error" }]});
     });
 
     it('should return 500 for unexpected error', async () => {
@@ -124,6 +124,6 @@ describe('POST /auth/reset-password', () => {
            .send({ password: '$SuperSecurePassword45', token: 'reset-password-valid' });
 
         expect(response.status).toBe(500);
-        expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
+        expect(response.body).toEqual({messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
     });
 });

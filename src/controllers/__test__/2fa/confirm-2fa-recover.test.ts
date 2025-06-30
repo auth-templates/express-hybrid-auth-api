@@ -75,7 +75,7 @@ describe('POST /2fa/confirm-recover', () => {
 
         expect(VerificationTokensRepository.verify2FAToken).toHaveBeenCalledWith(token);
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({ message: "The two-step verification recovery link is invalid or no longer available. Please request a new link to recover your account." });
+        expect(response.body).toEqual({ messages: [{ text: "The two-step verification recovery link is invalid or no longer available. Please request a new link to recover your account.", severity: 'error' }]});
     });
 
     it('should return 400 when token is invalid', async () => {
@@ -87,7 +87,7 @@ describe('POST /2fa/confirm-recover', () => {
 
         expect(VerificationTokensRepository.verify2FAToken).toHaveBeenCalledWith(token);
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({ message: "Your two-step verification recovery link has expired. Please start the recovery process again to regain access to your account." });
+        expect(response.body).toEqual({ messages: [{text:"Your two-step verification recovery link has expired. Please start the recovery process again to regain access to your account.", severity: 'error' }]});
     });
 
     it('should return 400 when token is invalid', async () => {
@@ -99,7 +99,7 @@ describe('POST /2fa/confirm-recover', () => {
 
         expect(VerificationTokensRepository.verify2FAToken).toHaveBeenCalledWith(token);
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({ message: "The two-step verification recovery link is invalid or no longer available. Please request a new link to recover your account." });
+        expect(response.body).toEqual({ messages: [{text:"The two-step verification recovery link is invalid or no longer available. Please request a new link to recover your account.", severity: "error"}]});
     });
 
     it('should return 500 for internal errors', async () => {
@@ -112,6 +112,6 @@ describe('POST /2fa/confirm-recover', () => {
 
         expect(VerificationTokensRepository.verify2FAToken).toHaveBeenCalledWith(token);
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({ message: "An unexpected error occurred. Please try again later or contact support." });
+        expect(response.body).toEqual({ messages: [{ text:"An unexpected error occurred. Please try again later or contact support.", severity: "error"}]});
     });
 })

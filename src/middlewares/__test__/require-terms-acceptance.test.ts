@@ -49,7 +49,7 @@ describe('requireTermsAcceptance middleware', () => {
     requireTermsAcceptance(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Translated: validation.terms' });
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text:'Translated: validation.terms', severity: "error"}]});
     expect(next).not.toHaveBeenCalled();
   });
 

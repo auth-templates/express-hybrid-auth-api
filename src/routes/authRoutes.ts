@@ -1,5 +1,4 @@
 import express from 'express';
-
 import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword, acceptTerms, verifyLogin2FA } from '../controllers/authController';
 import { authenticate } from '../middlewares/authenticate';
 
@@ -79,20 +78,28 @@ const router = express.Router();
  *         newPassword:
  *           type: string
  *           example: "StrongNewPassword!2025"
- *     ErrorResponse:
+ *     Message:
  *       type: object
+ *       required:
+ *         - text
+ *         - severity
  *       properties:
- *         message:
+ *         text:
  *           type: string
- *           example: "Internal server error"
- *         error:
+ *           example: "Operation completed successfully."
+ *         severity:
  *           type: string
- *     ValidationErrorItem:
+ *           enum: [error, warning, info, success]
+ *           example: "success"
+ *     ApiMessageResponse:
  *       type: object
+ *       required:
+ *         - messages
  *       properties:
- *         message:
- *           type: string
- *           example: "Invalid email format"
+ *         messages:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Message'
  *     User:
  *       type: object
  *       properties:
@@ -141,12 +148,24 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: User successfully registered.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "User created successfully."
+ *                   severity: "success"
  *       500:
  *         description: Server error during signup.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
  */
 router.post('/signup', signup);
 
@@ -165,12 +184,44 @@ router.post('/signup', signup);
  *     responses:
  *       200:
  *         description: Token verified and user activated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Signup verified successfully."
+ *                   severity: "success"
  *       400:
  *         description: Invalid or expired token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Invalid or expired verification token."
+ *                   severity: "error"
  *       404:
  *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "User not found."
+ *                   severity: "error"
  *       500:
  *         description: Server error during verification.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
  */
 router.post('/verify-signup', verifySignup);
 
@@ -203,15 +254,31 @@ router.post('/verify-signup', verifySignup);
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/ValidationErrorItem'
+ *                $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Password must contain at least one uppercase letter"
+ *                   severity: "error"
+ *       401:
+ *         description: Incorrect email or password.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Incorrect email or password."
+ *                   severity: "error"
  *       500:
  *         description: Server error during login.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
  */
 router.post('/login', login);
 
@@ -229,7 +296,11 @@ router.post('/login', login);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
  */
 router.post('/logout', authenticate, logout);
 
@@ -247,13 +318,21 @@ router.post('/logout', authenticate, logout);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Invalid or missing refresh token."
+ *                   severity: "error"
  *       500:
  *         description: Server error during token refresh.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
  */
 router.post('/refresh', authenticate, refresh);
 
@@ -277,17 +356,21 @@ router.post('/refresh', authenticate, refresh);
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Password reset not allowed
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Password reset not allowed."
+ *                   severity: "warning"
  *       500:
  *         description: Server error during password reset.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
  */
 router.post('/reset-password/request', resetPassword);
 
@@ -311,51 +394,70 @@ router.post('/reset-password/request', resetPassword);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Invalid or expired reset token, or invalid password."
+ *                   severity: "error"
  *       500:
  *         description: Server error during password reset.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
  */
 router.post('/reset-password', confirmResetPassword);
-
 
 /**
  * @swagger
  * /auth/accept-terms:
  *   post:
  *     summary: Accept Terms of Service
- *     description: >-
+ *     description: >
  *       Marks the user's Terms of Service as accepted. Requires a valid session and refresh token.
  *       A new access token is issued with updated claims and sent via an HTTP-only cookie.
  *     responses:
- *       '204':
+ *       204:
  *         description: Terms accepted successfully. New access token set in cookie.
  *         headers:
  *           Set-Cookie:
  *             description: HTTP-only cookie containing a new access token.
  *             schema:
  *               type: string
- *       '401':
+ *       401:
  *         description: Unauthorized - session missing or expired.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       '403':
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Unauthorized: session missing or expired."
+ *                   severity: "error"
+ *       403:
  *         description: Invalid or missing refresh token.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       '500':
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Invalid or missing refresh token."
+ *                   severity: "error"
+ *       500:
  *         description: Server error during terms acceptance or token generation.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
  */
 router.post('/accept-terms', authenticate, acceptTerms);
 
@@ -390,21 +492,32 @@ router.post('/accept-terms', authenticate, acceptTerms);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Invalid or expired two-factor authentication code."
+ *                   severity: "error"
  *       401:
  *         description: Unauthorized - session missing or expired.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Unauthorized: session missing or expired."
+ *                   severity: "error"
  *       500:
  *         description: Server error during 2FA verification.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
  */
-
 router.post('/verify-2fa', authenticate, verifyLogin2FA);
 
 export default router;

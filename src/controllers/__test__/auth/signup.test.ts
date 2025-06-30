@@ -63,7 +63,7 @@ describe('POST /signup', () => {
         .send(signupData);
 
         expect(response.status).toBe(409);
-        expect(response.body.message).toBe('email is already in use');
+        expect(response.body).toEqual({ messages: [{text:'email is already in use', severity: "error"}]});
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
@@ -74,7 +74,7 @@ describe('POST /signup', () => {
         .send(signupData);
 
         expect(response.status).toBe(500);
-        expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
+        expect(response.body).toEqual({messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
     });
 
     it('should return 400 if password is missing one digit', async () => {
@@ -84,7 +84,7 @@ describe('POST /signup', () => {
         });
 
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['Password must contain at least one digit']);
+        expect(response.body).toEqual({messages: [{text:'Password must contain at least one digit', severity: "error"}]});
     });
 
     it('should return 400 if password is longer than 100 characters', async () => {
@@ -94,7 +94,7 @@ describe('POST /signup', () => {
         });
 
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['Password must be at most 100 characters']);
+        expect(response.body).toEqual({messages: [{text: 'Password must be at most 100 characters', severity: "error"}]});
     });
 
     it('should return 400 if password is less than 8 characters', async () => {
@@ -104,7 +104,7 @@ describe('POST /signup', () => {
         });
       
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['Password must be at least 8 characters']);
+        expect(response.body).toEqual({messages:[{text:'Password must be at least 8 characters', severity: "error"}]});
     });
 
     it('should return 400 if password does no contain at least one special character', async () => {
@@ -114,7 +114,7 @@ describe('POST /signup', () => {
         });
       
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['Password must contain at least one special character']);
+        expect(response.body).toEqual({messages:[{text: 'Password must contain at least one special character', severity: "error"}]});
     });
       
     it('should return 400 if first name is missing', async () => {
@@ -124,7 +124,7 @@ describe('POST /signup', () => {
         });
       
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['First name must be at least 1 character']);
+        expect(response.body).toEqual({messages: [{text:'First name must be at least 1 character', severity: "error"}]});
     });
 
     it('should return 400 if first name is longer than 30 characters', async () => {
@@ -134,7 +134,7 @@ describe('POST /signup', () => {
         });
       
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['First name must be at most 30 characters']);
+        expect(response.body).toEqual({messages: [{text:'First name must be at most 30 characters', severity: "error"}]});
     });
 
     it('should return 400 if last name is missing', async () => {
@@ -144,7 +144,7 @@ describe('POST /signup', () => {
         });
     
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['Last name must be at least 1 character']);
+        expect(response.body).toStrictEqual({ messages: [{text:'Last name must be at least 1 character', severity: "error"}]});
     });
 
     it('should return 400 if last name is longer than 30 characters', async () => {
@@ -154,7 +154,7 @@ describe('POST /signup', () => {
         });
       
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['Last name must be at most 30 characters']);
+        expect(response.body).toStrictEqual({ messages: [{text:'Last name must be at most 30 characters', severity: "error"}]});
     });
 
     it('should return 400 if email is invalid', async () => {
@@ -164,7 +164,7 @@ describe('POST /signup', () => {
         });
       
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual(['Invalid email address']);
+        expect(response.body).toStrictEqual({messages: [{text:'Invalid email address', severity: "error"}]});
     });
 
     it('should return 400 if role is invalid', async () => {
@@ -174,7 +174,7 @@ describe('POST /signup', () => {
         });
       
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual([ "Invalid type: Expected (\"employee\" | \"manager\" | \"admin\") but received \"ds\""]);
+        expect(response.body).toStrictEqual({messages: [{text: "Invalid type: Expected (\"employee\" | \"manager\" | \"admin\") but received \"ds\"", severity: "error"}]});
     });
 
     it('should return 400 if terms and conditions is not accepted', async () => {
@@ -184,7 +184,7 @@ describe('POST /signup', () => {
         });
       
         expect(response.status).toBe(400);
-        expect(response.body).toStrictEqual([ "You must accept the terms and conditions."]);
+        expect(response.body).toStrictEqual({messages:[{text: "You must accept the terms and conditions.", severity: "error"}]});
     });
 });
 

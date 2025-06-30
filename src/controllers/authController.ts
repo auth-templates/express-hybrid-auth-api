@@ -14,6 +14,7 @@ import { RefreshTokenStore } from '../lib/redis/redis-token';
 import { validatePassword } from '../lib/validation-schemas/password-schema';
 import { destroyUserSession, initializeUserSession, setCookieTokens } from '../lib/session';
 import { authenticator } from 'otplib';
+import { createMessageResponse } from '../lib/response';
 
 export async function savePassswordResetToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
@@ -49,12 +50,10 @@ export const verifySignup = async (request: Request, response: Response): Promis
         response.status(204).send();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
-              message: request.t(error.translationKey, error.params),
-            });
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        response.status(500).json({ message: request.t('errors.internal') });
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
 
@@ -63,20 +62,14 @@ export const signup = async (request: Request, response: Response): Promise<void
         const issues = validateSignupData(request.body);
 
         if ( issues.length > 0 ) {
-            response.status(400).json(
-                issues.map(({message, items}) => request.t(message, items))
-            );
+            response.status(400).json(createMessageResponse(
+                issues.map(({message, items}) => request.t(message, items)) as string [], 
+                'error'
+            ));
             return
         }
 
         const { firstName, lastName, email, password, role, termsAccepted } = request.body;
-        
-        if ( !termsAccepted ) {
-             response.status(400).json(
-                issues.map(({message, items}) => request.t(message, items))
-            );
-            return
-        }
 
         const id = await UserRepository.createUser({
             firstName,
@@ -93,12 +86,10 @@ export const signup = async (request: Request, response: Response): Promise<void
         response.status(204).send();
     } catch ( error ) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
-              message: request.t(error.translationKey, error.params),
-            });
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        response.status(500).json({ message: request.t('errors.internal') });
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
 
@@ -109,9 +100,10 @@ export const login = async (request: Request, response: Response): Promise<void>
         const issues = validateLoginData({email, password});
 
         if ( issues.length > 0 ) {
-            response.status(400).json(
-                [issues[0]].map(({message, items}) => ({message: request.t(message, items)}))
-            );
+            response.status(400).json(createMessageResponse(
+                [issues[0]].map(({message, items}) => request.t(message, items)) as string[],  
+                'error'
+            ));
             return
         }
 
@@ -121,12 +113,10 @@ export const login = async (request: Request, response: Response): Promise<void>
         response.status(200).send(user);
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
-              message: request.t(error.translationKey, error.params),
-            });
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        response.status(500).json({ message: request.t('errors.internal') });
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 };
 
@@ -138,12 +128,10 @@ export const logout = async (request: Request, response: Response): Promise<void
         destroyUserSession(request, response);
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
-              message: request.t(error.translationKey, error.params),
-            });
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        response.status(500).json({ message: request.t('errors.internal') });
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
 
@@ -174,12 +162,10 @@ export const refresh = async (request: Request, response: Response): Promise<voi
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
-                message: request.t(error.translationKey, error.params),
-            });
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        response.status(500).json({ message: request.t('errors.internal') });
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
 
@@ -200,12 +186,10 @@ export const resetPassword = async (request: Request, response: Response): Promi
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
-                message: request.t(error.translationKey, error.params),
-            });
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        response.status(500).json({ message: request.t('errors.internal') });
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
 
@@ -216,9 +200,10 @@ export const confirmResetPassword = async (request: Request, response: Response)
         const issues = validatePassword(password);
 
         if ( issues.length > 0 ) {
-            response.status(400).json(
-               issues.map(({message, items}) => request.t(message, items))
-            );
+            response.status(400).json(createMessageResponse(
+                [issues[0]].map(({message, items}) => request.t(message, items)) as string[],  
+                'error'
+            ));
             return
         }
 
@@ -234,12 +219,10 @@ export const confirmResetPassword = async (request: Request, response: Response)
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
-                message: request.t(error.translationKey, error.params),
-            });
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        response.status(500).json({ message: request.t('errors.internal') });
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
 
@@ -264,12 +247,10 @@ export const acceptTerms = async (request: Request, response: Response): Promise
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
-                message: request.t(error.translationKey, error.params),
-            });
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        response.status(500).json({ message: request.t('errors.internal') });
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
 
@@ -301,11 +282,9 @@ export const verifyLogin2FA = async (request: Request, response: Response): Prom
         response.status(200).json(user);
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
-                message: request.t(error.translationKey, error.params),
-            });
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        response.status(500).json({ message: request.t('errors.internal') });
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { createMessageResponse } from '../lib/response';
 
 /**
  * Blocks access to protected routes if session has pending2FA = true.
@@ -8,7 +9,7 @@ export function require2FA(request: Request, response: Response, next: NextFunct
   const isPending2FA = request.session?.pending2FA;
 
   if ( isPending2FA && request.path !== '/auth/verify-2fa' ) {
-    response.status(403).json({ message: request.t('validation.terms') }); 
+    response.status(403).json(createMessageResponse(request.t('validation.terms'), 'error')); 
     return
   }
 

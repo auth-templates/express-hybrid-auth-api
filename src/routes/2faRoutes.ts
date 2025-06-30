@@ -1,5 +1,11 @@
 import express from 'express';
-import { setup2FA, verify2FASetup, disable2FA, recover2FA, confirm2FARecover } from '../controllers/2faController';
+import {
+  setup2FA,
+  verify2FASetup,
+  disable2FA,
+  recover2FA,
+  confirm2FARecover
+} from '../controllers/2faController';
 import { authenticate } from '../middlewares/authenticate';
 
 const router = express.Router();
@@ -8,6 +14,23 @@ const router = express.Router();
  * @swagger
  * components:
  *   schemas:
+ *     Message:
+ *       type: object
+ *       properties:
+ *         text:
+ *           type: string
+ *           example: "Two-factor authentication enabled successfully."
+ *         severity:
+ *           type: string
+ *           enum: [error, warning, info, success]
+ *           example: success
+ *     ApiMessageResponse:
+ *       type: object
+ *       properties:
+ *         messages:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Message'
  *     TwoFASetupResponse:
  *       type: object
  *       properties:
@@ -48,19 +71,23 @@ const router = express.Router();
  * @swagger
  * /2fa/setup:
  *   post:
- *     summary: Generates QR code and temporary secret for 2FA setup
- *     description: Initiates the 2FA setup process by generating a QR code and a temporary secret for a TOTP app like Google Authenticator.
+ *     summary: Initialize 2FA Setup
+ *     description: Generates a QR code and a temporary secret to start the two-factor authentication setup process.
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: 2FA setup information returned successfully
+ *         description: 2FA setup initialized with QR code and secret.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/TwoFASetupResponse'
  *       401:
- *         description: Unauthorized - missing or invalid token
+ *         description: Unauthorized - Missing or invalid authentication token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  */
 router.post('/setup', authenticate, setup2FA);
 
@@ -68,8 +95,8 @@ router.post('/setup', authenticate, setup2FA);
  * @swagger
  * /2fa/verify-setup:
  *   post:
- *     summary: Verifies the 2FA setup code
- *     description: Verifies the TOTP code to confirm 2FA setup with an authenticator app.
+ *     summary: Verify 2FA Setup Code
+ *     description: Verifies the TOTP code to confirm two-factor authentication setup.
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -80,11 +107,23 @@ router.post('/setup', authenticate, setup2FA);
  *             $ref: '#/components/schemas/Verify2FACodeRequest'
  *     responses:
  *       200:
- *         description: Verification successful, 2FA enabled
+ *         description: Two-factor authentication enabled successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  *       400:
- *         description: Invalid code
+ *         description: Invalid two-factor authentication code.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized - Missing or invalid authentication token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  */
 router.post('/verify-setup', authenticate, verify2FASetup);
 
@@ -92,17 +131,29 @@ router.post('/verify-setup', authenticate, verify2FASetup);
  * @swagger
  * /2fa/disable:
  *   delete:
- *     summary: Disables 2FA
- *     description: Disables two-factor authentication for the current user and deletes the 2FA secret from the database.
+ *     summary: Disable Two-Factor Authentication
+ *     description: Disables 2FA for the current user and removes the 2FA secret.
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: 2FA disabled successfully
+ *         description: Two-factor authentication disabled successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  *       400:
- *         description: Invalid request
+ *         description: Failed to disable two-factor authentication.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  *       401:
- *         description: Unauthorized - missing or invalid token
+ *         description: Unauthorized - Missing or invalid authentication token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  */
 router.delete('/disable', authenticate, disable2FA);
 
@@ -110,8 +161,8 @@ router.delete('/disable', authenticate, disable2FA);
  * @swagger
  * /2fa/recover:
  *   post:
- *     summary: Request email-based 2FA reset
- *     description: Requests a recovery process for users who are locked out due to losing access to their 2FA device (phone).
+ *     summary: Request 2FA Recovery
+ *     description: Sends a recovery email to users who lost access to their 2FA device.
  *     requestBody:
  *       required: true
  *       content:
@@ -120,11 +171,23 @@ router.delete('/disable', authenticate, disable2FA);
  *             $ref: '#/components/schemas/Recover2FARequest'
  *     responses:
  *       200:
- *         description: 2FA reset request sent successfully
+ *         description: Recovery email sent successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  *       400:
- *         description: Invalid email or failed request
+ *         description: Invalid email or request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  *       404:
- *         description: User not found
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  */
 router.post('/recover', recover2FA);
 
@@ -132,8 +195,8 @@ router.post('/recover', recover2FA);
  * @swagger
  * /2fa/confirm-recover:
  *   post:
- *     summary: Confirm 2FA reset
- *     description: Confirms the reset process for 2FA by verifying the token sent to the user's email.
+ *     summary: Confirm 2FA Recovery
+ *     description: Confirms 2FA reset by verifying the recovery token sent via email.
  *     requestBody:
  *       required: true
  *       content:
@@ -142,13 +205,24 @@ router.post('/recover', recover2FA);
  *             $ref: '#/components/schemas/ConfirmRecover2FARequest'
  *     responses:
  *       200:
- *         description: 2FA successfully disabled and reset
+ *         description: Two-factor authentication recovery confirmed.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  *       400:
- *         description: Invalid token
+ *         description: Invalid or expired recovery token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  *       401:
- *         description: Unauthorized - missing or invalid token
+ *         description: Unauthorized - Missing or invalid authentication token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
  */
 router.post('/confirm-recover', confirm2FARecover);
-
 
 export default router;

@@ -2,17 +2,18 @@ import { Request, Response } from 'express';
 import { NextFunction } from "express";
 import jwt from 'jsonwebtoken';
 import GlobalConfig from '../config';
+import { createMessageResponse } from '../lib/response';
 
 export function authenticate(request: Request, response: Response, next: NextFunction): void {
   try {
     if ( !request.session || !request.session.user?.id ) {
-      response.status(401).json({ error: 'Session invalid or expired' });
+      response.status(401).json(createMessageResponse('Session invalid or expired', 'error'));
       return
     }
 
     const token = request.cookies?.accessToken;
     if (!token) {
-      response.status(401).json({ error: 'Access token missing' });
+      response.status(401).json(createMessageResponse('Access token missing', 'error'));
       return
     }
 
@@ -20,19 +21,16 @@ export function authenticate(request: Request, response: Response, next: NextFun
 
     next();
   } catch (err) {
-    // console.error('Authentication error:', err);
-
-    // Token expired or invalid
     if (err instanceof jwt.TokenExpiredError) {
-      response.status(401).json({ error: 'Access token expired' });
+      response.status(401).json(createMessageResponse('Access token expired', 'error'));
       return
     }
 
     if (err instanceof jwt.JsonWebTokenError) {
-      response.status(403).json({ error: 'Invalid access token' });
+      response.status(403).json(createMessageResponse('Invalid access token', 'error'));
       return
     }
 
-    response.status(500).json({ error: 'Internal server error' });
+    response.status(500).json(createMessageResponse('Internal server error', 'error'));
   }
 }

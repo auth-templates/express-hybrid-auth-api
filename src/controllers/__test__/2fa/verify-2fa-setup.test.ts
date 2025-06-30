@@ -60,7 +60,7 @@ describe('POST /2fa/setup', () => {
         expect(Redis2FA.verify2faSetup).toHaveBeenCalledWith(sessionData.user.id, code);
         expect(UserRepository.verifyAndSaveSecret).toHaveBeenCalledWith(sessionData.user.id, twoStepSecret);
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({message: "Two-factor authentication has been successfully verified."});
+        expect(response.body).toEqual({messages:[ {text: "Two-factor authentication has been successfully verified.", severity: "error"}]});
     });
 
     it('should return 400 if an unexpected error occurs', async () => {
@@ -81,7 +81,7 @@ describe('POST /2fa/setup', () => {
                                     .send({code});
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({message: "The 2FA code must be a 6-digit number."});
+        expect(response.body).toEqual({messages: [{text: "The 2FA code must be a 6-digit number.", severity: "error"}]});
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
@@ -101,6 +101,6 @@ describe('POST /2fa/setup', () => {
                                     .send({code});
 
         expect(response.status).toBe(500);
-        expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
+        expect(response.body).toEqual({messages: [{text: 'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
     });
 })

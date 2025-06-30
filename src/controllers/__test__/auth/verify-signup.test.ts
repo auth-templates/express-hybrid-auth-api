@@ -57,7 +57,7 @@ describe('POST /auth/verify-signup', () => {
             .send({ token: 'signup-used-1' });
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('This verification link has already been used. If you haven’t completed your signup, request a new link.');
+        expect(response.body).toEqual({messages: [{text:'This verification link has already been used. If you haven’t completed your signup, request a new link.', severity: "error"}]});
     });
 
     it('should return 400 for an expired token', async () => {
@@ -70,7 +70,7 @@ describe('POST /auth/verify-signup', () => {
             .send({ token: 'signup-expired-1' });
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('Your verification link has expired. Please request a new one to continue.');
+        expect(response.body).toEqual({messages: [{text:'Your verification link has expired. Please request a new one to continue.', severity: "error"}]});
     });
 
     it('should return 400 for a non-existent token or invalid token', async () => {
@@ -83,7 +83,7 @@ describe('POST /auth/verify-signup', () => {
             .send({ token: 'signup-invalid-1' });
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('The verification link is invalid or no longer available. Please check the link or request a new one.');
+        expect(response.body).toEqual({messages: [{text:'The verification link is invalid or no longer available. Please check the link or request a new one.', severity: "error"}]});
     });
 
     it('should return 500 for unexpected error', async () => {
@@ -96,6 +96,6 @@ describe('POST /auth/verify-signup', () => {
             .send({ token: 'signup-valid-1' });
 
         expect(response.status).toBe(500);
-        expect(response.body.message).toBe('An unexpected error occurred. Please try again later or contact support.');
+        expect(response.body).toEqual({messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
     });
 });
