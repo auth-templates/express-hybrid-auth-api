@@ -18,13 +18,19 @@ import csrfRoutes from './routes/csrfRoutes';
 import googleAuthRoutes from './routes/googleAuthRoutes';
 import githubAuthRoutes from './routes/githubAuthRoutes';
 import { errorHandler } from './middlewares/error-handler';
-import { csrfProtection, csrfTokenHandler } from './middlewares/csrf';
+import { csrfProtection } from './middlewares/csrf';
 import { requireTermsAcceptance } from './middlewares/require-terms-acceptance';
 import { require2FA } from './middlewares/require-2fa';
 import { authenticate } from './middlewares/authenticate';
+import cors from 'cors';
 
 const app = express();
-const port = 3000;
+const port = 3001;
+
+app.use(cors({
+  origin: 'http://localhost:3000',  // your frontend URL & port here
+  credentials: true,                 // allows cookies and auth headers
+}));
 
 app.use(session({
     store: new RedisStore({ client: redisClient }),
@@ -53,7 +59,7 @@ app.use(i18nMiddleware);
 app.use(cookieParser());
 app.use(express.json());
 
-app.get('/', csrfRoutes);
+app.use('/csrf', csrfRoutes);
 
 app.use(csrfProtection);
 

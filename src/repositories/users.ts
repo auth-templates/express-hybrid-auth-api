@@ -162,7 +162,7 @@ export class UserRepository {
             });
             
             if ( !userRecord ) {
-                throw new AppError('errors.user_not_found', {}, 400);
+                throw new AppError('errors.user_not_found', {}, 404);
             }
 
             const user: User = {

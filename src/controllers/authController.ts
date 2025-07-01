@@ -93,6 +93,21 @@ export const signup = async (request: Request, response: Response): Promise<void
     }
 }
 
+export async function getSession(request: Request, response: Response): Promise<void> {
+    const userId = request.session?.user?.id;
+    
+    try {
+        const user = await UserRepository.getUserById(userId);
+        response.status(200).send({user});
+    } catch (error) {
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            return
+        }
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+    }
+}
+
 export const login = async (request: Request, response: Response): Promise<void> => {
     const { email, password } = request.body;
     

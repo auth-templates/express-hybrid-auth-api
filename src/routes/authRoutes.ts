@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword, acceptTerms, verifyLogin2FA } from '../controllers/authController';
+import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword, acceptTerms, verifyLogin2FA, getSession } from '../controllers/authController';
 import { authenticate } from '../middlewares/authenticate';
 
 const router = express.Router();
@@ -519,5 +519,47 @@ router.post('/accept-terms', authenticate, acceptTerms);
  *                   severity: "error"
  */
 router.post('/verify-2fa', authenticate, verifyLogin2FA);
+
+/**
+ * @swagger
+ * /auth/session:
+ *   get:
+ *     summary: Get current user session
+ *     description: Returns the authenticated user's session information. Requires an active session.
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user session retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized - session missing or expired.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Unauthorized: session missing or expired."
+ *                   severity: "error"
+ *       500:
+ *         description: Server error retrieving session.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Internal server error"
+ *                   severity: "error"
+ */
+router.get('/session', authenticate, getSession);
+
 
 export default router;

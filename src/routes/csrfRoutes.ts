@@ -17,7 +17,7 @@ const router = Router();
 
 /**
  * @swagger
- * /csrf-token:
+ * /csrf/token:
  *   get:
  *     summary: Get CSRF token
  *     tags:
@@ -39,6 +39,6 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/CsrfTokenResponse'
  */
-router.get('/csrf-token', csrfTokenHandler);
+router.get('/token', csrfTokenHandler);
 
 export default router;

@@ -303,7 +303,7 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.getUserById(1)).rejects.toMatchObject({
                 translationKey: 'errors.user_not_found',
-                statusCode: 400,
+                statusCode: 404,
             });
         });
 
