@@ -54,7 +54,7 @@ describe('POST /auth/logout', () => {
         // Setup session dynamically
         await agent.post('/test/session').send(userSession);
 
-        const response = await agent.post('/auth/logout').set('Cookie', `refreshToken=${refreshToken}; connect.sid=session-id`)
+        const response = await agent.post('/auth/logout').set('Cookie', `refresh_token=${refreshToken}; connect.sid=session-id`)
 
         expect(RefreshTokenStore.removeRefreshToken).toHaveBeenCalledWith(userSession.user.id, refreshToken);
         expect(response.status).toBe(204);
@@ -80,7 +80,7 @@ describe('POST /auth/logout', () => {
             .post('/test/session')
             .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
 
-        const response = await agent.post('/auth/logout').set('Cookie', `refreshToken=token; connect.sid=session-id`)
+        const response = await agent.post('/auth/logout').set('Cookie', `refresh_token=token; connect.sid=session-id`)
 
         expect(response.status).toBe(500);
         expect(response.body).toEqual({messages: [{ text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});

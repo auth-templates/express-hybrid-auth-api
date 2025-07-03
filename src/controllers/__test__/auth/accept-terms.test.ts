@@ -64,7 +64,7 @@ describe('POST /auth/accept-terms', () => {
         const userSession = { user: { id: 1, email: 'test@example.com' }, termsAccepted: false };
         await agent.post('/test/session').send(userSession);
 
-        const response = await agent.post('/auth/accept-terms').send({acceptTerms: true}).set('Cookie', `refreshToken=${validToken}; connect.sid=session-id`);
+        const response = await agent.post('/auth/accept-terms').send({acceptTerms: true}).set('Cookie', `refresh_token=${validToken}; connect.sid=session-id`);
 
         expect(UserRepository.acceptTerms).toHaveBeenCalledWith(userSession.user.id, true);
         expect(response.status).toBe(204);

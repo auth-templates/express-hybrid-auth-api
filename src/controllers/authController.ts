@@ -137,7 +137,7 @@ export const login = async (request: Request, response: Response): Promise<void>
 
 export const logout = async (request: Request, response: Response): Promise<void> => {
     const userId = request.session?.user?.id;
-    const refreshToken = request.cookies?.refreshToken;
+    const refreshToken = request.cookies?.refresh_token;
     try {
         await RefreshTokenStore.removeRefreshToken(userId, refreshToken);
         destroyUserSession(request, response);
@@ -151,12 +151,13 @@ export const logout = async (request: Request, response: Response): Promise<void
 }
 
 async function issueNewAccessToken(req: Request, res: Response): Promise<void> {
-    const refreshToken = req.cookies?.refreshToken;
+    const refreshToken = req.cookies?.refresh_token;
     const userId = req.session?.user?.id;
     const pending2FA = req.session?.pending2FA;
     const termsAccepted = req.session?.termsAccepted;
 
     const stored = await RefreshTokenStore.getStoredRefreshToken(userId, refreshToken);
+
     if ( !refreshToken || refreshToken !== stored ) {
         throw new AppError('errors.invalid_refresh_token', {}, 403);
     }
@@ -170,16 +171,21 @@ async function issueNewAccessToken(req: Request, res: Response): Promise<void> {
     ]);
 }
 
-
 export const refresh = async (request: Request, response: Response): Promise<void> => {
     try {
         await issueNewAccessToken(request, response);
         response.status(204).end();
     } catch (error) {
+        try {
+        console.log(error, createMessageResponse(request.t(error.translationKey, error.params) as string, 'error'));
         if (error instanceof AppError) {
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        } catch(error) {
+            console.log("error", "fail");
+        }
+        console.log("here");
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }

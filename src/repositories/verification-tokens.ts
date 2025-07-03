@@ -87,8 +87,6 @@ export class VerificationTokensRepository {
                 },
                 orderBy: { created_at: 'desc' },
             });
-
-            console.log("TOKEN RECORD", await hash(token), tokenRecord);
             
             if ( !tokenRecord ) {
                 throw new AppError('tokens.2fa.invalid', {}, 400);

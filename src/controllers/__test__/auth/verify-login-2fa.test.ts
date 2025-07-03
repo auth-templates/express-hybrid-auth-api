@@ -85,7 +85,7 @@ describe('POST /auth/verify-2fa', () => {
         await agent.post('/test/session').send(userSession);
 
         const code = "123456";
-        const response = await agent.post('/auth/verify-2fa').set('Cookie', `refreshToken=${validToken}; connect.sid=session-id`).send({code});
+        const response = await agent.post('/auth/verify-2fa').set('Cookie', `refresh_token=${validToken}; connect.sid=session-id`).send({code});
 
         expect(UserRepository.getUser2FASecretById).toHaveBeenCalledWith(userSession.user.id);
         expect(otplib.authenticator.verify).toHaveBeenCalledWith({secret: twofaSecret, token: code });

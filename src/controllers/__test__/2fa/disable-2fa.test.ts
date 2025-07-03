@@ -49,7 +49,7 @@ describe('POST /2fa/disable', () => {
         // Setup session dynamically
         await agent.post('/test/session').send(sessionData);
 
-        const response = await agent.post('/2fa/disable').set('Cookie', 'refreshToken=token; accessToken=access_token; connect.sid=session-id')
+        const response = await agent.post('/2fa/disable').set('Cookie', 'refresh_token=token; access_token=accesstoken; connect.sid=session-id')
     
         expect(response.status).toBe(204);
         expect(UserRepository.disable2FA).toHaveBeenCalledWith(sessionData.user.id);
@@ -66,7 +66,7 @@ describe('POST /2fa/disable', () => {
              .post('/test/session')
              .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
  
-        const response = await agent.post('/2fa/disable').set('Cookie', 'refreshToken=token; accessToken=accesss_token; connect.sid=session-id')
+        const response = await agent.post('/2fa/disable').set('Cookie', 'refresh_token=token; access_token=accesstoken; connect.sid=session-id')
  
         expect(response.status).toBe(500);
         expect(response.body).toEqual({ messages: [{ text: 'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});

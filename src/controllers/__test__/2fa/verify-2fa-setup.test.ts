@@ -54,7 +54,7 @@ describe('POST /2fa/setup', () => {
 
         const response = await agent.post('/2fa/verify-setup')
                         
-                                    .set('Cookie', 'refreshToken=token; accessToken=accesss_token; connect.sid=session-id')
+                                    .set('Cookie', 'refresh_token=token; access_token=accesstoken; connect.sid=session-id')
                                                 .set('Accept-Language', 'en')
                                     .send({code});
         expect(Redis2FA.verify2faSetup).toHaveBeenCalledWith(sessionData.user.id, code);
@@ -76,7 +76,7 @@ describe('POST /2fa/setup', () => {
         await agent.post('/test/session').send(sessionData);
 
         const response = await agent.post('/2fa/verify-setup')
-                                    .set('Cookie', 'refreshToken=token; accessToken=accesss_token; connect.sid=session-id')
+                                    .set('Cookie', 'refresh_token=token; access_token=accesstoken; connect.sid=session-id')
                                                 .set('Accept-Language', 'en')
                                     .send({code});
 
@@ -96,7 +96,7 @@ describe('POST /2fa/setup', () => {
             .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
 
         const response = await agent.post('/2fa/verify-setup')
-                                    .set('Cookie', 'refreshToken=token; accessToken=accesss_token; connect.sid=session-id')
+                                    .set('Cookie', 'refresh_token=token; access_token=accesstoken; connect.sid=session-id')
                                                 .set('Accept-Language', 'en')
                                     .send({code});
 

@@ -53,7 +53,7 @@ describe('POST /2fa/setup', () => {
         // Setup session dynamically
         await agent.post('/test/session').send(sessionData);
 
-        const response = await agent.post('/2fa/setup').set('Cookie', 'refreshToken=token; accessToken=accesss_token; connect.sid=session-id')
+        const response = await agent.post('/2fa/setup').set('Cookie', 'refresh_token=token; access_token=accessstoken; connect.sid=session-id')
     
         expect(Redis2FA.get2faSetup).toHaveBeenCalledWith(sessionData.user.id, sessionData.user.email);
         expect(response.status).toBe(200);
@@ -70,7 +70,7 @@ describe('POST /2fa/setup', () => {
             .post('/test/session')
             .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
 
-        const response = await agent.post('/2fa/setup').set('Cookie', 'refreshToken=token; accessToken=accesss_token; connect.sid=session-id')
+        const response = await agent.post('/2fa/setup').set('Cookie', 'refresh_token=token; access_token=accesstoken; connect.sid=session-id')
 
         expect(response.status).toBe(500);
         expect(response.body).toEqual({messages: [{text: 'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});

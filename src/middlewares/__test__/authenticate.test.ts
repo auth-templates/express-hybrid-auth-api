@@ -6,10 +6,11 @@ import GlobalConfig from '../../config';
 jest.mock('jsonwebtoken');
 
 describe('authenticate middleware', () => {
-  const mockRequest = (session = {}, cookies = {}) =>
+  const mockRequest = (session = {}, cookies = {}, originalUrl = '/') =>
     ({
       session,
       cookies,
+      originalUrl
     } as unknown as Request);
 
   const mockResponse = () => {
@@ -31,7 +32,7 @@ describe('authenticate middleware', () => {
   it('should call next() when session and valid token are present', () => {
     (jwt.verify as jest.Mock).mockReturnValue({});
 
-    const req = mockRequest(validSession, { accessToken: validToken });
+    const req = mockRequest(validSession, { access_token: validToken });
     const res = mockResponse();
 
     authenticate(req, res, next);
@@ -40,8 +41,18 @@ describe('authenticate middleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
+  it('should call next() without verifying token for /auth/refresh route', () => {
+    const req = mockRequest(validSession, {}, '/auth/refresh')
+    const res = mockResponse();
+
+    authenticate(req, res, next);
+
+    expect(jwt.verify).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
+});
+
   it('should return 401 if session is missing', () => {
-    const req = mockRequest(undefined, { accessToken: validToken });
+    const req = mockRequest(undefined, { access_token: validToken });
     const res = mockResponse();
 
     authenticate(req, res, next);
@@ -67,7 +78,7 @@ describe('authenticate middleware', () => {
       throw new jwt.TokenExpiredError('jwt expired', new Date());
     });
 
-    const req = mockRequest(validSession, { accessToken: validToken });
+    const req = mockRequest(validSession, { access_token: validToken });
     const res = mockResponse();
 
     authenticate(req, res, next);
@@ -81,7 +92,7 @@ describe('authenticate middleware', () => {
       throw new jwt.JsonWebTokenError('jwt malformed');
     });
 
-    const req = mockRequest(validSession, { accessToken: validToken });
+    const req = mockRequest(validSession, { access_token: validToken });
     const res = mockResponse();
 
     authenticate(req, res, next);
@@ -95,7 +106,7 @@ describe('authenticate middleware', () => {
       throw new Error('Unexpected failure');
     });
 
-    const req = mockRequest(validSession, { accessToken: validToken });
+    const req = mockRequest(validSession, { access_token: validToken });
     const res = mockResponse();
 
     authenticate(req, res, next);

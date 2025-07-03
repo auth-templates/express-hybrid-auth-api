@@ -7,11 +7,16 @@ import { createMessageResponse } from '../lib/response';
 export function authenticate(request: Request, response: Response, next: NextFunction): void {
   try {
     if ( !request.session || !request.session.user?.id ) {
-      response.status(401).json(createMessageResponse('Session invalid or expired', 'error'));
-      return
+        response.status(401).json(createMessageResponse('Session invalid or expired', 'error'));
+        return
     }
 
-    const token = request.cookies?.accessToken;
+    if ( request.originalUrl === '/auth/refresh' ) {
+        next()
+        return
+    }
+
+    const token = request.cookies?.access_token;
     if (!token) {
       response.status(401).json(createMessageResponse('Access token missing', 'error'));
       return

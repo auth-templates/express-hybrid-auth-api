@@ -8,7 +8,7 @@ import { createMessageResponse } from '../lib/response';
 export function require2FA(request: Request, response: Response, next: NextFunction): void {
   const isPending2FA = request.session?.pending2FA;
 
-  if ( isPending2FA && request.path !== '/auth/verify-2fa' ) {
+  if ( isPending2FA && request.originalUrl !== '/auth/verify-2fa' ) {
     response.status(403).json(createMessageResponse(request.t('validation.terms'), 'error')); 
     return
   }
