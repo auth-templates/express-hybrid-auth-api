@@ -12,11 +12,11 @@ const commonString = (min: number, max: number, fieldName: string) => v.pipe(
 
 export const createSignupSchema = () => {
   return v.object({
-    firstName: commonString(1, 30, 'firstname'),
-    lastName: commonString(1, 30, 'lastname'),
+    firstName: v.optional(commonString(1, 30, 'firstname')),
+    lastName: v.optional(commonString(1, 30, 'lastname')),
     email: v.pipe(v.string(), v.email('validation.email')),
     password: passwordValidationSchema(),
-    role: v.enum(Role),
+    role: v.optional(v.enum(Role)),
     termsAccepted: v.literal(true, 'validation.accept_terms')
   });
 };
