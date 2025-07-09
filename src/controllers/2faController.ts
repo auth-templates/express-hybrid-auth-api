@@ -10,6 +10,7 @@ import GlobalConfig from '../config';
 import { TokenType } from '../models/verification-token';
 import { UserStatus } from '../models/user';
 import { createMessageResponse } from '../lib/response';
+import logger from '@/lib/logger';
 
 export async function save2FAToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
@@ -36,6 +37,7 @@ export const setup2FA = async (request: Request, response: Response): Promise<vo
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params),"error"));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -65,6 +67,7 @@ export const verify2FASetup = async (request: Request, response: Response): Prom
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 };
@@ -80,6 +83,7 @@ export const disable2FA = async (request: Request, response: Response): Promise<
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), "error"));
     }
 }
@@ -104,6 +108,7 @@ export const recover2FA = async (request: Request, response: Response): Promise<
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -121,6 +126,7 @@ export const confirm2FARecover = async (request: Request, response: Response): P
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }

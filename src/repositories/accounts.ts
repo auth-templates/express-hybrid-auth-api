@@ -1,4 +1,5 @@
 import { AppError } from '../lib/error';
+import logger from '@/lib/logger';
 import { prismaClient } from '../lib/prisma-client';
 import { Role, User, UserStatus } from '../models/user';
 
@@ -64,6 +65,7 @@ export class AccountsRepository {
                 enabled2FA: user.twofa_enabled,
             };
         } catch (error) {
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }

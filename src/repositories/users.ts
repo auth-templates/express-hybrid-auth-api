@@ -1,5 +1,6 @@
 import { Prisma } from '../../generated/prisma';
 import { AppError } from '../lib/error';
+import logger from '@/lib/logger';
 import { verifyPasswordHash } from '../lib/password';
 import { prismaClient } from '../lib/prisma-client';
 import { PrismaErrorCode } from '../lib/prisma-error-codes';
@@ -26,6 +27,7 @@ export class UserRepository {
             if (error instanceof AppError) {
                 throw error;
             }
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -37,6 +39,7 @@ export class UserRepository {
                 data: { terms_accepted: acceptTerms },
             });
         } catch(error) {
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -62,6 +65,7 @@ export class UserRepository {
             throw new AppError('errors.is_already_in_use', { item: field }, 409);
           }
         }
+        logger.error(error);
         throw new AppError('errors.internal', {}, 500);
       }
     }
@@ -75,7 +79,7 @@ export class UserRepository {
                 },
             });
         } catch (error) {
-            console.log(error);
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -91,7 +95,7 @@ export class UserRepository {
                 },
             });
         } catch (error) {
-            console.log(error);
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -141,6 +145,7 @@ export class UserRepository {
             if ( error instanceof AppError ) {
                 throw error
             }
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -180,6 +185,7 @@ export class UserRepository {
             if ( error instanceof AppError ) {
                 throw error
             }
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -216,10 +222,10 @@ export class UserRepository {
 
             return user;
         } catch (error) {
-            console.log("error");
             if ( error instanceof AppError ) {
                 throw error
             }
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -234,6 +240,7 @@ export class UserRepository {
                 },
             });
         } catch (error) {
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -245,6 +252,7 @@ export class UserRepository {
                 data: { twofa_secret: null },
             });
         } catch (error) {
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }

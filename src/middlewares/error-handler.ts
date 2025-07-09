@@ -1,5 +1,6 @@
 import type { ErrorRequestHandler } from 'express';
 import { createMessageResponse } from '../lib/response';
+import logger from '@/lib/logger'
 
 // Underscore prefix (_) marks parameters as intentionally unused
 export const errorHandler: ErrorRequestHandler = (error, request, response, _next) => {
@@ -7,6 +8,9 @@ export const errorHandler: ErrorRequestHandler = (error, request, response, _nex
         response.status(403).json(createMessageResponse('Invalid CSRF token', 'error'));
         return;
     }
+
+
+    logger.error(error);
 
     response.status(error.status || 500).json(createMessageResponse(
         error.message || request.t('errors.internal'), 'error'

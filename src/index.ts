@@ -1,3 +1,4 @@
+import GlobalConfig from './config';
 import express from 'express';
 import swaggerUI from 'swagger-ui-express';
 import swaggerSpec from './swagger-config';
@@ -10,7 +11,6 @@ import appRoot from 'app-root-path'
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import { redisClient } from './lib/redis/client';
-import GlobalConfig from './config';
 import { Request, Response } from 'express';
 import passport from 'passport';
 import './strategies';

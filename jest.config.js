@@ -1,6 +1,9 @@
 // jest.config.js
 /** @type {import('jest').Config} */
 export default {
+    moduleNameMapper: {
+        '^@/(.*)$': '<rootDir>/src/$1', // Maps @/ to ./src/
+    },
     preset: 'ts-jest/presets/default-esm',
     setupFilesAfterEnv: ['<rootDir>/setupTests.ts'],
     testEnvironment: 'node',
@@ -33,6 +36,7 @@ export default {
         "src/routes/",         // ✅ Ignore route files
         "/main.ts",         // (Optional) ignore entry point
         "/index.ts",        // (Optional) if it's just exporting
+        "@/lib/logger"
     ],
     modulePathIgnorePatterns: ['<rootDir>/dist/'],
     coverageReporters: ['text', 'lcov'], // text for console, lcov for HTML

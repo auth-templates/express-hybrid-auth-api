@@ -6,6 +6,7 @@ import { PrismaErrorCode } from '../lib/prisma-error-codes';
 import { TokenType, VerificationToken } from '../models/verification-token';
 
 import { createTokenFingerprint } from '../lib/token';
+import logger from '@/lib/logger'
 
 type CreateVerificationTokenInput = Omit<VerificationToken, 'id' | 'createdAt' | 'usedAt' | 'token'> & { tokenHash: string, tokenFingerprint: string }
 
@@ -28,6 +29,7 @@ export class VerificationTokensRepository {
             throw new AppError('errors.user_not_found', {}, 404);
           }
         }
+        logger.error(error);
         throw new AppError('errors.internal', {}, 500);
       }
     }
@@ -71,6 +73,7 @@ export class VerificationTokensRepository {
             if (error instanceof AppError) {
                 throw error;
             }
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -113,6 +116,7 @@ export class VerificationTokensRepository {
             if (error instanceof AppError) {
                 throw error;
             }
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }
@@ -129,8 +133,6 @@ export class VerificationTokensRepository {
                 },
                 orderBy: { created_at: 'desc' },
             });
-
-            console.log("TOKEN RECORD", await hash(token), tokenRecord);
             
             if ( !tokenRecord ) {
                 throw new AppError('tokens.password-reset.invalid', {}, 400);
@@ -157,6 +159,7 @@ export class VerificationTokensRepository {
             if (error instanceof AppError) {
                 throw error;
             }
+            logger.error(error);
             throw new AppError('errors.internal', {}, 500);
         }
     }

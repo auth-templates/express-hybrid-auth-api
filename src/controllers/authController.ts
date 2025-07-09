@@ -1,4 +1,4 @@
-import { request, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { hashPassword } from "../lib/password";
 import { validateSignupData } from '../lib/validation-schemas/signup-schema';
 import { UserRepository } from '../repositories/users';
@@ -15,6 +15,7 @@ import { validatePassword } from '../lib/validation-schemas/password-schema';
 import { destroyUserSession, initializeUserSession, setCookieTokens } from '../lib/session';
 import { authenticator } from 'otplib';
 import { createMessageResponse } from '../lib/response';
+import logger from '@/lib/logger';
 
 export async function savePassswordResetToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
@@ -53,6 +54,7 @@ export const verifySignup = async (request: Request, response: Response): Promis
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -89,6 +91,7 @@ export const signup = async (request: Request, response: Response): Promise<void
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -104,6 +107,7 @@ export async function getSession(request: Request, response: Response): Promise<
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -131,6 +135,7 @@ export const login = async (request: Request, response: Response): Promise<void>
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 };
@@ -146,6 +151,7 @@ export const logout = async (request: Request, response: Response): Promise<void
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -176,16 +182,11 @@ export const refresh = async (request: Request, response: Response): Promise<voi
         await issueNewAccessToken(request, response);
         response.status(204).end();
     } catch (error) {
-        try {
-        console.log(error, createMessageResponse(request.t(error.translationKey, error.params) as string, 'error'));
         if (error instanceof AppError) {
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
-        } catch(error) {
-            console.log("error", "fail");
-        }
-        console.log("here");
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -210,6 +211,7 @@ export const resetPassword = async (request: Request, response: Response): Promi
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -243,6 +245,7 @@ export const confirmResetPassword = async (request: Request, response: Response)
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -271,6 +274,7 @@ export const acceptTerms = async (request: Request, response: Response): Promise
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
@@ -306,6 +310,7 @@ export const verifyLogin2FA = async (request: Request, response: Response): Prom
             response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
             return
         }
+        logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
     }
 }
