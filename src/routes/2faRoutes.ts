@@ -73,6 +73,8 @@ const router = express.Router();
  *   post:
  *     summary: Initialize 2FA Setup
  *     description: Generates a QR code and a temporary secret to start the two-factor authentication setup process.
+ *     tags:
+ *      - Two Factor Authentication
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -97,6 +99,8 @@ router.post('/setup', authenticate, setup2FA);
  *   post:
  *     summary: Verify 2FA Setup Code
  *     description: Verifies the TOTP code to confirm two-factor authentication setup.
+ *     tags:
+ *      - Two Factor Authentication
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -133,6 +137,8 @@ router.post('/verify-setup', authenticate, verify2FASetup);
  *   delete:
  *     summary: Disable Two-Factor Authentication
  *     description: Disables 2FA for the current user and removes the 2FA secret.
+ *     tags:
+ *      - Two Factor Authentication
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -163,6 +169,8 @@ router.delete('/disable', authenticate, disable2FA);
  *   post:
  *     summary: Request 2FA Recovery
  *     description: Sends a recovery email to users who lost access to their 2FA device.
+ *     tags:
+ *      - Two Factor Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -197,6 +205,8 @@ router.post('/recover', recover2FA);
  *   post:
  *     summary: Confirm 2FA Recovery
  *     description: Confirms 2FA reset by verifying the recovery token sent via email.
+ *     tags:
+ *      - Two Factor Authentication
  *     requestBody:
  *       required: true
  *       content:

@@ -15,6 +15,9 @@
         "invalid_2fa_verification_code": "Codul de verificare introdus este incorect. Vă rugăm să încercați din nou.",
         "2fa_required": "Finalizarea autentificării în doi pași este necesară pentru a accesa această resursă."
     },
+    "info": {
+        "confirmation_email_if_needed": "Dacă adresa ta de email trebuie încă verificată, un link de confirmare a fost trimis."
+    },
     "validation": {
         "accept_terms": "Trebuie să accepți termenii și condițiile.",
         "firstname": {

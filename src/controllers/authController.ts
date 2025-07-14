@@ -16,8 +16,9 @@ import { destroyUserSession, initializeUserSession, setCookieTokens } from '../l
 import { authenticator } from 'otplib';
 import { createMessageResponse } from '../lib/response';
 import logger from '@/lib/logger';
+import { validateEmail } from '@/lib/validation-schemas/email-validation-schema';
 
-export async function savePassswordResetToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
+export async function savePasswordResetToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + expiresInMinutes);
     await VerificationTokensRepository.createToken({
@@ -191,20 +192,70 @@ export const refresh = async (request: Request, response: Response): Promise<voi
     }
 }
 
+export const resendActivationEmail = async (request: Request, response: Response): Promise<void> => {
+    const { userEmail } = request.body;
+    
+    try { 
+        const issues = validateEmail({email: userEmail});
+
+        if ( issues.length > 0 ) {
+            response.status(400).json(createMessageResponse(
+                issues.map(({message, items}) => request.t(message, items)) as string [], 
+                'error'
+            ));
+            return
+        }
+
+        const user = await UserRepository.getUserByEmail(userEmail);
+
+        if ( user.status !== UserStatus.Pending ) { 
+            // returning 200 on purpose to avoid revealing sensitive information about the user
+            response.status(200).json(createMessageResponse([request.t('info.confirmation_email_if_needed')], 'info'));
+            return;
+        }
+
+        const expiresInMinutes = GlobalConfig.SIGNUP_TOKEN_MAX_AGE / 1000 / 60;
+        const { token, tokenFingerprint, hashedToken } = await generateToken();
+
+        await saveSignupToken(user.id, tokenFingerprint, hashedToken, expiresInMinutes);
+        await sendVerificationEmail({ token, userEmail, expiresInMinutes, t: request.t });
+
+        response.status(204).send();
+    } catch (error) {
+        if (error instanceof AppError) {
+            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            return;
+        }
+        logger.error(error);
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+    }
+};
+
 export const resetPassword = async (request: Request, response: Response): Promise<void> => {
     const { userEmail } = request.body;
     
     try {
+        const issues = validateEmail({email: userEmail});
+
+        if ( issues.length > 0 ) {
+            response.status(400).json(createMessageResponse(
+                issues.map(({message, items}) => request.t(message, items)) as string [], 
+                'error'
+            ));
+            return
+        }
+
         const { token, tokenFingerprint, hashedToken } = await generateToken();
         const user = await UserRepository.getUserByEmail(userEmail); 
 
         if( user.status !== UserStatus.Active ) {
-            throw new AppError('errors.password_reset_not_allowed', {}, 200) // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
+            // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
+            throw new AppError('errors.password_reset_not_allowed', {}, 200) 
         }
 
         const expiresInMinutes = GlobalConfig.PASSWORD_RESET_TOKEN_MAX_AGE / 1000 / 60;
-        await savePassswordResetToken(user.id, tokenFingerprint, hashedToken, expiresInMinutes);
-        await sendPasswordResetEmail({verificationCode: token, userEmail, expiresInMinutes, t: request.t});
+        await savePasswordResetToken(user.id, tokenFingerprint, hashedToken, expiresInMinutes);
+        await sendPasswordResetEmail({ token, userEmail, expiresInMinutes, t: request.t });
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
@@ -234,7 +285,8 @@ export const confirmResetPassword = async (request: Request, response: Response)
         const user = await UserRepository.getUserById(userId); 
 
         if( user.status !== UserStatus.Active ) {
-            throw new AppError('errors.password_reset_not_allowed', {}, 200) // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
+            // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
+            throw new AppError('errors.password_reset_not_allowed', {}, 200) 
         }
 
         await UserRepository.updatePassword(userId, await hashPassword(password)); 

@@ -88,10 +88,10 @@ export async function send2FADisabledEmail({t, userEmail}:{userEmail: string, t:
     await transporter.sendMail(options);
 }
 
-export async function sendPasswordResetEmail({t, userEmail, expiresInMinutes, verificationCode}:{t: (key: string, options?: any) => string, userEmail: string, expiresInMinutes: number, verificationCode: string}) {
+export async function sendPasswordResetEmail({t, userEmail, expiresInMinutes, token}:{t: (key: string, options?: any) => string, userEmail: string, expiresInMinutes: number, token: string}) {
     const emailHtml = await render(
         <PasswordResetEmail
-            resetUrl={`${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/reset-password?token=${verificationCode}`}
+            resetUrl={`${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/reset-password?token=${token}`}
             expiresInMinutes={expiresInMinutes}
             t={t} 
             frontendUrl={GlobalConfig.EMAIL_FRONTEND_BASE_URL}   

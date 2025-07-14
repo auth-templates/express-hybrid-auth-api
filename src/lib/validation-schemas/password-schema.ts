@@ -1,6 +1,5 @@
 import * as v from 'valibot';
 import { ValibotIssueReason } from '../valibot-issue-reason';
-import { CreateUserInput } from '../../models/user';
 import { ValidationIssue } from './validation-issue';
 
 export const passwordValidationSchema = () => v.pipe(

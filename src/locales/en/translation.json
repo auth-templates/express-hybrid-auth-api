@@ -15,6 +15,9 @@
         "invalid_2fa_verification_code": "The verification code you entered is incorrect. Please try again.",
         "2fa_required": "Finalizing two-step authentication is required to access this resource."
     },
+    "info": {
+        "confirmation_email_if_needed": "If your email still needs to be verified, a confirmation link has been sent."
+    },
     "validation": {
         "accept_terms": "You must accept the terms and conditions.",
         "firstname": {

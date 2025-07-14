@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword, acceptTerms, verifyLogin2FA, getSession } from '../controllers/authController';
+import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword, acceptTerms, verifyLogin2FA, getSession, resendActivationEmail } from '../controllers/authController';
 import { authenticate } from '../middlewares/authenticate';
 
 const router = express.Router();
@@ -58,14 +58,23 @@ const router = express.Router();
  *         token:
  *           type: string
  *           example: "signup-verification-token-here"
- *     ResetPasswordRequest:
+ *     ResendActivationEmailRequest:
  *       type: object
  *       required:
  *         - userEmail
  *       properties:
  *         userEmail:
  *           type: string
- *           example: "user@example.com"
+ *           format: email
+ *           example: user@example.com
+ *     ResetPasswordRequest:
+ *        type: object
+ *        required:
+ *          - userEmail
+ *        properties:
+ *          userEmail:
+ *            type: string
+ *            example: "user@example.com"
  *     ConfirmResetPasswordRequest:
  *       type: object
  *       required:
@@ -139,6 +148,8 @@ const router = express.Router();
  *   post:
  *     summary: User Signup
  *     description: Registers a new user and saves them to the database with admin role.
+ *     tags:
+ *      - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -175,6 +186,8 @@ router.post('/signup', signup);
  *   post:
  *     summary: Verify Signup Token
  *     description: Verifies a user's signup token and activates their account.
+ *     tags:
+ *      - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -231,6 +244,8 @@ router.post('/verify-signup', verifySignup);
  *   post:
  *     summary: User Login
  *     description: Generates a session token for the user and sets it in an HTTP-only cookie.
+ *     tags:
+ *      - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -284,10 +299,63 @@ router.post('/login', login);
 
 /**
  * @swagger
+ * /auth/resend-activation-email:
+ *  post:
+ *    summary: Resend account activation email
+ *    description: >
+ *      Resends an account activation email to the provided email address if the user has not yet verified it.
+ *      For security reasons, this endpoint returns a generic response regardless of the user's account state.
+ *    tags:
+ *      - Authentication
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/ResendActivationEmailRequest'
+ *    responses:
+ *      '200':
+ *        description: Confirmation email was resent (or not needed).
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ApiMessageResponse'
+ *            example:
+ *              messages:
+ *                - text: If your email still needs to be verified, a confirmation link has been sent.
+ *                  severity: info
+ *      '400':
+ *        description: Bad request (e.g. invalid email format)
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ApiMessageResponse'
+ *            example:
+ *              messages:
+ *                - text: The email address is not valid.
+ *                  severity: error
+ *      '500':
+ *        description: Internal server error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ApiMessageResponse'
+ *            example:
+ *              messages:
+ *                - text: An unexpected error occurred. Please try again later or contact support.
+ *                  severity: error
+ */
+
+router.post('/auth', resendActivationEmail)
+
+/**
+ * @swagger
  * /auth/logout:
  *   post:
  *     summary: User Logout
  *     description: Logs out the user by deleting the session cookie.
+ *     tags:
+ *      - Authentication
  *     responses:
  *       204:
  *         description: Logout successful, session cookie deleted.
@@ -310,6 +378,8 @@ router.post('/logout', authenticate, logout);
  *   post:
  *     summary: Refresh Access Token
  *     description: Refreshes the access token using a valid refresh token stored in cookies. Requires authentication.
+ *     tags:
+ *      - Authentication
  *     responses:
  *       204:
  *         description: Access token refreshed successfully. No content returned.
@@ -342,6 +412,8 @@ router.post('/refresh', authenticate, refresh);
  *   post:
  *     summary: Initiate Password Reset
  *     description: Sends a password reset email to the given email address. Always responds with 204 to avoid revealing user existence.
+ *     tags:
+ *      - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -380,6 +452,8 @@ router.post('/reset-password/request', resetPassword);
  *   post:
  *     summary: Complete Password Reset
  *     description: Resets the user's password using a valid reset token and a new password.
+ *     tags:
+ *      - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -420,6 +494,8 @@ router.post('/reset-password', confirmResetPassword);
  *     description: >
  *       Marks the user's Terms of Service as accepted. Requires a valid session and refresh token.
  *       A new access token is issued with updated claims and sent via an HTTP-only cookie.
+ *     tags:
+ *      - Authentication
  *     responses:
  *       204:
  *         description: Terms accepted successfully. New access token set in cookie.
@@ -467,6 +543,8 @@ router.post('/accept-terms', authenticate, acceptTerms);
  *   post:
  *     summary: Verify Two-Factor Authentication Code
  *     description: Verifies a 2FA code provided by the user during login. Requires an active session.
+ *     tags:
+ *      - Authentication
  *     security:
  *       - cookieAuth: []
  *     requestBody:
@@ -526,6 +604,8 @@ router.post('/verify-2fa', authenticate, verifyLogin2FA);
  *   get:
  *     summary: Get current user session
  *     description: Returns the authenticated user's session information. Requires an active session.
+ *     tags:
+ *      - Authentication
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -560,6 +640,5 @@ router.post('/verify-2fa', authenticate, verifyLogin2FA);
  *                   severity: "error"
  */
 router.get('/session', authenticate, getSession);
-
 
 export default router;

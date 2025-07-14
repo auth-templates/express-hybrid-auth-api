@@ -133,14 +133,14 @@ describe('Email sending functions', () => {
       t: mockT,
       userEmail: 'user@example.com',
       expiresInMinutes: 30,
-      verificationCode: 'reset-token-123',
+      token: 'reset-token-123',
     };
 
     await emailModule.sendPasswordResetEmail(args);
 
     expect(render).toHaveBeenCalledWith(expect.objectContaining({
       props: expect.objectContaining({
-        resetUrl: `${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/reset-password?token=${args.verificationCode}`,
+        resetUrl: `${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/reset-password?token=${args.token}`,
         expiresInMinutes: args.expiresInMinutes,
         t: args.t,
         frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
