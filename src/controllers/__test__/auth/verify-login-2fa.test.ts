@@ -9,6 +9,7 @@ import { UserRepository } from '../../../repositories/users';
 import * as jwt from 'jsonwebtoken';
 import { RefreshTokenStore } from '../../../lib/redis/redis-token';
 import * as otplib from 'otplib';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('otplib', () => ({
     authenticator: {
@@ -138,7 +139,7 @@ describe('POST /auth/verify-2fa', () => {
         const response = await agent.post('/auth/verify-2fa').send({ code: 'invalid-code' });
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text:'The verification code you entered is incorrect. Please try again.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:'The verification code you entered is incorrect. Please try again.', severity: "error"}], code: AppStatusCode.TWO_FA_VERIFICATION_FAILED});
     });
 
     it('should return 500 if unexpected error occurs', async () => {
@@ -151,6 +152,6 @@ describe('POST /auth/verify-2fa', () => {
         const response = await agent.post('/auth/verify-2fa').send({ code: '123456' });
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages:[{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
+        expect(response.body).toEqual({messages:[{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 });

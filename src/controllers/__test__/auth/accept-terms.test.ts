@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import { UserRepository } from '../../../repositories/users';
 import * as jwt from 'jsonwebtoken';
 import { RefreshTokenStore } from '../../../lib/redis/redis-token';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -117,6 +118,6 @@ describe('POST /auth/accept-terms', () => {
         const response = await agent.post('/auth/accept-terms');
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages: [{ text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{ text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 });

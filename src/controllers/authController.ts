@@ -17,6 +17,7 @@ import { authenticator } from 'otplib';
 import { createMessageResponse } from '../lib/response';
 import logger from '@/lib/logger';
 import { validateEmail } from '@/lib/validation-schemas/email-validation-schema';
+import { AppStatusCode } from '@/@types/status-code';
 
 export async function savePasswordResetToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
@@ -52,11 +53,11 @@ export const verifySignup = async (request: Request, response: Response): Promis
         response.status(204).send();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -89,11 +90,11 @@ export const signup = async (request: Request, response: Response): Promise<void
         response.status(204).send();
     } catch ( error ) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -105,11 +106,11 @@ export async function getSession(request: Request, response: Response): Promise<
         response.status(200).send({user});
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -133,11 +134,11 @@ export const login = async (request: Request, response: Response): Promise<void>
         response.status(200).send(user);
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 };
 
@@ -149,11 +150,11 @@ export const logout = async (request: Request, response: Response): Promise<void
         destroyUserSession(request, response);
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -166,7 +167,7 @@ async function issueNewAccessToken(req: Request, res: Response): Promise<void> {
     const stored = await RefreshTokenStore.getStoredRefreshToken(userId, refreshToken);
 
     if ( !refreshToken || refreshToken !== stored ) {
-        throw new AppError('errors.invalid_refresh_token', {}, 403);
+        throw new AppError('errors.invalid_refresh_token', {}, AppStatusCode.REFRESH_TOKEN_INVALID, 403);
     }
 
     await RefreshTokenStore.resetRefreshTokenExpiration(userId, refreshToken);
@@ -184,11 +185,11 @@ export const refresh = async (request: Request, response: Response): Promise<voi
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -210,7 +211,7 @@ export const resendActivationEmail = async (request: Request, response: Response
 
         if ( user.status !== UserStatus.Pending ) { 
             // returning 200 on purpose to avoid revealing sensitive information about the user
-            response.status(200).json(createMessageResponse([request.t('info.confirmation_email_if_needed')], 'info'));
+            response.status(200).json(createMessageResponse([request.t('info.confirmation_email_if_needed')], 'info', AppStatusCode.CONFIRMATION_EMAIL_SENT_IF_NEEDED));
             return;
         }
 
@@ -223,11 +224,11 @@ export const resendActivationEmail = async (request: Request, response: Response
         response.status(204).send();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return;
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 };
 
@@ -245,25 +246,25 @@ export const resetPassword = async (request: Request, response: Response): Promi
             return
         }
 
-        const { token, tokenFingerprint, hashedToken } = await generateToken();
         const user = await UserRepository.getUserByEmail(userEmail); 
 
         if( user.status !== UserStatus.Active ) {
             // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
-            throw new AppError('errors.password_reset_not_allowed', {}, 200) 
+            throw new AppError('errors.password_reset_not_initiated', {}, AppStatusCode.PASSWORD_RESET_NOT_INITIATED, 200) 
         }
 
+        const { token, tokenFingerprint, hashedToken } = await generateToken();
         const expiresInMinutes = GlobalConfig.PASSWORD_RESET_TOKEN_MAX_AGE / 1000 / 60;
         await savePasswordResetToken(user.id, tokenFingerprint, hashedToken, expiresInMinutes);
         await sendPasswordResetEmail({ token, userEmail, expiresInMinutes, t: request.t });
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -286,7 +287,7 @@ export const confirmResetPassword = async (request: Request, response: Response)
 
         if( user.status !== UserStatus.Active ) {
             // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
-            throw new AppError('errors.password_reset_not_allowed', {}, 200) 
+            throw new AppError('errors.password_reset_not_initiated', {}, AppStatusCode.PASSWORD_RESET_NOT_INITIATED, 200) 
         }
 
         await UserRepository.updatePassword(userId, await hashPassword(password)); 
@@ -294,11 +295,11 @@ export const confirmResetPassword = async (request: Request, response: Response)
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -323,11 +324,11 @@ export const acceptTerms = async (request: Request, response: Response): Promise
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -347,7 +348,7 @@ export const verifyLogin2FA = async (request: Request, response: Response): Prom
 
         const isValid = authenticator.verify({ token: code, secret: twofaSecret });
         if ( !isValid ) {
-           throw new AppError('errors.invalid_2fa_verification_code', {}, 400);
+           throw new AppError('errors.2fa_verification_code_invalid', {}, AppStatusCode.TWO_FA_VERIFICATION_FAILED, 400);
         }
 
         // Clear pending2FA flag
@@ -359,10 +360,10 @@ export const verifyLogin2FA = async (request: Request, response: Response): Prom
         response.status(200).json(user);
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }

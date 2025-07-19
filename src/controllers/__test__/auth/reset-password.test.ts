@@ -10,6 +10,7 @@ import { VerificationTokensRepository } from '../../../repositories/verification
 import * as emailService from '../../../lib/mailer';
 import * as Token from '../../../lib/token';
 import { UserStatus } from '../../../models/user';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -86,35 +87,34 @@ describe('POST /auth/reset-password', () => {
 
     it('should return 200 when user status is not active', async () => {
         (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue({validUser2FA: valid2FAUser, status: UserStatus.Deactivated});
-        jest.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.2fa_recovery_not_allowed', {}, 200));
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({ messages:[{text:"Password reset could not be initiated. Please contact support if the issue persists.",  severity: "error"}]});
+        expect(response.body).toEqual({ messages:[{text:"Password reset could not be initiated. Please contact support if the issue persists.",  severity: "error"}], code: AppStatusCode.PASSWORD_RESET_NOT_INITIATED});
     });
 
     it('should return 404 for user\'s email is not found in database', async () => {
-        (UserRepository.getUserByEmail as jest.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, 404));
+        (UserRepository.getUserByEmail as jest.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
             
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ messages:[{text:"No user found with the provided email address.", severity: "error"}]});
+        expect(response.body).toEqual({ messages:[{text:"No user found with the provided email address.", severity: "error"}], code: AppStatusCode.USER_NOT_FOUND});
     });
     
     it('should return 404 if user id is not found when saving the token in database', async () => {
         (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue(valid2FAUser);
-        jest.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, 404));
+        jest.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ messages: [{text: "User not found.", severity: "error"}]});
+        expect(response.body).toEqual({ messages: [{text: "User not found.", severity: "error"}], code: AppStatusCode.USER_NOT_FOUND});
     });
 
     it('should return 500 for internal errors', async () => {
@@ -125,6 +125,6 @@ describe('POST /auth/reset-password', () => {
 
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({ messages: [{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error" }]});
+        expect(response.body).toEqual({ messages: [{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 })

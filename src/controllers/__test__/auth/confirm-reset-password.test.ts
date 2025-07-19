@@ -8,6 +8,7 @@ import { UserRepository } from '../../../repositories/users';
 import * as emailService from '../../../lib/mailer';
 import { Role, UserStatus } from '../../../models/user';
 import { hashPassword } from '../../../lib/password';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../repositories/verification-tokens');
 jest.mock('../../../lib/password');
@@ -62,7 +63,7 @@ describe('POST /auth/reset-password', () => {
 
     it('should return 400 for a used token', async () => {
         (VerificationTokensRepository.verifyPasswordResetToken as jest.Mock).mockRejectedValue(
-            new AppError('tokens.password-reset.used', {}, 400)
+            new AppError('tokens.password-reset.already_used', {}, AppStatusCode.PASSWORD_RESET_TOKEN_ALREADY_USED, 400)
         );
 
         const response = await request(app).post('/auth/reset-password')
@@ -70,12 +71,12 @@ describe('POST /auth/reset-password', () => {
                 .send({ password: '$SuperSecurePassword45', token: 'reset-password-used' });
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text:'This password reset link has already been used. If you still need to reset your password, request a new link.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:'This password reset link has already been used. If you still need to reset your password, request a new link.', severity: "error"}], code: AppStatusCode.PASSWORD_RESET_TOKEN_ALREADY_USED});
     });
 
     it('should return 400 for an expired token', async () => {
         (VerificationTokensRepository.verifyPasswordResetToken as jest.Mock).mockRejectedValue(
-            new AppError('tokens.password-reset.expired', {}, 400)
+            new AppError('tokens.password-reset.expired', {}, AppStatusCode.PASSWORD_RESET_TOKEN_EXPIRED, 400)
         );
 
         const response = await request(app).post('/auth/reset-password')
@@ -83,12 +84,12 @@ describe('POST /auth/reset-password', () => {
                 .send({ password: '$SuperSecurePassword45', token: 'reset-password-expired' });
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text:'Your password reset link has expired. Please request a new one to reset your password.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:'Your password reset link has expired. Please request a new one to reset your password.', severity: "error"}], code: AppStatusCode.PASSWORD_RESET_TOKEN_EXPIRED});
     });
 
     it('should return 400 for a non-existent token or invalid token', async () => {
         (VerificationTokensRepository.verifyPasswordResetToken as jest.Mock).mockRejectedValue(
-            new AppError('tokens.password-reset.invalid', {}, 400)
+            new AppError('tokens.password-reset.invalid', {}, AppStatusCode.PASSWORD_RESET_TOKEN_INVALID, 400)
         );
 
         const response = await request(app)
@@ -97,7 +98,7 @@ describe('POST /auth/reset-password', () => {
            .send({ password: '$SuperSecurePassword45', token: 'reset-password-expired' });
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text: 'The password reset link is invalid or no longer available. Please request a new link to reset your password.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text: 'The password reset link is invalid or no longer available. Please request a new link to reset your password.', severity: "error"}], code: AppStatusCode.PASSWORD_RESET_TOKEN_INVALID});
     });
 
     it('should return 200 when user status is not active', async () => {
@@ -110,7 +111,7 @@ describe('POST /auth/reset-password', () => {
            .send({ password: '$SuperSecurePassword45', token: 'reset-password-expired' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({ messages: [{text:"Password reset could not be initiated. Please contact support if the issue persists.", severity: "error" }]});
+        expect(response.body).toEqual({ messages: [{text:"Password reset could not be initiated. Please contact support if the issue persists.", severity: "error" }], code: AppStatusCode.PASSWORD_RESET_NOT_INITIATED});
     });
 
     it('should return 500 for unexpected error', async () => {
@@ -124,6 +125,6 @@ describe('POST /auth/reset-password', () => {
            .send({ password: '$SuperSecurePassword45', token: 'reset-password-valid' });
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 });

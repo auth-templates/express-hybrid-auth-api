@@ -1,3 +1,4 @@
+import { AppStatusCode } from '@/@types/status-code';
 import { errorHandler } from '../error-handler';
 import type { Request, Response, NextFunction } from 'express';
 
@@ -21,7 +22,7 @@ describe('errorHandler middleware', () => {
         errorHandler(err, {} as Request, res as Response, {} as NextFunction);
 
         expect(statusMock).toHaveBeenCalledWith(403);
-        expect(jsonMock).toHaveBeenCalledWith({ messages:[{ text: 'Invalid CSRF token', severity: "error"}]});
+        expect(jsonMock).toHaveBeenCalledWith({ messages:[{ text: 'Invalid CSRF token', severity: "error"}], code: AppStatusCode.CSRF_TOKEN_INVALID});
     });
 
     test('should respond with error status and message if provided', () => {

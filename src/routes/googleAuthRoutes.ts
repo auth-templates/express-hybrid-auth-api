@@ -19,7 +19,7 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
         response.status(200).send(user);
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json({
+            response.status(error.httpStatusCode).json({
               message: request.t(error.translationKey, error.params),
             });
             return

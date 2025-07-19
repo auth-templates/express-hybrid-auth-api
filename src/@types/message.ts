@@ -1,3 +1,4 @@
+import { AppStatusCode } from "./status-code";
 
 export type Message = {
     text: string;
@@ -5,5 +6,6 @@ export type Message = {
 };
 
 export type ApiMessageResponse = {
-    messages: Message[]
+    messages: Message[],
+    code?: AppStatusCode;
 }

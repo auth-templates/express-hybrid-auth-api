@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import { verify2FASetup } from '../../2faController';
 import * as Redis2FA from '../../../lib/redis/redis-2fa';
 import { UserRepository } from '../../../repositories/users';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -60,7 +61,7 @@ describe('POST /2fa/setup', () => {
         expect(Redis2FA.verify2faSetup).toHaveBeenCalledWith(sessionData.user.id, code);
         expect(UserRepository.verifyAndSaveSecret).toHaveBeenCalledWith(sessionData.user.id, twoStepSecret);
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({messages:[ {text: "Two-factor authentication has been successfully verified.", severity: "error"}]});
+        expect(response.body).toEqual({messages:[ {text: "Two-factor authentication has been successfully verified.", severity: "info"}], code: AppStatusCode.TWO_FA_SETUP_SUCCESS});
     });
 
     it('should return 400 if an unexpected error occurs', async () => {
@@ -101,6 +102,6 @@ describe('POST /2fa/setup', () => {
                                     .send({code});
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages: [{text: 'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text: 'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 })

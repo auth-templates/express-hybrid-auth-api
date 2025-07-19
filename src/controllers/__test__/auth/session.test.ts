@@ -6,6 +6,7 @@ import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
 import GlobalConfig from '../../../config';
 import { getSession } from '../../authController';
 import { AppError } from '../../../lib/error';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../repositories/users');
 
@@ -64,13 +65,13 @@ describe('GET /auth/session', () => {
     });
 
     it('should return AppError status code and translation message', async () => {
-        const appError = new AppError('errors.user_not_found', {}, 404);
+        const appError = new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404);
         (UserRepository.getUserById as jest.Mock).mockRejectedValue(appError);
 
         const response = await request(app).get('/auth/session').set('Accept-Language', 'en');
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({messages:[{text: "User not found.", severity: "error"}]});
+        expect(response.body).toEqual({messages:[{text: "User not found.", severity: "error"}], code: AppStatusCode.USER_NOT_FOUND});
     });
 
     it('should return 500 with generic message if unknown error thrown', async () => {
@@ -79,6 +80,6 @@ describe('GET /auth/session', () => {
         const response = await request(app).get('/auth/session').set('Accept-Language', 'en');
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages:[{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error"}]});
+        expect(response.body).toEqual({messages:[{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 });

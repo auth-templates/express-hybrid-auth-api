@@ -8,6 +8,7 @@ import { CreateUserInput, Role } from '../../../models/user';
 import { AppError } from '../../../lib/error';
 import { VerificationTokensRepository } from '../../../repositories/verification-tokens';
 import * as emailService from '../../../lib/mailer';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../repositories/users');
 jest.mock('../../../lib/password');
@@ -56,14 +57,14 @@ describe('POST /signup', () => {
     });
 
     it('should return 409 if email is already in use', async () => {
-        (UserRepository.createUser as jest.Mock).mockRejectedValue(new AppError('errors.is_already_in_use', { item: 'email' }, 409));
+        (UserRepository.createUser as jest.Mock).mockRejectedValue(new AppError('errors.email_address_already_in_use', {}, AppStatusCode.EMAIL_ALREADY_IN_USE, 409));
 
         const response = await request(app)
-        .post('/signup')
+        .post('/signup').set('Accept-Language', 'en')
         .send(signupData);
 
         expect(response.status).toBe(409);
-        expect(response.body).toEqual({ messages: [{text:'email is already in use', severity: "error"}]});
+        expect(response.body).toEqual({ messages: [{text:'This email address is already in use. Please use a different one.', severity: "error"}], code: AppStatusCode.EMAIL_ALREADY_IN_USE});
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
@@ -74,7 +75,7 @@ describe('POST /signup', () => {
         .send(signupData);
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 
     it('should return 400 if password is missing one digit', async () => {

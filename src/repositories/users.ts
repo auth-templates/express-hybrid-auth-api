@@ -5,6 +5,7 @@ import { verifyPasswordHash } from '../lib/password';
 import { prismaClient } from '../lib/prisma-client';
 import { PrismaErrorCode } from '../lib/prisma-error-codes';
 import { Role, User, UserStatus } from '../models/user';
+import { AppStatusCode } from '@/@types/status-code';
 
 type CreateUserInput = Omit<User, 'id' | 'createdAt'> & { passwordHash: string }
 
@@ -19,7 +20,7 @@ export class UserRepository {
             });
 
             if (!result || !result.twofa_secret) {
-                throw new AppError('errors.user_2fa_secret_not_found', {}, 404);
+                throw new AppError('errors.2fa_not_configured', {}, AppStatusCode.TWO_FA_NOT_CONFIGURED, 403);
             }
 
             return result.twofa_secret;
@@ -28,7 +29,7 @@ export class UserRepository {
                 throw error;
             }
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
 
@@ -40,7 +41,7 @@ export class UserRepository {
             });
         } catch(error) {
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
     
@@ -61,12 +62,11 @@ export class UserRepository {
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === PrismaErrorCode.UniqueConstraintFailed) {
-            const field = (error.meta?.target as string[])[0];
-            throw new AppError('errors.is_already_in_use', { item: field }, 409);
+            throw new AppError('errors.email_address_already_in_use', {}, AppStatusCode.EMAIL_ALREADY_IN_USE, 409);
           }
         }
         logger.error(error);
-        throw new AppError('errors.internal', {}, 500);
+        throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
       }
     }
 
@@ -80,7 +80,7 @@ export class UserRepository {
             });
         } catch (error) {
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
     
@@ -96,7 +96,7 @@ export class UserRepository {
             });
         } catch (error) {
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
 
@@ -117,17 +117,17 @@ export class UserRepository {
             });
             
             if ( !userRecord ) {
-                throw new AppError('errors.invalid_credentials', {}, 400);
+                throw new AppError('errors.invalid_credentials', {}, AppStatusCode.INVALID_CREDENTIALS, 400);
             }
 
             if ( userRecord.password_hash === '__OAUTH__' ) {
-                throw new AppError('errors.social_login_required', {}, 401);
+                throw new AppError('errors.social_login_required', {}, AppStatusCode.SOCIAL_LOGIN_REQUIRED, 401);
             }
 
             const isMatch = await verifyPasswordHash(userRecord.password_hash, password);
 
             if ( !isMatch ) {
-                throw new AppError('errors.invalid_credentials', {}, 400);
+                throw new AppError('errors.invalid_credentials', {}, AppStatusCode.INVALID_CREDENTIALS, 400);
             }
 
             const user: User = {
@@ -146,7 +146,7 @@ export class UserRepository {
                 throw error
             }
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
     
@@ -167,7 +167,7 @@ export class UserRepository {
             });
             
             if ( !userRecord ) {
-                throw new AppError('errors.user_not_found', {}, 404);
+                throw new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404);
             }
 
             const user: User = {
@@ -186,7 +186,7 @@ export class UserRepository {
                 throw error
             }
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
 
@@ -207,7 +207,7 @@ export class UserRepository {
             });
             
             if ( !userRecord ) {
-                throw new AppError('errors.user_email_not_found', {}, 404);
+                throw new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404);
             }
 
             const user: User = {
@@ -226,7 +226,7 @@ export class UserRepository {
                 throw error
             }
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
 
@@ -241,7 +241,7 @@ export class UserRepository {
             });
         } catch (error) {
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
     
@@ -253,7 +253,7 @@ export class UserRepository {
             });
         } catch (error) {
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
 }

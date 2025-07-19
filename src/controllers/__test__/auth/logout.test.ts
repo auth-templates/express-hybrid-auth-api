@@ -6,6 +6,7 @@ import session from 'express-session';
 import GlobalConfig from '../../../config';
 import { RefreshTokenStore } from '../../../lib/redis/redis-token';
 import cookieParser from 'cookie-parser';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -83,6 +84,6 @@ describe('POST /auth/logout', () => {
         const response = await agent.post('/auth/logout').set('Cookie', `refresh_token=token; connect.sid=session-id`)
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages: [{ text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{ text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 });

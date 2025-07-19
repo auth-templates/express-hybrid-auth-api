@@ -5,6 +5,7 @@ import { get2faSetup, verify2faSetup } from '../redis-2fa';
 import { AppError } from '../../error';
 import qrcode from 'qrcode';
 import config from '../../../config';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('qrcode', () => ({
   __esModule: true, // <- Important for default export mocking
@@ -50,7 +51,8 @@ describe('verify2faSetup', () => {
         await expect(verify2faSetup(userId, code)).rejects.toThrow(AppError);
         await expect(verify2faSetup(userId, code)).rejects.toMatchObject({
             translationKey: 'errors.2fa_setup_invalid',
-            statusCode: 400,
+            httpStatusCode:400,
+            code: AppStatusCode.TWO_FA_SETUP_INVALID
         });
 
         expect(authenticator.verify).not.toHaveBeenCalled();
@@ -64,8 +66,9 @@ describe('verify2faSetup', () => {
 
         await expect(verify2faSetup(userId, code)).rejects.toThrow(AppError);
         await expect(verify2faSetup(userId, code)).rejects.toMatchObject({
-            translationKey: 'errors.invalid_verification_code',
-            statusCode: 400,
+            translationKey: 'errors.2fa_verification_code_invalid',
+            httpStatusCode:400,
+            code: AppStatusCode.TWO_FA_VERIFICATION_CODE_INVALID
         });
 
         expect(authenticator.verify).toHaveBeenCalledWith({ token: code, secret: tempSecret });

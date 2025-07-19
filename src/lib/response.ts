@@ -1,16 +1,23 @@
+import { AppStatusCode } from "@/@types/status-code";
 import { ApiMessageResponse, Message } from "../@types/message";
 
+interface ExtendedApiMessageResponse extends ApiMessageResponse {
+  code?: AppStatusCode;
+}
+
 /**
- * Creates a standardized API response containing one or more messages.
+ * Creates a standardized API response containing one or more messages, with an optional app-specific response code.
  *
- * Accepts a single message or an array of messages, and wraps them into
- * an `ApiMessageResponse` structure. All messages will share the same severity level.
+ * This function wraps one or more message strings into an `ApiMessageResponse` structure. All messages
+ * will share the same severity level. An optional `code` allows the frontend to handle responses programmatically
+ * (e.g., redirect, show custom UI with links).
  *
  * @param text - A single message string or an array of strings to display to the user.
  * @param severity - The severity level of the message(s). Defaults to `'info'`.
  *                   Valid values are `'error'`, `'warning'`, `'info'`, and `'success'`.
+ * @param code - Optional application-specific response code (e.g., `EMAIL_VERIFICATION_REQUIRED`).
  *
- * @returns An `ApiMessageResponse` object with one or more messages.
+ * @returns An `ApiMessageResponse` object with one or more messages, and an optional app code.
  *
  * @example
  * ```ts
@@ -23,24 +30,25 @@ import { ApiMessageResponse, Message } from "../@types/message";
  * //   ]
  * // }
  *
- * createMessageResponse(["Email required", "Password too short"], "error");
+ * createMessageResponse([Invalid email or password. Please try again.], "error", AppStatusCode.INVALID_CREDENTIALS);
  *
  * // Returns:
  * // {
  * //   messages: [
- * //     { text: "Email required", severity: "error" },
- * //     { text: "Password too short", severity: "error" }
- * //   ]
+ * //     { text: "Invalid email or password. Please try again.", severity: "error" },
+ * //   ],
+ * //   code: "INVALID_CREDENTIALS"
  * // }
  * ```
  */
 export function createMessageResponse(
-    text: string | string[],
-    severity: Message['severity'] = 'info'
-): ApiMessageResponse {
-    const messages: Message[] = Array.isArray(text)
-        ? text.map((t) => ({ text: t, severity }))
-        : [{ text, severity }];
+  text: string | string[],
+  severity: Message['severity'] = 'info',
+  code?: AppStatusCode
+): ExtendedApiMessageResponse {
+  const messages: Message[] = Array.isArray(text)
+    ? text.map((t) => ({ text: t, severity }))
+    : [{ text, severity }];
 
-    return { messages };
+  return code ? { messages, code } : { messages };
 }

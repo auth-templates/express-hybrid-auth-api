@@ -4,6 +4,7 @@ import { RedisController } from './redis-controller';
 import config from '../../config';
 import { AppError } from '../error';
 import { redisClient } from './client';
+import { AppStatusCode } from '@/@types/status-code';
 
 const redisController = new RedisController(redisClient);
 
@@ -18,13 +19,13 @@ export async function verify2faSetup(userId: number, code: string): Promise<stri
     const tempSecret = await redisController.get(`2fa:temp:${userId}`);
         
     if ( !tempSecret ) {
-        throw new AppError('errors.2fa_setup_invalid', {}, 400);
+        throw new AppError('errors.2fa_setup_invalid', {}, AppStatusCode.TWO_FA_SETUP_INVALID, 400);
     }
 
     const isValid = authenticator.verify({ token: code, secret: tempSecret });
 
     if ( !isValid ) {
-        throw new AppError( 'errors.invalid_verification_code', {}, 400);
+        throw new AppError('errors.2fa_verification_code_invalid', {}, AppStatusCode.TWO_FA_VERIFICATION_CODE_INVALID, 400);
     }
 
     await redisController.remove(`2fa:temp:${userId}`);

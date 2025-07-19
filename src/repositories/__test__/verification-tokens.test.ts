@@ -4,6 +4,7 @@ import { PrismaErrorCode } from "../../lib/prisma-error-codes";
 import { TokenType } from "../../models/verification-token";
 import { VerificationTokensRepository } from "../verification-tokens";
 import * as tokenLib from '../../lib/token';
+import { AppStatusCode } from "@/@types/status-code";
 
 jest.mock('../../lib/token');
 jest.mock('../../lib/prisma-client', () => ({
@@ -59,7 +60,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.createToken(input)).rejects.toMatchObject({
                 translationKey: 'errors.user_not_found',
-                statusCode: 404,
+                httpStatusCode:404,
+                code: AppStatusCode.USER_NOT_FOUND
             });
         });
 
@@ -68,7 +70,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.createToken(input)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -107,7 +110,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.verifySignupToken(token)).rejects.toMatchObject({
                 translationKey: 'tokens.signup.invalid',
-                statusCode: 400,
+                httpStatusCode:400,
+                code: AppStatusCode.SIGNUP_TOKEN_INVALID
             });
         });
 
@@ -122,7 +126,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.verifySignupToken(token)).rejects.toMatchObject({
                 translationKey: 'tokens.signup.expired',
-                statusCode: 400,
+                httpStatusCode:400,
+                code: AppStatusCode.SIGNUP_TOKEN_EXPIRED
             });
         });
 
@@ -136,8 +141,9 @@ describe('VerificationTokensRepository', () => {
             mockTokenFindFirst(TokenType.SignUp, fingerprint, tokenRecord);
 
             await expect(VerificationTokensRepository.verifySignupToken(token)).rejects.toMatchObject({
-                translationKey: 'tokens.signup.used',
-                statusCode: 400,
+                translationKey: 'tokens.signup.already_used',
+                httpStatusCode:400,
+                code: AppStatusCode.SIGNUP_TOKEN_ALREADY_USED
             });
         });
 
@@ -148,7 +154,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.verifySignupToken(token)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -180,7 +187,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.verify2FAToken(token)).rejects.toMatchObject({
                 translationKey: 'tokens.2fa.invalid',
-                statusCode: 400,
+                httpStatusCode:400,
+                code: AppStatusCode.TWO_FA_RECOVERY_TOKEN_INVALID
             });
         });
 
@@ -195,7 +203,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.verify2FAToken(token)).rejects.toMatchObject({
                 translationKey: 'tokens.2fa.expired',
-                statusCode: 400,
+                httpStatusCode:400,
+                code: AppStatusCode.TWO_FA_RECOVERY_TOKEN_EXPIRED
             });
         });
 
@@ -209,8 +218,9 @@ describe('VerificationTokensRepository', () => {
             mockTokenFindFirst(TokenType.TwoFA, fingerprint, tokenRecord);
 
             await expect(VerificationTokensRepository.verify2FAToken(token)).rejects.toMatchObject({
-                translationKey: 'tokens.2fa.used',
-                statusCode: 400,
+                translationKey: 'tokens.2fa.already_used',
+                httpStatusCode:400,
+                code: AppStatusCode.TWO_FA_RECOVERY_TOKEN_ALREADY_USED
             });
         });
 
@@ -221,7 +231,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.verify2FAToken(token)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -253,7 +264,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.verifyPasswordResetToken(token)).rejects.toMatchObject({
                 translationKey: 'tokens.password-reset.invalid',
-                statusCode: 400,
+                httpStatusCode:400,
+                code: AppStatusCode.PASSWORD_RESET_TOKEN_INVALID
             });
         });
 
@@ -268,7 +280,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.verifyPasswordResetToken(token)).rejects.toMatchObject({
                 translationKey: 'tokens.password-reset.expired',
-                statusCode: 400,
+                httpStatusCode:400,
+                code: AppStatusCode.PASSWORD_RESET_TOKEN_EXPIRED
             });
         });
 
@@ -282,8 +295,9 @@ describe('VerificationTokensRepository', () => {
             mockTokenFindFirst(TokenType.PasswordReset, fingerprint, tokenRecord);
 
             await expect(VerificationTokensRepository.verifyPasswordResetToken(token)).rejects.toMatchObject({
-                translationKey: 'tokens.password-reset.used',
-                statusCode: 400,
+                translationKey: 'tokens.password-reset.already_used',
+                httpStatusCode:400,
+                code: AppStatusCode.PASSWORD_RESET_TOKEN_ALREADY_USED
             });
         });
 
@@ -294,7 +308,8 @@ describe('VerificationTokensRepository', () => {
 
             await expect(VerificationTokensRepository.verifyPasswordResetToken(token)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });

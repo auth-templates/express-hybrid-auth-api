@@ -2,6 +2,7 @@ import { AppError } from '../lib/error';
 import logger from '@/lib/logger';
 import { prismaClient } from '../lib/prisma-client';
 import { Role, User, UserStatus } from '../models/user';
+import { AppStatusCode } from '@/@types/status-code';
 
 export type createAccountInput = {
     id: string,
@@ -66,7 +67,7 @@ export class AccountsRepository {
             };
         } catch (error) {
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
 }

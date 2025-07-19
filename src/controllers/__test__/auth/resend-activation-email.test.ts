@@ -10,6 +10,7 @@ import { VerificationTokensRepository } from '../../../repositories/verification
 import * as emailService from '../../../lib/mailer';
 import * as Token from '../../../lib/token';
 import { UserStatus } from '../../../models/user';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -66,7 +67,6 @@ describe('POST /auth/resend-activation-email', () => {
         const userEmail = "dev@mail.com"
         const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
 
-        console.log(response.body);
         expect(response.status).toBe(204);
         expect(UserRepository.getUserByEmail).toHaveBeenCalledWith(userEmail);
         expect(VerificationTokensRepository.createToken).toHaveBeenCalledWith({
@@ -87,35 +87,33 @@ describe('POST /auth/resend-activation-email', () => {
 
     it('should return 200 when user status is not active', async () => {
         (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue({validUser2FA: validUser, status: UserStatus.Deactivated});
-        jest.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.2fa_recovery_not_allowed', {}, 200));
-
         const userEmail = "dev@mail.com"
         const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({ messages:[{text:"If your email still needs to be verified, a confirmation link has been sent.",  severity: "info"}]});
+        expect(response.body).toEqual({ messages:[{text:"If your email still needs to be verified, a confirmation link has been sent.",  severity: "info"}], code: AppStatusCode.CONFIRMATION_EMAIL_SENT_IF_NEEDED});
     });
 
     it('should return 404 for user\'s email is not found in database', async () => {
-        (UserRepository.getUserByEmail as jest.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, 404));
+        (UserRepository.getUserByEmail as jest.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
             
 
         const userEmail = "dev@mail.com"
         const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ messages:[{text:"No user found with the provided email address.", severity: "error"}]});
+        expect(response.body).toEqual({ messages:[{text:"No user found with the provided email address.", severity: "error"}], code: AppStatusCode.USER_NOT_FOUND});
     });
     
     it('should return 404 if user id is not found when saving the token in database', async () => {
         (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue(validUser);
-        jest.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, 404));
+        jest.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
 
         const userEmail = "dev@mail.com"
         const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ messages: [{text: "User not found.", severity: "error"}]});
+        expect(response.body).toEqual({ messages: [{text: "User not found.", severity: "error"}], code: AppStatusCode.USER_NOT_FOUND});
     });
 
     it('should return 500 for internal errors', async () => {
@@ -126,6 +124,6 @@ describe('POST /auth/resend-activation-email', () => {
 
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({ messages: [{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error" }]});
+        expect(response.body).toEqual({ messages: [{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 });

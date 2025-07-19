@@ -1,3 +1,4 @@
+import { AppStatusCode } from "@/@types/status-code";
 import { requireTermsAcceptance } from "../require-terms-acceptance";
 
 describe('requireTermsAcceptance middleware', () => {
@@ -49,7 +50,7 @@ describe('requireTermsAcceptance middleware', () => {
     requireTermsAcceptance(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ messages: [{text:'Translated: validation.terms', severity: "error"}]});
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text:'Translated: validation.accept_terms', severity: "error"}], code: AppStatusCode.TERMS_ACCEPTANCE_REQUIRED});
     expect(next).not.toHaveBeenCalled();
   });
 

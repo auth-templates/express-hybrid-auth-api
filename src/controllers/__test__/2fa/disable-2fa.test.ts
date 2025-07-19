@@ -6,6 +6,7 @@ import GlobalConfig from '../../../config';
 import cookieParser from 'cookie-parser';
 import { disable2FA } from '../../2faController';
 import { UserRepository } from '../../../repositories/users';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -69,6 +70,6 @@ describe('POST /2fa/disable', () => {
         const response = await agent.post('/2fa/disable').set('Cookie', 'refresh_token=token; access_token=accesstoken; connect.sid=session-id')
  
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({ messages: [{ text: 'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
+        expect(response.body).toEqual({ messages: [{ text: 'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 });

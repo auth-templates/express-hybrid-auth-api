@@ -2,18 +2,19 @@
     "greeting": "Salut!",
     "errors": {
         "internal": "A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu sau contactează suportul.",
-        "is_already_in_use": "{{item}} este deja folosit",
+        "email_address_already_in_use": "Această adresă de email este deja folosită. Te rugăm să folosești alta.",
         "invalid_credentials": "Email sau parolă incorectă. Te rugăm să încerci din nou.",
         "invalid_2fa_code_format": "Codul 2FA trebuie să fie un număr din 6 cifre.",
         "user_email_not_found": "Nu a fost găsit niciun utilizator cu adresa de email furnizată.",
         "user_not_found": "Utilizatorul nu a fost găsit.",
-        "2fa_recovery_not_allowed": "Recuperarea verificării în doi pași nu a putut fi inițiată. Contactați suportul dacă problema persistă.",
-        "password_reset_not_allowed": "Resetarea parolei nu a putut fi inițiată. Te rugăm să contactezi suportul dacă problema persistă.",
+        "2fa_recovery_not_initiated": "Recuperarea verificării în doi pași nu a putut fi inițiată. Contactați suportul dacă problema persistă.",
+        "password_reset_not_initiated": "Resetarea parolei nu a putut fi inițiată. Te rugăm să contactezi suportul dacă problema persistă.",
         "social_login_required": "Se pare că v-ați înregistrat folosind un cont social. Vă rugăm să vă autentificați folosind acel furnizor.",
         "2fa_setup_invalid": "Configurarea 2FA a expirat sau nu mai este valabilă. Vă rugăm să încercați din nou.",
         "invalid_refresh_token": "A apărut o eroare neașteptată. Vă rugăm să încercați să vă conectați din nou.",
-        "invalid_2fa_verification_code": "Codul de verificare introdus este incorect. Vă rugăm să încercați din nou.",
-        "2fa_required": "Finalizarea autentificării în doi pași este necesară pentru a accesa această resursă."
+        "2fa_verification_code_invalid": "Codul de verificare introdus este incorect. Vă rugăm să încercați din nou.",
+        "2fa_required": "Finalizarea autentificării în doi pași este necesară pentru a accesa această resursă.",
+        "2fa_not_configured": "Autentificarea în doi pași nu este configurată pentru contul tău."
     },
     "info": {
         "confirmation_email_if_needed": "Dacă adresa ta de email trebuie încă verificată, un link de confirmare a fost trimis."
@@ -50,17 +51,17 @@
     "tokens": {
         "signup": {
             "expired": "Linkul de verificare a expirat. Te rugăm să soliciți unul nou pentru a continua.",
-            "used": "Acest link de verificare a fost deja folosit. Dacă nu ai finalizat înregistrarea, solicită un nou link.",
+            "already_used": "Acest link de verificare a fost deja folosit. Dacă nu ai finalizat înregistrarea, solicită un nou link.",
             "invalid": "Linkul de verificare este invalid sau nu mai este valabil. Verifică linkul sau solicită unul nou."
         },
         "2fa": {
             "expired": "Linkul de recuperare pentru verificarea în doi pași a expirat. Vă rugăm să reluați procesul de recuperare pentru a recăpăta accesul la cont.",
-            "used": "Acest link de recuperare pentru verificarea în doi pași a fost deja folosit. Dacă aveți în continuare nevoie de acces, solicitați un nou link de recuperare.",
+            "already_used": "Acest link de recuperare pentru verificarea în doi pași a fost deja folosit. Dacă aveți în continuare nevoie de acces, solicitați un nou link de recuperare.",
             "invalid": "Linkul de recuperare pentru verificarea în doi pași este invalid sau nu mai este disponibil. Vă rugăm să solicitați un link nou pentru a vă recupera contul."
         },
         "password-reset": {
             "expired": "Linkul de resetare a parolei a expirat. Te rugăm să soliciți unul nou pentru a-ți reseta parola.",
-            "used": "Acest link de resetare a parolei a fost deja folosit. Dacă încă ai nevoie să-ți resetezi parola, solicită un link nou.",
+            "already_used": "Acest link de resetare a parolei a fost deja folosit. Dacă încă ai nevoie să-ți resetezi parola, solicită un link nou.",
             "invalid": "Linkul de resetare a parolei este invalid sau nu mai este disponibil. Te rugăm să soliciți un link nou pentru a-ți reseta parola."
         }
     },

@@ -11,6 +11,8 @@ import { TokenType } from '../models/verification-token';
 import { UserStatus } from '../models/user';
 import { createMessageResponse } from '../lib/response';
 import logger from '@/lib/logger';
+import { AppStatusCode } from '@/@types/status-code';
+import { validateEmail } from '@/lib/validation-schemas/email-validation-schema';
 
 export async function save2FAToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();
@@ -34,11 +36,11 @@ export const setup2FA = async (request: Request, response: Response): Promise<vo
         response.status(200).json({ qrCodeUrl, secret });
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params),"error"));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), "error", error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -52,7 +54,7 @@ export const verify2FASetup = async (request: Request, response: Response): Prom
         if ( issues.length > 0 ) {
             response.status(400).json(createMessageResponse(
                 [issues[0]].map(({message, items}) => request.t(message, items)) as string[],  
-                'error'
+                'error',
             ));
             return
         }
@@ -61,14 +63,14 @@ export const verify2FASetup = async (request: Request, response: Response): Prom
 
         await UserRepository.verifyAndSaveSecret(userId, twoStepSecret);
 
-        response.status(200).json(createMessageResponse(request.t('2fa.setup_verified'), 'error'));
+        response.status(200).json(createMessageResponse(request.t('2fa.setup_verified'), 'info', AppStatusCode.TWO_FA_SETUP_SUCCESS));
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 };
 
@@ -80,11 +82,11 @@ export const disable2FA = async (request: Request, response: Response): Promise<
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), "error"));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), "error", AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -92,24 +94,34 @@ export const recover2FA = async (request: Request, response: Response): Promise<
     const { userEmail } = request.body;
     
     try {
-        const { token, tokenFingerprint, hashedToken } = await generateToken();
+        const issues = validateEmail({email: userEmail});
+
+        if ( issues.length > 0 ) {
+            response.status(400).json(createMessageResponse(
+                issues.map(({message, items}) => request.t(message, items)) as string [], 
+                'error'
+            ));
+            return
+        }
+        
         const user = await UserRepository.getUserByEmail(userEmail); 
 
         if( user.status !== UserStatus.Active || !user.enabled2FA ) {
-            throw new AppError('errors.2fa_recovery_not_allowed', {}, 200) // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
+            throw new AppError('errors.2fa_recovery_not_initiated', {}, AppStatusCode.TWO_FA_RECOVERY_NOT_INITIATED, 200) // 200 is on purpose because this This prevents attackers from confirming whether a user exists or is locked out.
         }
 
+        const { token, tokenFingerprint, hashedToken } = await generateToken();
         const expiresInMinutes = GlobalConfig.TWOFA_RECOVERY_TOKEN_MAX_AGE / 1000 / 60;
         await save2FAToken(user.id, tokenFingerprint, hashedToken, expiresInMinutes);
         await send2FARecoverEmail({verificationCode: token, userEmail, expiresInMinutes, t: request.t });
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }
 
@@ -123,10 +135,10 @@ export const confirm2FARecover = async (request: Request, response: Response): P
         response.status(204).send();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.statusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error'));
+            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
             return
         }
         logger.error(error);
-        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error'));
+        response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
 }

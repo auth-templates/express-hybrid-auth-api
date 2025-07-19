@@ -8,6 +8,7 @@ import session from 'express-session';
 import GlobalConfig from '../../../config';
 import { RefreshTokenStore } from '../../../lib/redis/redis-token';
 import jwt from 'jsonwebtoken';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -148,7 +149,7 @@ describe('POST /auth/login', () => {
 
     it('should return 400 for invalid credentials (wrong password but valid)', async () => {
         (UserRepository.login as jest.Mock).mockRejectedValue(
-            new AppError('errors.invalid_credentials', {}, 400)
+            new AppError('errors.invalid_credentials', {}, AppStatusCode.INVALID_CREDENTIALS, 400)
         );
 
         const response = await request(app)
@@ -160,7 +161,7 @@ describe('POST /auth/login', () => {
             });
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text:"Invalid email or password. Please try again.", severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:"Invalid email or password. Please try again.", severity: "error"}], code: AppStatusCode.INVALID_CREDENTIALS});
     });
 
     it('should return 500 for internal errors', async () => {
@@ -175,6 +176,6 @@ describe('POST /auth/login', () => {
             });
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages:[{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error"}]});
+        expect(response.body).toEqual({messages:[{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 })

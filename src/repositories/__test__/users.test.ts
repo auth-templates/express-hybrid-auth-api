@@ -1,3 +1,4 @@
+import { AppStatusCode } from "@/@types/status-code";
 import { Prisma } from "../../../generated/prisma";
 import { verifyPasswordHash } from "../../lib/password";
 import { prismaClient } from "../../lib/prisma-client";
@@ -38,21 +39,23 @@ describe('UserRepository', () => {
             expect(result).toBe(mockSecret);
         });
 
-        it('should throw 404 AppError if user not found', async () => {
+        it('should throw 403 AppError if user not found', async () => {
             (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(null);
 
             await expect(UserRepository.getUser2FASecretById(42)).rejects.toMatchObject({
-                translationKey: 'errors.user_2fa_secret_not_found',
-                statusCode: 404,
+                translationKey: 'errors.2fa_not_configured',
+                httpStatusCode: 403,
+                code: AppStatusCode.TWO_FA_NOT_CONFIGURED
             });
         });
 
-        it('should throw 404 AppError if twofa_secret is missing', async () => {
+        it('should throw 403 AppError if twofa_secret is missing', async () => {
             (prismaClient.users.findUnique as jest.Mock).mockResolvedValue({ twofa_secret: null });
 
             await expect(UserRepository.getUser2FASecretById(42)).rejects.toMatchObject({
-                translationKey: 'errors.user_2fa_secret_not_found',
-                statusCode: 404,
+                translationKey: 'errors.2fa_not_configured',
+                httpStatusCode: 403,
+                code: AppStatusCode.TWO_FA_NOT_CONFIGURED
             });
         });
 
@@ -61,7 +64,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.getUser2FASecretById(42)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -86,8 +90,9 @@ describe('UserRepository', () => {
             (prismaClient.users.update as jest.Mock).mockRejectedValue(new Error('DB error'));
 
             await expect(UserRepository.acceptTerms(42, true)).rejects.toMatchObject({
-            translationKey: 'errors.internal',
-            statusCode: 500,
+                translationKey: 'errors.internal',
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -118,6 +123,16 @@ describe('UserRepository', () => {
             expect(id).toBe(1);
         });
 
+        it('should throw AppError with 500 on other errors', async () => {
+            (prismaClient.users.create as jest.Mock).mockRejectedValue(new Error('Unknown error'));
+
+            await expect(UserRepository.createUser(userData)).rejects.toMatchObject({
+                translationKey: 'errors.internal',
+                httpStatusCode: 500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
+            });
+        });
+
         it('should throw AppError with 409 on unique constraint failure', async () => {
             const prismaError = new Prisma.PrismaClientKnownRequestError(
                 'Unique constraint failed',
@@ -131,17 +146,9 @@ describe('UserRepository', () => {
             (prismaClient.users.create as jest.Mock).mockRejectedValue(prismaError);
 
             await expect(UserRepository.createUser(userData)).rejects.toMatchObject({
-                translationKey: 'errors.is_already_in_use',
-                statusCode: 409,
-            });
-        });
-
-        it('should throw AppError with 500 on other errors', async () => {
-            (prismaClient.users.create as jest.Mock).mockRejectedValue(new Error('Unknown error'));
-
-            await expect(UserRepository.createUser(userData)).rejects.toMatchObject({
-                translationKey: 'errors.internal',
-                statusCode: 500,
+                translationKey: 'errors.email_address_already_in_use',
+                httpStatusCode:409,
+                code: AppStatusCode.EMAIL_ALREADY_IN_USE
             });
         });
     });
@@ -160,7 +167,8 @@ describe('UserRepository', () => {
             (prismaClient.users.update as jest.Mock).mockRejectedValue(new Error('fail'));
             await expect(UserRepository.updatePassword(1, 'newhash')).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -189,7 +197,8 @@ describe('UserRepository', () => {
             (prismaClient.users.update as jest.Mock).mockRejectedValue(new Error('fail'));
             await expect(UserRepository.updateUserStatus(1, UserStatus.Active)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -234,7 +243,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.login('john@example.com', 'password')).rejects.toMatchObject({
                 translationKey: 'errors.invalid_credentials',
-                statusCode: 400,
+                httpStatusCode:400,
+                code: AppStatusCode.INVALID_CREDENTIALS
             });
         });
 
@@ -246,7 +256,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.login('john@example.com', 'password')).rejects.toMatchObject({
                 translationKey: 'errors.social_login_required',
-                statusCode: 401,
+                httpStatusCode:401,
+                code: AppStatusCode.SOCIAL_LOGIN_REQUIRED
             });
         });
 
@@ -256,7 +267,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.login('john@example.com', 'wrongpassword')).rejects.toMatchObject({
                 translationKey: 'errors.invalid_credentials',
-                statusCode: 400,
+                httpStatusCode:400,
+                code: AppStatusCode.INVALID_CREDENTIALS
             });
         });
 
@@ -265,7 +277,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.login('john@example.com', 'password')).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -303,7 +316,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.getUserById(1)).rejects.toMatchObject({
                 translationKey: 'errors.user_not_found',
-                statusCode: 404,
+                httpStatusCode:404,
+                code: AppStatusCode.USER_NOT_FOUND
             });
         });
 
@@ -312,7 +326,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.getUserById(1)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -350,7 +365,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.getUserByEmail('jane@example.com')).rejects.toMatchObject({
                 translationKey: 'errors.user_email_not_found',
-                statusCode: 404,
+                httpStatusCode:404,
+                code: AppStatusCode.USER_NOT_FOUND
             });
         });
 
@@ -359,7 +375,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.getUserByEmail('jane@example.com')).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -381,7 +398,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.verifyAndSaveSecret(1, 'secret')).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });
@@ -403,7 +421,8 @@ describe('UserRepository', () => {
 
             await expect(UserRepository.disable2FA(1)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
-                statusCode: 500,
+                httpStatusCode:500,
+                code: AppStatusCode.INTERNAL_SERVER_ERROR
             });
         });
     });

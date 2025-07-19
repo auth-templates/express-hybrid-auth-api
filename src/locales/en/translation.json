@@ -2,18 +2,19 @@
     "greeting": "Hello!",
     "errors": {
         "internal": "An unexpected error occurred. Please try again later or contact support.",
-        "is_already_in_use": "{{item}} is already in use",
+        "email_address_already_in_use": "This email address is already in use. Please use a different one.",
         "invalid_credentials": "Invalid email or password. Please try again.",
         "invalid_2fa_code_format": "The 2FA code must be a 6-digit number.",
         "user_email_not_found": "No user found with the provided email address.",
         "user_not_found": "User not found.",
-        "2fa_recovery_not_allowed": "Two-step verification recovery could not be initiated. Please contact support if the issue persists.",
-        "password_reset_not_allowed": "Password reset could not be initiated. Please contact support if the issue persists.",
+        "2fa_recovery_not_initiated": "Two-step verification recovery could not be initiated. Please contact support if the issue persists.",
+        "password_reset_not_initiated": "Password reset could not be initiated. Please contact support if the issue persists.",
         "social_login_required": "It looks like you signed up using a social login. Please use that provider to log in.",
-        "2fa_setup_invalid": "Your 2FA setup has expired or is no longer valid. Please try setting it up again.",
         "invalid_refresh_token": "An unexpected error occurred. Please retry to log in.",
-        "invalid_2fa_verification_code": "The verification code you entered is incorrect. Please try again.",
-        "2fa_required": "Finalizing two-step authentication is required to access this resource."
+        "2fa_verification_code_invalid": "The verification code you entered is incorrect. Please try again.",
+        "2fa_required": "Finalizing two-step authentication is required to access this resource.",
+        "2fa_setup_invalid": "Your 2FA setup has expired or is no longer valid. Please try setting it up again.",
+        "2fa_not_configured": "Two-factor authentication is not configured for your account."
     },
     "info": {
         "confirmation_email_if_needed": "If your email still needs to be verified, a confirmation link has been sent."
@@ -50,17 +51,17 @@
     "tokens" : {
         "signup": {
             "expired": "Your verification link has expired. Please request a new one to continue.",
-            "used": "This verification link has already been used. If you haven’t completed your signup, request a new link.",
+            "already_used": "This verification link has already been used. If you haven’t completed your signup, request a new link.",
             "invalid": "The verification link is invalid or no longer available. Please check the link or request a new one."
         },
         "2fa": {
             "expired": "Your two-step verification recovery link has expired. Please start the recovery process again to regain access to your account.",
-            "used": "This two-step verification recovery link has already been used. If you still need access, request a new recovery link.",
+            "already_used": "This two-step verification recovery link has already been used. If you still need access, request a new recovery link.",
             "invalid": "The two-step verification recovery link is invalid or no longer available. Please request a new link to recover your account."
         },
         "password-reset": {
             "expired": "Your password reset link has expired. Please request a new one to reset your password.",
-            "used": "This password reset link has already been used. If you still need to reset your password, request a new link.",
+            "already_used": "This password reset link has already been used. If you still need to reset your password, request a new link.",
             "invalid": "The password reset link is invalid or no longer available. Please request a new link to reset your password."
         }
     },

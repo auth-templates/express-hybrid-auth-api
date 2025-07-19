@@ -7,6 +7,7 @@ import GlobalConfig from '../../../config';
 import { RefreshTokenStore } from '../../../lib/redis/redis-token';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');
@@ -47,7 +48,7 @@ describe('POST /auth/refresh', () => {
     it('should 403 when no refresh_token cookie', async () => {
         const response = await request(app).post('/auth/refresh');
         expect(response.status).toBe(403);
-        expect(response.body).toEqual({ messages: [{text:'An unexpected error occurred. Please retry to log in.', severity: "error"}]});
+        expect(response.body).toEqual({ messages: [{text:'An unexpected error occurred. Please retry to log in.', severity: "error"}], code: AppStatusCode.REFRESH_TOKEN_INVALID});
     });
 
     it('should 403 when refresh_token does not match stored', async () => {
@@ -64,7 +65,7 @@ describe('POST /auth/refresh', () => {
 
         expect(RefreshTokenStore.getStoredRefreshToken).toHaveBeenCalledWith(1, 'bad-token');
         expect(response.status).toBe(403);
-        expect(response.body).toEqual({ messages: [{text:'An unexpected error occurred. Please retry to log in.', severity: "error"}]});
+        expect(response.body).toEqual({ messages: [{text:'An unexpected error occurred. Please retry to log in.', severity: "error"}], code: AppStatusCode.REFRESH_TOKEN_INVALID});
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
@@ -80,7 +81,7 @@ describe('POST /auth/refresh', () => {
         const response = await agent.post('/auth/refresh').set('Cookie', 'refresh_token=bad-token; connect.sid=session-id')
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({ messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
+        expect(response.body).toEqual({ messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 
     it('should 204 and set new access_token cookie when valid', async () => {

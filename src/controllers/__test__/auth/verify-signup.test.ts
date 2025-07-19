@@ -7,6 +7,7 @@ import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
 import { UserRepository } from '../../../repositories/users';
 import * as emailService from '../../../lib/mailer';
 import { Role, UserStatus } from '../../../models/user';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('../../../repositories/verification-tokens');
 
@@ -49,7 +50,7 @@ describe('POST /auth/verify-signup', () => {
 
     it('should return 400 for a used token', async () => {
         (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
-            new AppError('tokens.signup.used', {}, 400)
+            new AppError('tokens.signup.already_used', {}, AppStatusCode.SIGNUP_TOKEN_ALREADY_USED, 400)
         );
 
         const response = await request(app)
@@ -57,12 +58,12 @@ describe('POST /auth/verify-signup', () => {
             .send({ token: 'signup-used-1' });
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text:'This verification link has already been used. If you haven’t completed your signup, request a new link.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:'This verification link has already been used. If you haven’t completed your signup, request a new link.', severity: "error"}], code: AppStatusCode.SIGNUP_TOKEN_ALREADY_USED});
     });
 
     it('should return 400 for an expired token', async () => {
         (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
-            new AppError('tokens.signup.expired', {}, 400)
+            new AppError('tokens.signup.expired', {}, AppStatusCode.SIGNUP_TOKEN_EXPIRED, 400)
         );
 
         const response = await request(app)
@@ -70,12 +71,12 @@ describe('POST /auth/verify-signup', () => {
             .send({ token: 'signup-expired-1' });
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text:'Your verification link has expired. Please request a new one to continue.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:'Your verification link has expired. Please request a new one to continue.', severity: "error"}], code: AppStatusCode.SIGNUP_TOKEN_EXPIRED});
     });
 
     it('should return 400 for a non-existent token or invalid token', async () => {
         (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
-            new AppError('tokens.signup.invalid', {}, 400)
+            new AppError('tokens.signup.invalid', {}, AppStatusCode.SIGNUP_TOKEN_INVALID, 400)
         );
 
         const response = await request(app)
@@ -83,7 +84,7 @@ describe('POST /auth/verify-signup', () => {
             .send({ token: 'signup-invalid-1' });
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text:'The verification link is invalid or no longer available. Please check the link or request a new one.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:'The verification link is invalid or no longer available. Please check the link or request a new one.', severity: "error"}], code: AppStatusCode.SIGNUP_TOKEN_INVALID});
     });
 
     it('should return 500 for unexpected error', async () => {
@@ -96,6 +97,6 @@ describe('POST /auth/verify-signup', () => {
             .send({ token: 'signup-valid-1' });
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}]});
+        expect(response.body).toEqual({messages: [{text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
     });
 });

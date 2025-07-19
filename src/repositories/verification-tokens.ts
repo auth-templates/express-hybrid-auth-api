@@ -1,4 +1,3 @@
-import { hash } from '@node-rs/argon2';
 import { Prisma } from '../../generated/prisma';
 import { AppError } from '../lib/error';
 import { prismaClient } from '../lib/prisma-client';
@@ -7,6 +6,7 @@ import { TokenType, VerificationToken } from '../models/verification-token';
 
 import { createTokenFingerprint } from '../lib/token';
 import logger from '@/lib/logger'
+import { AppStatusCode } from '@/@types/status-code';
 
 type CreateVerificationTokenInput = Omit<VerificationToken, 'id' | 'createdAt' | 'usedAt' | 'token'> & { tokenHash: string, tokenFingerprint: string }
 
@@ -26,11 +26,11 @@ export class VerificationTokensRepository {
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === PrismaErrorCode.RecordNotFound) {
-            throw new AppError('errors.user_not_found', {}, 404);
+            throw new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404);
           }
         }
         logger.error(error);
-        throw new AppError('errors.internal', {}, 500);
+        throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
       }
     }
 
@@ -49,17 +49,17 @@ export class VerificationTokensRepository {
     
 
             if ( !tokenRecord ) {
-                throw new AppError('tokens.signup.invalid', {}, 400);
+                throw new AppError('tokens.signup.invalid', {}, AppStatusCode.SIGNUP_TOKEN_INVALID, 400);
             }
     
             // Check if token is expired
             if (tokenRecord.expires_at < now) {
-                throw new AppError('tokens.signup.expired', {}, 400);
+                throw new AppError('tokens.signup.expired', {}, AppStatusCode.SIGNUP_TOKEN_EXPIRED, 400);
             }
     
             // Check if token has already been used
             if (tokenRecord.used_at !== null) {
-                throw new AppError('tokens.signup.used', {}, 400);
+                throw new AppError('tokens.signup.already_used', {}, AppStatusCode.SIGNUP_TOKEN_ALREADY_USED, 400);
             }
     
             // Token is valid — mark as used and activate user
@@ -74,7 +74,7 @@ export class VerificationTokensRepository {
                 throw error;
             }
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
     
@@ -92,17 +92,17 @@ export class VerificationTokensRepository {
             });
             
             if ( !tokenRecord ) {
-                throw new AppError('tokens.2fa.invalid', {}, 400);
+                throw new AppError('tokens.2fa.invalid', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_INVALID, 400);
             }
     
             // Check if token is expired
             if (tokenRecord.expires_at < now) {
-                throw new AppError('tokens.2fa.expired', {}, 400);
+                throw new AppError('tokens.2fa.expired', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_EXPIRED, 400);
             }
     
             // Check if token has already been used
             if (tokenRecord.used_at !== null) {
-                throw new AppError('tokens.2fa.used', {}, 400);
+                throw new AppError('tokens.2fa.already_used', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_ALREADY_USED, 400);
             }
     
             // Token is valid — mark as used and activate user
@@ -117,7 +117,7 @@ export class VerificationTokensRepository {
                 throw error;
             }
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
         }
     }
     
@@ -135,17 +135,17 @@ export class VerificationTokensRepository {
             });
             
             if ( !tokenRecord ) {
-                throw new AppError('tokens.password-reset.invalid', {}, 400);
+                throw new AppError('tokens.password-reset.invalid', {}, AppStatusCode.PASSWORD_RESET_TOKEN_INVALID, 400);
             }
     
             // Check if token is expired
             if (tokenRecord.expires_at < now) {
-                throw new AppError('tokens.password-reset.expired', {}, 400);
+                throw new AppError('tokens.password-reset.expired', {}, AppStatusCode.PASSWORD_RESET_TOKEN_EXPIRED, 400);
             }
     
             // Check if token has already been used
             if (tokenRecord.used_at !== null) {
-                throw new AppError('tokens.password-reset.used', {}, 400);
+                throw new AppError('tokens.password-reset.already_used', {}, AppStatusCode.PASSWORD_RESET_TOKEN_ALREADY_USED, 400);
             }
     
             // Token is valid — mark as used and activate user
@@ -160,7 +160,7 @@ export class VerificationTokensRepository {
                 throw error;
             }
             logger.error(error);
-            throw new AppError('errors.internal', {}, 500);
+            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR ,500);
         }
     }
 }

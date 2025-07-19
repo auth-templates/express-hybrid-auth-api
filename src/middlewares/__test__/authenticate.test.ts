@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { authenticate } from '../authenticate';
 import GlobalConfig from '../../config';
+import { AppStatusCode } from '@/@types/status-code';
 
 jest.mock('jsonwebtoken');
 
@@ -58,7 +59,7 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ messages:[{text:'Session invalid or expired', severity: "error"}]});
+    expect(res.json).toHaveBeenCalledWith({ messages:[{text:'Session invalid or expired', severity: "error"}], code: AppStatusCode.SESSION_INVALID_OR_EXPIRED});
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -69,7 +70,7 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ messages: [{text: 'Access token missing', severity: "error"}]});
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text: 'Access token missing', severity: "error"}], code: AppStatusCode.ACCESS_TOKEN_MISSING});
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -84,7 +85,7 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ messages: [{text: 'Access token expired', severity: "error"}]});
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text: 'Access token expired', severity: "error"}], code: AppStatusCode.ACCESS_TOKEN_EXPIRED});
   });
 
   it('should return 403 if token is invalid', () => {
@@ -98,7 +99,7 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ messages: [{text: 'Invalid access token', severity: "error"}]});
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text: 'Invalid access token', severity: "error"}], code: AppStatusCode.ACCESS_TOKEN_INVALID});
   });
 
   it('should return 500 for unexpected errors', () => {
@@ -112,6 +113,6 @@ describe('authenticate middleware', () => {
     authenticate(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ messages: [{text:'Internal server error', severity: "error"}]});
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text:'Internal server error', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
   });
 });

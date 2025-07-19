@@ -1,3 +1,4 @@
+import { AppStatusCode } from "@/@types/status-code";
 import { AppError } from "../../lib/error";
 import { prismaClient } from "../../lib/prisma-client";
 import { AccountsRepository, createAccountInput } from "../accounts";
@@ -95,7 +96,8 @@ describe('AccountsRepository', () => {
     await expect(AccountsRepository.findOrCreate(input)).rejects.toThrow(AppError);
     await expect(AccountsRepository.findOrCreate(input)).rejects.toMatchObject({
       translationKey: 'errors.internal',
-      statusCode: 500,
+      code: AppStatusCode.INTERNAL_SERVER_ERROR,
+      httpStatusCode:500,
     });
   });
 });

@@ -1,3 +1,4 @@
+import { AppStatusCode } from "@/@types/status-code";
 import { require2FA } from "../require-2fa";
 
 describe('require2FA middleware', () => {
@@ -49,7 +50,7 @@ describe('require2FA middleware', () => {
     require2FA(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ messages: [{text:'Translated: validation.terms', severity: "error"}]});
+    expect(res.json).toHaveBeenCalledWith({ messages: [{text:'Translated: validation.2fa_required', severity: "error"}], code: AppStatusCode.TWO_FA_VERIFICATION_REQUIRED});
     expect(next).not.toHaveBeenCalled();
   });
 
