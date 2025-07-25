@@ -88,11 +88,11 @@ export default function EmailAddressChangedEmail({
     
 
 EmailAddressChangedEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3000',
-    frontendUrl: 'http://localhost:3000',
+    assetsUrl: 'http://localhost:3001',
+    frontendUrl: 'http://localhost:3001',
     oldEmail: 'old@example.com',
     newEmail: 'new@example.com',
-    confirmLink: 'http://localhost:3000/confirm-email-change',
+    confirmLink: 'http://localhost:3001/confirm-email-change',
     t: getEmailTranslator(),
 } satisfies EmailAddressChangedEmailProps;
 

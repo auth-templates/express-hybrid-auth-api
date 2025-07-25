@@ -6,7 +6,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * components:
+ *  components:
  *   schemas:
  *     SignupRequest:
  *       type: object
@@ -30,6 +30,128 @@ const router = express.Router();
  *         termsAccepted:
  *           type: boolean
  *           example: true
+ * /auth/signup:
+ *   parameters:
+ *      - $ref: '#/components/parameters/XCsrfTokenHeader'
+ *   post:
+ *     summary: User Signup
+ *     description: Registers a new user and saves them to the database with admin role.
+ *     security: []
+ *     tags:
+ *      - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SignupRequest'
+ *     responses:
+ *       204:
+ *         description: User successfully registered.
+ *       400: 
+ *         description: One or more fields contain invalid input values.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             examples:
+ *               MultipleInputValidationErrors:
+ *                 summary: Multiple input validation errors
+ *                 value:
+ *                   messages:
+ *                     - text: Password must contain at least one digit
+ *                       severity: error
+ *                     - text: Password must contain at least one special character
+ *                       severity: error
+ *               SingleInputValidationError:
+ *                 summary: Single input validation errors
+ *                 value:
+ *                   messages:
+ *                     - text: Password must contain at least one special character
+ *                       severity: error
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+router.post('/signup', signup);
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     VerifyTokenRequest:
+ *       type: object
+ *       required:
+ *         - token
+ *       properties:
+ *         token:
+ *           type: string
+ *           example: "signup-verification-token-here"
+ * /auth/verify-signup:
+ *   parameters:
+ *     - $ref: '#/components/parameters/XCsrfTokenHeader'
+ *   post:
+ *     summary: Verify Signup Token
+ *     description: Verifies a user's signup token and activates their account.
+ *     security: []
+ *     tags:
+ *      - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/VerifyTokenRequest'
+ *     responses:
+ *       204:
+ *         description: Token verified and user activated.
+ *       400: 
+ *         description: One or more fields contain invalid input values.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             examples:
+ *               TwoFaSignupTokenInvalid: 
+ *                 summary: Signup verification token is invalid
+ *                 value:
+ *                   messages:
+ *                     - text: The verification link is invalid or no longer available. Please check the link or request a new one.
+ *                       severity: error
+ *                   code: SIGNUP_TOKEN_INVALID
+ *               TwoFaSignupTokenExpired: 
+ *                 summary: Signup verification token is expired
+ *                 value: 
+ *                   messages: 
+ *                     - text: Your verification link has expired. Please request a new one to continue.
+ *                       severity: error
+ *                   code: SIGNUP_TOKEN_EXPIRED
+ *               TwoFaSignupTokenAlreadyUsed:
+ *                 summary: Signup verification token already used
+ *                 value:
+ *                   messages:
+ *                     - text: This verification link has already been used. If you haven’t completed your signup, request a new link.
+ *                       severity: error
+ *                   code: SIGNUP_TOKEN_ALREADY_USED
+ *       401:
+ *         description: When user is not found in the database
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Activation failed. Please contact support if the issue persists."
+ *                   severity: "error"
+ *               code: VERIFICATION_FAILED
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+router.post('/verify-signup', verifySignup);
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
  *     LoginRequest:
  *       type: object
  *       required:
@@ -42,73 +164,6 @@ const router = express.Router();
  *         password:
  *           type: string
  *           example: "$SuperSecurePassword45"
- *     Verify2FARequest:
- *       type: object
- *       required:
- *         - code
- *       properties:
- *         code:
- *           type: string
- *           example: "123456"  
- *     VerifyTokenRequest:
- *       type: object
- *       required:
- *         - token
- *       properties:
- *         token:
- *           type: string
- *           example: "signup-verification-token-here"
- *     ResendActivationEmailRequest:
- *       type: object
- *       required:
- *         - userEmail
- *       properties:
- *         userEmail:
- *           type: string
- *           format: email
- *           example: user@example.com
- *     ResetPasswordRequest:
- *        type: object
- *        required:
- *          - userEmail
- *        properties:
- *          userEmail:
- *            type: string
- *            example: "user@example.com"
- *     ConfirmResetPasswordRequest:
- *       type: object
- *       required:
- *         - token
- *         - newPassword
- *       properties:
- *         token:
- *           type: string
- *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *         newPassword:
- *           type: string
- *           example: "StrongNewPassword!2025"
- *     Message:
- *       type: object
- *       required:
- *         - text
- *         - severity
- *       properties:
- *         text:
- *           type: string
- *           example: "Operation completed successfully."
- *         severity:
- *           type: string
- *           enum: [error, warning, info, success]
- *           example: "success"
- *     ApiMessageResponse:
- *       type: object
- *       required:
- *         - messages
- *       properties:
- *         messages:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/Message'
  *     User:
  *       type: object
  *       properties:
@@ -140,110 +195,13 @@ const router = express.Router();
  *           type: string
  *           nullable: true
  *           example: "active"
- */
-
-/**
- * @swagger
- * /auth/signup:
- *   post:
- *     summary: User Signup
- *     description: Registers a new user and saves them to the database with admin role.
- *     tags:
- *      - Authentication
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/SignupRequest'
- *     responses:
- *       200:
- *         description: User successfully registered.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "User created successfully."
- *                   severity: "success"
- *       500:
- *         description: Server error during signup.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
- */
-router.post('/signup', signup);
-
-/**
- * @swagger
- * /auth/verify-signup:
- *   post:
- *     summary: Verify Signup Token
- *     description: Verifies a user's signup token and activates their account.
- *     tags:
- *      - Authentication
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/VerifyTokenRequest'
- *     responses:
- *       200:
- *         description: Token verified and user activated.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Signup verified successfully."
- *                   severity: "success"
- *       400:
- *         description: Invalid or expired token.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Invalid or expired verification token."
- *                   severity: "error"
- *       404:
- *         description: User not found.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "User not found."
- *                   severity: "error"
- *       500:
- *         description: Server error during verification.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
- */
-router.post('/verify-signup', verifySignup);
-
-/**
- * @swagger
  * /auth/login:
+ *   parameters:
+ *     - $ref: '#/components/parameters/XCsrfTokenHeader'
  *   post:
  *     summary: User Login
  *     description: Generates a session token for the user and sets it in an HTTP-only cookie.
+ *     security: []
  *     tags:
  *      - Authentication
  *     requestBody:
@@ -257,9 +215,20 @@ router.post('/verify-signup', verifySignup);
  *         description: Login successful, session token set in cookie and user info returned.
  *         headers:
  *           Set-Cookie:
- *             description: HTTP-only session cookie containing the session token.
+ *             description: |
+ *               Multiple HTTP-only cookies set for session and authentication:
+ *               - `connect.sid`: Express session ID (server-side session store)
+ *               - `access_token`: Short-lived JWT for frontend access control
+ *               - `refresh_token`: Token to renew access token via /auth/token endpoint
  *             schema:
  *               type: string
+ *             examples:
+ *               connectSid:
+ *                 value: connect.sid=s%3Aabc123; HttpOnly; Secure; Path=/; Max-Age=3600
+ *               accessToken:
+ *                 value: access_token=eyJhbGci...; HttpOnly; Secure; Path=/; Max-Age=900
+ *               refreshToken:
+ *                 value: refresh_token=def456; HttpOnly; Secure; Path=/; Max-Age=604800
  *         content:
  *           application/json:
  *             schema:
@@ -285,26 +254,32 @@ router.post('/verify-signup', verifySignup);
  *                 - text: "Incorrect email or password."
  *                   severity: "error"
  *       500:
- *         description: Server error during login.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/login', login);
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     ResendActivationEmailRequest:
+ *       type: object
+ *       required:
+ *         - userEmail
+ *       properties:
+ *         userEmail:
+ *           type: string
+ *           format: email
+ *           example: user@example.com
  * /auth/resend-activation-email:
+ *  parameters:
+ *     - $ref: '#/components/parameters/XCsrfTokenHeader'
  *  post:
  *    summary: Resend account activation email
  *    description: >
  *      Resends an account activation email to the provided email address if the user has not yet verified it.
  *      For security reasons, this endpoint returns a generic response regardless of the user's account state.
+ *    security: []
  *    tags:
  *      - Authentication
  *    requestBody:
@@ -314,7 +289,7 @@ router.post('/login', login);
  *          schema:
  *            $ref: '#/components/schemas/ResendActivationEmailRequest'
  *    responses:
- *      '200':
+ *      200:
  *        description: Confirmation email was resent (or not needed).
  *        content:
  *          application/json:
@@ -324,7 +299,7 @@ router.post('/login', login);
  *              messages:
  *                - text: If your email still needs to be verified, a confirmation link has been sent.
  *                  severity: info
- *      '400':
+ *      400:
  *        description: Bad request (e.g. invalid email format)
  *        content:
  *          application/json:
@@ -332,25 +307,30 @@ router.post('/login', login);
  *              $ref: '#/components/schemas/ApiMessageResponse'
  *            example:
  *              messages:
- *                - text: The email address is not valid.
+ *                - text: Invalid email address
  *                  severity: error
- *      '500':
- *        description: Internal server error
+ *      401:
+ *        description: When user is not found in database
  *        content:
  *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/ApiMessageResponse'
  *            example:
  *              messages:
- *                - text: An unexpected error occurred. Please try again later or contact support.
- *                  severity: error
+ *                - text: "Failed to send the verification email. Please try again later or contact support."
+ *                  severity: "error"
+ *              code: EMAIL_VERIFICATION_SEND_FAILED
+ *      500:
+ *         $ref: '#/components/responses/InternalServerError'
  */
 
-router.post('/auth', resendActivationEmail)
+router.post('/resend-activation-email', resendActivationEmail)
 
 /**
  * @swagger
  * /auth/logout:
+ *   parameters:
+ *     - $ref: '#/components/parameters/XCsrfTokenHeader'
  *   post:
  *     summary: User Logout
  *     description: Logs out the user by deleting the session cookie.
@@ -359,30 +339,40 @@ router.post('/auth', resendActivationEmail)
  *     responses:
  *       204:
  *         description: Logout successful, session cookie deleted.
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedErrors'
  *       500:
- *         description: Server error during logout.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/logout', authenticate, logout);
 
 /**
  * @swagger
  * /auth/refresh:
+ *   parameters:
+ *     - $ref: '#/components/parameters/XCsrfTokenHeader'
  *   post:
  *     summary: Refresh Access Token
  *     description: Refreshes the access token using a valid refresh token stored in cookies. Requires authentication.
+ *     security:
+ *       - SessionCookieAuth: []
+ *         RefreshTokenCookieAuth: []
  *     tags:
  *      - Authentication
  *     responses:
  *       204:
  *         description: Access token refreshed successfully. No content returned.
+ *       401:
+ *        description: Authentication error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ApiMessageResponse'
+ *            example:
+ *               messages:
+ *               - text: Session invalid or expired
+ *                 severity: error
+ *               code: SESSION_INVALID_OR_EXPIRED
  *       403:
  *         description: Invalid or missing refresh token.
  *         content:
@@ -391,27 +381,33 @@ router.post('/logout', authenticate, logout);
  *               $ref: '#/components/schemas/ApiMessageResponse'
  *             example:
  *               messages:
- *                 - text: "Invalid or missing refresh token."
+ *                 - text: An unexpected error occurred. Please retry to log in.
  *                   severity: "error"
+ *               code: REFRESH_TOKEN_INVALID
  *       500:
- *         description: Server error during token refresh.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/refresh', authenticate, refresh);
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     ResetPasswordRequest:
+ *        type: object
+ *        required:
+ *          - userEmail
+ *        properties:
+ *          userEmail:
+ *            type: string
+ *            example: "user@example.com"
  * /auth/reset-password/request:
+ *   parameters:
+ *     - $ref: '#/components/parameters/XCsrfTokenHeader'
  *   post:
  *     summary: Initiate Password Reset
  *     description: Sends a password reset email to the given email address. Always responds with 204 to avoid revealing user existence.
+ *     security: []
  *     tags:
  *      - Authentication
  *     requestBody:
@@ -431,27 +427,58 @@ router.post('/refresh', authenticate, refresh);
  *               $ref: '#/components/schemas/ApiMessageResponse'
  *             example:
  *               messages:
- *                 - text: "Password reset not allowed."
- *                   severity: "warning"
- *       500:
- *         description: Server error during password reset.
+ *                 - text: "Password reset could not be initiated. Please contact support if the issue persists."
+ *                   severity: "error"
+ *               code: PASSWORD_RESET_NOT_INITIATED
+ *       400:
+ *         description: Bad request (e.g. invalid email format)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ApiMessageResponse'
  *             example:
  *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
+ *                 - text: Invalid email address
+ *                   severity: error
+ *       401:
+ *         description: When user is not found in database
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: Failed to send the password reset verification email. Please try again later or contact support.
+ *                   severity: error
+ *               code: EMAIL_PASSWORD_RESET_SEND_FAILED
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/reset-password/request', resetPassword);
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     ConfirmResetPasswordRequest:
+ *       type: object
+ *       required:
+ *         - token
+ *         - newPassword
+ *       properties:
+ *         token:
+ *           type: string
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *         newPassword:
+ *           type: string
+ *           example: "StrongNewPassword!2025"
  * /auth/reset-password:
+ *   parameters:
+ *     - $ref: '#/components/parameters/XCsrfTokenHeader'
  *   post:
  *     summary: Complete Password Reset
  *     description: Resets the user's password using a valid reset token and a new password.
+ *     security: []
  *     tags:
  *      - Authentication
  *     requestBody:
@@ -461,34 +488,82 @@ router.post('/reset-password/request', resetPassword);
  *           schema:
  *             $ref: '#/components/schemas/ConfirmResetPasswordRequest'
  *     responses:
+ *       200:
+ *         description: Password reset not allowed (e.g., user inactive).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: "Password reset could not be initiated. Please contact support if the issue persists."
+ *                   severity: "error"
+ *               code: PASSWORD_RESET_NOT_INITIATED
  *       204:
  *         description: Password successfully reset.
- *       400:
- *         description: Invalid or expired token, or invalid password format.
+ *       400: 
+ *         description: One or more fields contain invalid input values.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             examples:
+ *               MultipleInputValidationErrors:
+ *                 summary: Multiple input validation errors
+ *                 value:
+ *                   messages:
+ *                     - text: Password must contain at least one digit
+ *                       severity: error
+ *                     - text: Password must contain at least one special character
+ *                       severity: error
+ *               SingleInputValidationError:
+ *                 summary: Single input validation errors
+ *                 value:
+ *                   messages:
+ *                     - text: Password must contain at least one special character
+ *                       severity: error
+ *               PasswordResetTokenInvalid: 
+ *                 summary: Password reset token is invalid
+ *                 value:
+ *                   messages:
+ *                     - text: The password reset link is invalid or no longer available. Please request a new link to reset your password.
+ *                       severity: error
+ *                   code: PASSWORD_RESET_TOKEN_INVALID
+ *               PasswordResetTokenExpired: 
+ *                 summary: Password reset token is expired
+ *                 value: 
+ *                   messages: 
+ *                     - text: Your password reset link has expired. Please request a new one to reset your password.
+ *                       severity: error
+ *                   code: PASSWORD_RESET_TOKEN_EXPIRED
+ *               PasswordResetTokenAlreadyUsed:
+ *                 summary: Password reset token already used
+ *                 value:
+ *                   messages:
+ *                     - text: This password reset link has already been used. If you still need to reset your password, request a new link.
+ *                       severity: error
+ *                   code: PASSWORD_RESET_TOKEN_ALREADY_USED
+ *       401:
+ *         description: When user is not found in the database
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ApiMessageResponse'
  *             example:
  *               messages:
- *                 - text: "Invalid or expired reset token, or invalid password."
+ *                 - text: Failed to reset the password. Please try again later or contact support.
  *                   severity: "error"
+ *               code: PASSWORD_RESET_FAILED
  *       500:
- *         description: Server error during password reset.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/reset-password', confirmResetPassword);
 
 /**
  * @swagger
  * /auth/accept-terms:
+ *   parameters:
+ *     - $ref: '#/components/parameters/XCsrfTokenHeader'
  *   post:
  *     summary: Accept Terms of Service
  *     description: >
@@ -501,45 +576,63 @@ router.post('/reset-password', confirmResetPassword);
  *         description: Terms accepted successfully. New access token set in cookie.
  *         headers:
  *           Set-Cookie:
- *             description: HTTP-only cookie containing a new access token.
+ *             description: |
+ *               Multiple HTTP-only cookies set for session and authentication:
+ *               - `connect.sid`: Express session ID (server-side session store)
+ *               - `access_token`: Short-lived JWT for frontend access control
+ *               - `refresh_token`: Token to renew access token via /auth/token endpoint
  *             schema:
  *               type: string
+ *             examples:
+ *               connectSid:
+ *                 value: connect.sid=s%3Aabc123; HttpOnly; Secure; Path=/; Max-Age=3600
+ *               accessToken:
+ *                 value: access_token=eyJhbGci...; HttpOnly; Secure; Path=/; Max-Age=900
+ *               refreshToken:
+ *                 value: refresh_token=def456; HttpOnly; Secure; Path=/; Max-Age=604800
  *       401:
- *         description: Unauthorized - session missing or expired.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Unauthorized: session missing or expired."
- *                   severity: "error"
+ *         $ref: '#/components/responses/UnauthorizedErrors'
  *       403:
- *         description: Invalid or missing refresh token.
+ *         description: Authorization errors.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Invalid or missing refresh token."
- *                   severity: "error"
+ *             examples:
+ *               InvalidOrMissingRefreshToken:
+ *                 summary: Invalid or missing refresh token.
+ *                 value:
+ *                   messages:
+ *                     - text: An unexpected error occurred. Please retry to log in.
+ *                       severity: "error"
+ *                   code: REFRESH_TOKEN_INVALID
+ *               TermsAlreadyAccepted:
+ *                 summary: Terms already accepted.
+ *                 value:
+ *                   messages:
+ *                     - text: You have already accepted the terms and conditions.
+ *                       severity: "info"
+ *                   code: TERMS_ALREADY_ACCEPTED
  *       500:
- *         description: Server error during terms acceptance or token generation.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/accept-terms', authenticate, acceptTerms);
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     Verify2FARequest:
+ *       type: object
+ *       required:
+ *         - code
+ *       properties:
+ *         code:
+ *           type: string
+ *           example: "123456"  
  * /auth/verify-2fa:
+ *   parameters:
+ *     - $ref: '#/components/parameters/XCsrfTokenHeader'
  *   post:
  *     summary: Verify Two-Factor Authentication Code
  *     description: Verifies a 2FA code provided by the user during login. Requires an active session.
@@ -573,28 +666,59 @@ router.post('/accept-terms', authenticate, acceptTerms);
  *               $ref: '#/components/schemas/ApiMessageResponse'
  *             example:
  *               messages:
- *                 - text: "Invalid or expired two-factor authentication code."
+ *                 - text: "The verification code you entered is invalid. Please try again."
  *                   severity: "error"
+ *               code: TWO_FA_VERIFICATION_CODE_INVALID
+ *       403:
+ *         description: Authorization errors.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             examples:
+ *               InvalidOrMissingRefreshToken:
+ *                 summary: Invalid or missing refresh token.
+ *                 value:
+ *                   messages:
+ *                     - text: An unexpected error occurred. Please retry to log in.
+ *                       severity: error
+ *                   code: REFRESH_TOKEN_INVALID
+ *               TwoFaVerificationNotConfigured:
+ *                 summary: Two factor verification is not configured.
+ *                 value:
+ *                   messages:
+ *                     - text: Two-factor authentication is not configured for your account.
+ *                       severity: error
+ *                   code: TWO_FA_NOT_CONFIGURED       
+ *               TwoFaVerificationNotPending:
+ *                 summary: Two factor verification is not pending.
+ *                 value:
+ *                   messages:
+ *                     - text: Two-factor authentication verification is not pending.
+ *                       severity: error
+ *                   code: TWO_FA_VERIFICATION_NOT_PENDING
  *       401:
- *         description: Unauthorized - session missing or expired.
+ *         description: UnauthorizedErrors errors
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Unauthorized: session missing or expired."
- *                   severity: "error"
+ *             examples:
+ *               SessionInvalidOrExpired:
+ *                 $ref: '#/components/examples/SessionInvalidOrExpired'
+ *               AccessTokenMissing:
+ *                 $ref: '#/components/examples/AccessTokenMissing'
+ *               AccessTokenExpired:
+ *                 $ref: '#/components/examples/AccessTokenExpired'
+ *               TwoFaVerificationFailed:
+ *                 summary: When user is not found in the database
+ *                 value:
+ *                   messages:
+ *                     - text: Two-factor authentication failed. Please try again or contact support.
+ *                       severity: "error"
+ *                   code: TWO_FA_VERIFICATION_FAILED
  *       500:
- *         description: Server error during 2FA verification.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/verify-2fa', authenticate, verifyLogin2FA);
 
@@ -618,26 +742,21 @@ router.post('/verify-2fa', authenticate, verifyLogin2FA);
  *               properties:
  *                 user:
  *                   $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiMessageResponse'
+ *             example:
+ *               messages:
+ *                 - text: User not found.
+ *                   severity: "error"
+ *               code: USER_NOT_FOUND
  *       401:
- *         description: Unauthorized - session missing or expired.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Unauthorized: session missing or expired."
- *                   severity: "error"
+ *         $ref: '#/components/responses/UnauthorizedErrors'
  *       500:
- *         description: Server error retrieving session.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessageResponse'
- *             example:
- *               messages:
- *                 - text: "Internal server error"
- *                   severity: "error"
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.get('/session', authenticate, getSession);
 

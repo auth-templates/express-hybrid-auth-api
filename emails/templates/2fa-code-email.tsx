@@ -80,8 +80,8 @@ export default function TwoFactorAuthEmail({
 }
 
 TwoFactorAuthEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3000',
-    frontendUrl: 'http://localhost:3000',
+    assetsUrl: 'http://localhost:3001',
+    frontendUrl: 'http://localhost:3001',
     verificationCode: '123456',
     expiresInMinutes: 30,
     t: getEmailTranslator(),

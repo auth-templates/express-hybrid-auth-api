@@ -95,26 +95,26 @@ describe('POST /auth/reset-password', () => {
         expect(response.body).toEqual({ messages:[{text:"Password reset could not be initiated. Please contact support if the issue persists.",  severity: "error"}], code: AppStatusCode.PASSWORD_RESET_NOT_INITIATED});
     });
 
-    it('should return 404 for user\'s email is not found in database', async () => {
+    it('should return 401 with generic message when user is not found in the database', async () => {
         (UserRepository.getUserByEmail as jest.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
             
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
 
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({ messages:[{text:"No user found with the provided email address.", severity: "error"}], code: AppStatusCode.USER_NOT_FOUND});
+        expect(response.status).toBe(401);
+        expect(response.body).toEqual({ messages:[{text:"Failed to send the password reset verification email. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.EMAIL_PASSWORD_RESET_SEND_FAILED});
     });
     
-    it('should return 404 if user id is not found when saving the token in database', async () => {
+    it('should return 401 with generic message when user is not found when saving the token in database', async () => {
         (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue(valid2FAUser);
         jest.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
 
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({ messages: [{text: "User not found.", severity: "error"}], code: AppStatusCode.USER_NOT_FOUND});
+        expect(response.status).toBe(401);
+        expect(response.body).toEqual({ messages: [{text: "Failed to send the password reset verification email. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.EMAIL_PASSWORD_RESET_SEND_FAILED});
     });
 
     it('should return 500 for internal errors', async () => {

@@ -28,7 +28,7 @@ const app = express();
 const port = 3001;
 
 app.use(cors({
-  origin: 'http://localhost:3000',  // your frontend URL & port here
+  origin: 'http://localhost:3001',  // your frontend URL & port here
   credentials: true,                 // allows cookies and auth headers
 }));
 
@@ -66,7 +66,6 @@ app.use(csrfProtection);
 console.log("env:", process.env.NODE_ENV)
 
 if ( process.env.NODE_ENV === 'development' ) {
-    console.log("swagger-dark", path.join(appRoot.path, 'public/swagger-dark.css'));
     app.use('/swagger-dark.css', express.static(path.join(appRoot.path, 'public/swagger-dark.css')));
     app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec, {
         customCssUrl: '/swagger-dark.css' 

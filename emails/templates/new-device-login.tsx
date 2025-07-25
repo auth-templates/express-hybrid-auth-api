@@ -95,8 +95,8 @@ export default function NewDeviceLoginEmail({
     
 
 NewDeviceLoginEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3000',
-    frontendUrl: 'http://localhost:3000',
+    assetsUrl: 'http://localhost:3001',
+    frontendUrl: 'http://localhost:3001',
     userEmail: 'user@example.com',
     location: 'San Francisco, CA, USA',
     device: 'Chrome on Windows',

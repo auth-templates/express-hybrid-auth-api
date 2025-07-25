@@ -86,8 +86,8 @@ export default function AccountDetailsUpdatedEmail({
 
 
 AccountDetailsUpdatedEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3000',
-    frontendUrl: 'http://localhost:3000',
+    assetsUrl: 'http://localhost:3001',
+    frontendUrl: 'http://localhost:3001',
     updatedFields: ['name', 'email address'],
     t: getEmailTranslator(),
 } satisfies AccountDetailsUpdatedEmailProps;

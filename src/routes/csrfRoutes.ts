@@ -13,10 +13,6 @@ const router = Router();
  *         csrfToken:
  *           type: string
  *           example: "abc123csrfTOKEN456xyz"
- */
-
-/**
- * @swagger
  * /csrf/token:
  *   get:
  *     summary: Get CSRF token

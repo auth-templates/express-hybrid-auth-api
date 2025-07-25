@@ -53,7 +53,12 @@ export const verifySignup = async (request: Request, response: Response): Promis
         response.status(204).send();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            if (error.code === AppStatusCode.USER_NOT_FOUND) {
+                // Hide actual user existence to prevent user enumeration; respond with generic activation failure message.
+                response.status(401).json(createMessageResponse(request.t('errors.activation_failed_user_not_found'), 'error', AppStatusCode.VERIFICATION_FAILED))
+            } else {
+                response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            }
             return
         }
         logger.error(error);
@@ -90,7 +95,12 @@ export const signup = async (request: Request, response: Response): Promise<void
         response.status(204).send();
     } catch ( error ) {
         if (error instanceof AppError) {
-            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            if (error.code === AppStatusCode.USER_NOT_FOUND) {
+                // Hide actual user existence to prevent user enumeration; respond with generic activation failure message.
+                response.status(401).json(createMessageResponse(request.t('errors.activation_failed_user_not_found'), 'error', AppStatusCode.VERIFICATION_FAILED))
+            } else {
+                response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            }
             return
         }
         logger.error(error);
@@ -224,7 +234,12 @@ export const resendActivationEmail = async (request: Request, response: Response
         response.status(204).send();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            if (error.code === AppStatusCode.USER_NOT_FOUND) {
+                // Hide actual user existence to prevent user enumeration; respond with generic activation failure message.
+                response.status(401).json(createMessageResponse(request.t('errors.email_verification_send_failed'), 'error', AppStatusCode.EMAIL_VERIFICATION_SEND_FAILED))
+            } else {
+                response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            }
             return;
         }
         logger.error(error);
@@ -260,7 +275,12 @@ export const resetPassword = async (request: Request, response: Response): Promi
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            if (error.code === AppStatusCode.USER_NOT_FOUND) {
+                // Hide actual user existence to prevent user enumeration; respond with generic activation failure message.
+                response.status(401).json(createMessageResponse(request.t('errors.email_password_reset_send_failed'), 'error', AppStatusCode.EMAIL_PASSWORD_RESET_SEND_FAILED))
+            } else {
+                response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            }
             return
         }
         logger.error(error);
@@ -295,7 +315,12 @@ export const confirmResetPassword = async (request: Request, response: Response)
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            if (error.code === AppStatusCode.USER_NOT_FOUND) {
+                // Hide actual user existence to prevent user enumeration; respond with generic activation failure message.
+                response.status(401).json(createMessageResponse(request.t('errors.password_reset_failed'), 'error', AppStatusCode.PASSWORD_RESET_FAILED))
+            } else {
+                response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            }
             return
         }
         logger.error(error);
@@ -310,7 +335,7 @@ export const acceptTerms = async (request: Request, response: Response): Promise
     
     try {
         if ( termsAccepted === true ) {
-            response.status(403).end();
+            response.status(403).json(createMessageResponse(request.t('errors.terms_already_accepted'), 'info', AppStatusCode.TERMS_ALREADY_ACCEPTED));
             return
         }
 
@@ -340,7 +365,7 @@ export const verifyLogin2FA = async (request: Request, response: Response): Prom
         const { code } = request.body;
 
         if ( !pending2FA ) {
-            response.status(401).end();
+            response.status(403).json(createMessageResponse(request.t('errors.2fa_verification_not_pending'), 'error', AppStatusCode.TWO_FA_VERIFICATION_NOT_PENDING));
             return
         }
 
@@ -348,7 +373,7 @@ export const verifyLogin2FA = async (request: Request, response: Response): Prom
 
         const isValid = authenticator.verify({ token: code, secret: twofaSecret });
         if ( !isValid ) {
-           throw new AppError('errors.2fa_verification_code_invalid', {}, AppStatusCode.TWO_FA_VERIFICATION_FAILED, 400);
+           throw new AppError('errors.2fa_verification_code_invalid', {}, AppStatusCode.TWO_FA_VERIFICATION_CODE_INVALID, 400);
         }
 
         // Clear pending2FA flag
@@ -360,7 +385,12 @@ export const verifyLogin2FA = async (request: Request, response: Response): Prom
         response.status(200).json(user);
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            if (error.code === AppStatusCode.USER_NOT_FOUND) {
+                // Hide actual user existence to prevent user enumeration; respond with generic activation failure message.
+                response.status(401).json(createMessageResponse(request.t('errors.2fa_verification_failed'), 'error', AppStatusCode.TWO_FA_VERIFICATION_FAILED))
+            } else {
+                response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            }
             return
         }
         logger.error(error);

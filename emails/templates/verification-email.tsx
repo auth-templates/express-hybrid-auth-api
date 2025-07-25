@@ -84,9 +84,9 @@ export default function EmailVerification({
 }
 
 EmailVerification.PreviewProps = {
-    assetsUrl: 'http://localhost:3000',
-    frontendUrl: 'http://localhost:3000',
-    verificationUrl: 'http://localhost:3000/verify?token=abc123',
+    assetsUrl: 'http://localhost:3001',
+    frontendUrl: 'http://localhost:3001',
+    verificationUrl: 'http://localhost:3001/verify?token=abc123',
     t: getEmailTranslator(),
     expiresInMinutes: 30
 } satisfies EmailVerificationProps;

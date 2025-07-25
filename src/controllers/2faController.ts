@@ -35,10 +35,6 @@ export const setup2FA = async (request: Request, response: Response): Promise<vo
         const { qrCodeUrl, secret } = await get2faSetup(userId, userEmail);
         response.status(200).json({ qrCodeUrl, secret });
     } catch (error) {
-        if (error instanceof AppError) {
-            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), "error", error.code));
-            return
-        }
         logger.error(error);
         response.status(500).json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
     }
@@ -117,7 +113,12 @@ export const recover2FA = async (request: Request, response: Response): Promise<
         response.status(204).end();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            if (error.code === AppStatusCode.USER_NOT_FOUND) {
+                // Hide actual user existence to prevent user enumeration; respond with generic activation failure message.
+                response.status(401).json(createMessageResponse(request.t('errors.email_2fa_recovery_send_failed'), 'error', AppStatusCode.EMAIL_TWO_FA_RECOVERY_SEND_FAILED))
+            } else {
+                response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            }
             return
         }
         logger.error(error);
@@ -135,7 +136,12 @@ export const confirm2FARecover = async (request: Request, response: Response): P
         response.status(204).send();
     } catch (error) {
         if (error instanceof AppError) {
-            response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            if (error.code === AppStatusCode.USER_NOT_FOUND) {
+                // Hide actual user existence to prevent user enumeration; respond with generic activation failure message.
+                response.status(401).json(createMessageResponse(request.t('errors.2fa_recovery_failed'), 'error', AppStatusCode.TWO_FA_RECOVERY_FAILED))
+            } else {
+                response.status(error.httpStatusCode).json(createMessageResponse(request.t(error.translationKey, error.params), 'error', error.code));
+            }
             return
         }
         logger.error(error);

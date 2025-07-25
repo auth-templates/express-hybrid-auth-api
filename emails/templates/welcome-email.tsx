@@ -72,8 +72,8 @@ export default function WelcomeEmail({
 }
 
 WelcomeEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3000',
-    frontendUrl: 'http://localhost:3000',
+    assetsUrl: 'http://localhost:3001',
+    frontendUrl: 'http://localhost:3001',
     t: getEmailTranslator(),
 } satisfies WelcomeEmailProps;
 

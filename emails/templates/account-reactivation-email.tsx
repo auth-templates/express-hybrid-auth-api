@@ -75,8 +75,8 @@ export default function AccountReactivationEmail({
 }
 
 AccountReactivationEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3000',
-    frontendUrl: 'http://localhost:3000',
+    assetsUrl: 'http://localhost:3001',
+    frontendUrl: 'http://localhost:3001',
     t: getEmailTranslator(),
 } satisfies AccountReactivationEmailProps;
 

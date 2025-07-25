@@ -12,12 +12,21 @@
         "social_login_required": "Se pare că v-ați înregistrat folosind un cont social. Vă rugăm să vă autentificați folosind acel furnizor.",
         "2fa_setup_invalid": "Configurarea 2FA a expirat sau nu mai este valabilă. Vă rugăm să încercați din nou.",
         "invalid_refresh_token": "A apărut o eroare neașteptată. Vă rugăm să încercați să vă conectați din nou.",
-        "2fa_verification_code_invalid": "Codul de verificare introdus este incorect. Vă rugăm să încercați din nou.",
+        "2fa_verification_code_invalid": "Codul de verificare introdus este invalid. Vă rugăm să încercați din nou.",
         "2fa_required": "Finalizarea autentificării în doi pași este necesară pentru a accesa această resursă.",
-        "2fa_not_configured": "Autentificarea în doi pași nu este configurată pentru contul tău."
+        "2fa_not_configured": "Autentificarea în doi pași nu este configurată pentru contul tău.",
+        "2fa_verification_not_pending": "Verificarea autentificării cu doi factori nu este în așteptare.",
+        "activation_failed_user_not_found": "Activarea a eșuat. Vă rugăm să contactați suportul dacă problema persistă.",
+        "email_verification_send_failed": "Trimiterea e-mailului de verificare a eșuat. Vă rugăm să încercați din nou mai târziu sau să contactați suportul.",
+        "email_password_reset_send_failed": "Trimiterea e-mailului de resetare a parolei a eșuat. Vă rugăm să încercați din nou mai târziu sau să contactați suportul.",
+        "password_reset_failed": "Resetarea parolei a eșuat. Vă rugăm să încercați din nou mai târziu sau contactați suportul.",
+        "2fa_verification_failed": "Autentificarea cu doi factori a eșuat. Vă rugăm să încercați din nou sau contactați suportul.",
+        "email_2fa_recovery_send_failed": "Trimiterea e-mailului de recuperare pentru autentificarea cu doi factori a eșuat. Vă rugăm să încercați din nou mai târziu sau contactați suportul.",
+        "2fa_recovery_failed": "Recuperarea autentificării cu doi factori a eșuat. Vă rugăm să încercați din nou mai târziu sau contactați suportul."
     },
     "info": {
-        "confirmation_email_if_needed": "Dacă adresa ta de email trebuie încă verificată, un link de confirmare a fost trimis."
+        "confirmation_email_if_needed": "Dacă adresa ta de email trebuie încă verificată, un link de confirmare a fost trimis.",
+        "terms_already_accepted": "Ați acceptat deja termenii și condițiile."
     },
     "validation": {
         "accept_terms": "Trebuie să accepți termenii și condițiile.",

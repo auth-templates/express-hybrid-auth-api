@@ -106,25 +106,25 @@ describe('POST /2fa/recover', () => {
         expect(response.body).toEqual({ messages: [{text: "Two-step verification recovery could not be initiated. Please contact support if the issue persists.", severity: "error"}], code: AppStatusCode.TWO_FA_RECOVERY_NOT_INITIATED});
     });
 
-    it('should return 404 for user\'s email is not found in database', async () => {
+    it('should return 401 with generic message when user is not found in the database', async () => {
         (UserRepository.getUserByEmail as jest.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
             
         const userEmail = "user@mail.com"
         const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
 
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({ messages: [{ text: "No user found with the provided email address.", severity: "error"}], code: AppStatusCode.USER_NOT_FOUND});
+        expect(response.status).toBe(401);
+        expect(response.body).toEqual({ messages: [{ text: "Failed to send the two-factor authentication recovery email. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.EMAIL_TWO_FA_RECOVERY_SEND_FAILED});
     });
     
-    it('should return 404 if user id is not found when saving the token in database', async () => {
+    it('should return 401 with generic message when user is not found when saving the token in database', async () => {
         (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue(validUser2FA);
         jest.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
 
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({ messages: [{ text: "User not found.", severity: "error" }], code: AppStatusCode.USER_NOT_FOUND});
+        expect(response.status).toBe(401);
+        expect(response.body).toEqual({ messages: [{ text: "Failed to send the two-factor authentication recovery email. Please try again later or contact support.", severity: "error" }], code: AppStatusCode.EMAIL_TWO_FA_RECOVERY_SEND_FAILED});
     });
 
 

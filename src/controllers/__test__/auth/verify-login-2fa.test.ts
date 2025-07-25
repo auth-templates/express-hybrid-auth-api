@@ -116,7 +116,7 @@ describe('POST /auth/verify-2fa', () => {
     });
 
     
-    it('should return 401 if no user or no pending2FA in session', async () => {
+    it('should return 403 if no user or no pending2FA in session', async () => {
         const agent = request.agent(app);
 
         // No user, no pending2FA
@@ -124,7 +124,7 @@ describe('POST /auth/verify-2fa', () => {
 
         const response = await agent.post('/auth/verify-2fa').send({ code: '123456' });
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(403);
         expect(UserRepository.getUser2FASecretById).not.toHaveBeenCalled();
     });
 
@@ -139,7 +139,7 @@ describe('POST /auth/verify-2fa', () => {
         const response = await agent.post('/auth/verify-2fa').send({ code: 'invalid-code' });
 
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text:'The verification code you entered is incorrect. Please try again.', severity: "error"}], code: AppStatusCode.TWO_FA_VERIFICATION_FAILED});
+        expect(response.body).toEqual({messages: [{text:'The verification code you entered is invalid. Please try again.', severity: "error"}], code: AppStatusCode.TWO_FA_VERIFICATION_CODE_INVALID});
     });
 
     it('should return 500 if unexpected error occurs', async () => {
