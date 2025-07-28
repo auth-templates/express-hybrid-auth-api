@@ -1,5 +1,6 @@
-# flexible-leaves-api
-The backend api for flexible leaves application 
+# node-hybrid-jwt-session-auth
+
+This is a backend API that uses a hybrid authentication approach combining Express server-side sessions and JWT-based access control, with all credentials stored in HTTP-only cookies. This approach ensures security while allowing stateless validation for route access.
 
 ## 🛠️ Setup
 
