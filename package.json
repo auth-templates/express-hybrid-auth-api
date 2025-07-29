@@ -1,14 +1,14 @@
 {
   "type": "module",
-  "name": "flexible-leaves-api",
+  "name": "express-hybrid-auth-api",
   "version": "1.0.0",
-  "description": "The backend api for flexible leaves application",
+  "description": "Hybrid authentication API using Express sessions and JWTs with secure HTTP-only cookies.",
   "main": "dist/index.js",
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
-    "codegen": "openapi-rq -i ./.swagger/flexible-leaves-api.yml",
+    "codegen": "openapi-rq -i ./.swagger/express-hybrid-auth-api.yml",
     "email:dev": "npx react-email dev --dir emails/templates",
     "prisma:generate": "prisma generate",
     "reset-and-seed": "npx prisma db push && npx prisma db seed",

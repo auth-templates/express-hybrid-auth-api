@@ -5,5 +5,5 @@ import * as yaml from 'js-yaml';
 // Convert the Swagger JSON to YAML
 const swaggerYaml = yaml.dump(swaggerSpec);
 
-writeFileSync('./.swagger/flexible-leaves-api.yml', swaggerYaml);
-console.log('✅ Swagger JSON generated at .swagger/flexible-leaves-api.yml');
+writeFileSync('./.swagger/express-hybrid-auth-api.yml', swaggerYaml);
+console.log('✅ Swagger JSON generated at .swagger/express-hybrid-auth-api.yml');
