@@ -1,5 +1,5 @@
 ### Valid credentials
-POST http://localhost:3001/auth/login
+POST http://localhost:3000/auth/login
 content-type: application/json
 
 {
@@ -8,7 +8,7 @@ content-type: application/json
 }
 
 #### Invalid email
-POST http://localhost:3001/auth/login
+POST http://localhost:3000/auth/login
 content-type: application/json
 
 {
@@ -18,7 +18,7 @@ content-type: application/json
 
 
 #### Invalid password
-POST http://localhost:3001/auth/login
+POST http://localhost:3000/auth/login
 content-type: application/json
 
 {
@@ -28,7 +28,7 @@ content-type: application/json
 
 
 #### Invalid password
-POST http://localhost:3001/auth/login
+POST http://localhost:3000/auth/login
 content-type: application/json
 
 {

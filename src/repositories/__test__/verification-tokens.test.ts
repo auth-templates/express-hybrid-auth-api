@@ -1,10 +1,10 @@
-import { Prisma } from "../../../generated/prisma";
-import { prismaClient } from "../../lib/prisma-client";
-import { PrismaErrorCode } from "../../lib/prisma-error-codes";
-import { TokenType } from "../../models/verification-token";
-import { VerificationTokensRepository } from "../verification-tokens";
-import * as tokenLib from '../../lib/token';
-import { AppStatusCode } from "@/@types/status-code";
+import { Prisma } from "../../../generated/prisma/index.js";
+import { prismaClient } from "../../lib/prisma-client.js";
+import { PrismaErrorCode } from "../../lib/prisma-error-codes.js";
+import { TokenType } from "../../models/verification-token.js";
+import { VerificationTokensRepository } from "../verification-tokens.js";
+import * as tokenLib from '../../lib/token.js';
+import { AppStatusCode } from "@/@types/status-code.js";
 
 jest.mock('../../lib/token');
 jest.mock('../../lib/prisma-client', () => ({

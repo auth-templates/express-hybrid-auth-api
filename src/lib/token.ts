@@ -1,7 +1,7 @@
 import { generateRandomString, RandomReader } from '@oslojs/crypto/random';
 import { createHash, webcrypto } from 'node:crypto';
 import { hash, verify } from "@node-rs/argon2";
-import GlobalConfig from '../config';
+import GlobalConfig from '../config.js';
 import jwt from 'jsonwebtoken';
 import { randomBytes } from 'node:crypto'
 

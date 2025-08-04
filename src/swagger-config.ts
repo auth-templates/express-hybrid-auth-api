@@ -11,7 +11,7 @@ const swaggerDefinition = {
     openapi: '3.0.3',
     servers: [
         {
-            url: 'http://localhost:3001',
+            url: 'http://localhost:3000',
         }, 
     ],
     ...extraSwaggerYaml, // Merge YAML definitions

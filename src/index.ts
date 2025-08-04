@@ -1,34 +1,34 @@
-import GlobalConfig from './config';
+import GlobalConfig from './config.js';
 import express from 'express';
 import swaggerUI from 'swagger-ui-express';
-import swaggerSpec from './swagger-config';
-import authRouter from './routes/authRoutes';
-import twofaRoutes from './routes/2faRoutes';
+import swaggerSpec from './swagger-config.js';
+import authRouter from './routes/authRoutes.js';
+import twofaRoutes from './routes/2faRoutes.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import { i18nMiddleware } from './middlewares/i18n';
+import { i18nMiddleware } from './middlewares/i18n.js';
 import appRoot from 'app-root-path'
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
-import { redisClient } from './lib/redis/client';
+import { redisClient } from './lib/redis/client.js';
 import { Request, Response } from 'express';
 import passport from 'passport';
-import './strategies';
-import csrfRoutes from './routes/csrfRoutes';
-import googleAuthRoutes from './routes/googleAuthRoutes';
-import githubAuthRoutes from './routes/githubAuthRoutes';
-import { errorHandler } from './middlewares/error-handler';
-import { csrfProtection } from './middlewares/csrf';
-import { requireTermsAcceptance } from './middlewares/require-terms-acceptance';
-import { require2FA } from './middlewares/require-2fa';
-import { authenticate } from './middlewares/authenticate';
+import './strategies/index.js';
+import csrfRoutes from './routes/csrfRoutes.js';
+import googleAuthRoutes from './routes/googleAuthRoutes.js';
+import githubAuthRoutes from './routes/githubAuthRoutes.js';
+import { errorHandler } from './middlewares/error-handler.js';
+import { csrfProtection } from './middlewares/csrf.js';
+import { requireTermsAcceptance } from './middlewares/require-terms-acceptance.js';
+import { require2FA } from './middlewares/require-2fa.js';
+import { authenticate } from './middlewares/authenticate.js';
 import cors from 'cors';
 
 const app = express();
-const port = 3001;
+const port = 3000;
 
 app.use(cors({
-  origin: 'http://localhost:3001',  // your frontend URL & port here
+  origin: 'http://localhost:3000',  // your frontend URL & port here
   credentials: true,                 // allows cookies and auth headers
 }));
 

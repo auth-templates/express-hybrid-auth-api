@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
+        "allowJs": true,
         "resolveJsonModule": true,
         "jsx": "react-jsx",
         "target": "esnext",
-        "module": "esnext",
+        "module": "nodenext",
         "esModuleInterop": true,
-        "moduleResolution": "node",
+        "moduleResolution": "nodenext",
         // "strict": true,  // Enable strict type-checking
         "skipLibCheck": true,  // Skip library declaration file checks
         "sourceMap": true,

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { authenticate } from '../authenticate';
-import GlobalConfig from '../../config';
-import { AppStatusCode } from '@/@types/status-code';
+import { authenticate } from '../authenticate.js';
+import GlobalConfig from '../../config.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 jest.mock('jsonwebtoken');
 

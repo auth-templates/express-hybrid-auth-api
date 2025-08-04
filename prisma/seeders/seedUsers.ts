@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../generated/prisma';
+import { PrismaClient } from '../../generated/prisma/index.js';
 
 export async function seedUsers(prisma: PrismaClient) {
     await prisma.users.createMany({

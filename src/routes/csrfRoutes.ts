@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { csrfTokenHandler } from '../middlewares/csrf';
+import { csrfTokenHandler } from '../middlewares/csrf.js';
 
 const router = Router();
 

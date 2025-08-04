@@ -11,7 +11,7 @@ import {
     Section,
     Text,
 } from '@react-email/components';
-import { getEmailTranslator } from '../utils/getEmailTranslator';
+import { getEmailTranslator } from '../utils/getEmailTranslator.js';
 
 interface AccountDetailsUpdatedEmailProps {
     assetsUrl: string,
@@ -86,8 +86,8 @@ export default function AccountDetailsUpdatedEmail({
 
 
 AccountDetailsUpdatedEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3001',
-    frontendUrl: 'http://localhost:3001',
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     updatedFields: ['name', 'email address'],
     t: getEmailTranslator(),
 } satisfies AccountDetailsUpdatedEmailProps;

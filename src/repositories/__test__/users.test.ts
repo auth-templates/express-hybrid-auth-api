@@ -1,9 +1,9 @@
-import { AppStatusCode } from "@/@types/status-code";
-import { Prisma } from "../../../generated/prisma";
-import { verifyPasswordHash } from "../../lib/password";
-import { prismaClient } from "../../lib/prisma-client";
-import { Role, UserStatus } from "../../models/user";
-import { UserRepository } from "../users";
+import { AppStatusCode } from "@/@types/status-code.js";
+import { Prisma } from "../../../generated/prisma/index.js";
+import { verifyPasswordHash } from "../../lib/password.js";
+import { prismaClient } from "../../lib/prisma-client.js";
+import { Role, UserStatus } from "../../models/user.js";
+import { UserRepository } from "../users.js";
 
 jest.mock('../../lib/prisma-client', () => ({
     prismaClient: {

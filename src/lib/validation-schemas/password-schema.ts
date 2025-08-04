@@ -1,6 +1,6 @@
 import * as v from 'valibot';
-import { ValibotIssueReason } from '../valibot-issue-reason';
-import { ValidationIssue } from './validation-issue';
+import { ValibotIssueReason } from '../valibot-issue-reason.js';
+import { ValidationIssue } from './validation-issue.js';
 
 export const passwordValidationSchema = () => v.pipe(
     v.string(),

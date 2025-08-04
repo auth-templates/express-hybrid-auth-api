@@ -1,15 +1,15 @@
 import request from 'supertest';
 import express from 'express';
-import { verifyLogin2FA } from '../../authController';
-import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
+import { verifyLogin2FA } from '../../authController.js';
+import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n.js';
 import session from 'express-session';
-import GlobalConfig from '../../../config';
+import GlobalConfig from '../../../config.js';
 import cookieParser from 'cookie-parser';
-import { UserRepository } from '../../../repositories/users';
+import { UserRepository } from '../../../repositories/users.js';
 import * as jwt from 'jsonwebtoken';
-import { RefreshTokenStore } from '../../../lib/redis/redis-token';
+import { RefreshTokenStore } from '../../../lib/redis/redis-token.js';
 import * as otplib from 'otplib';
-import { AppStatusCode } from '@/@types/status-code';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 jest.mock('otplib', () => ({
     authenticator: {

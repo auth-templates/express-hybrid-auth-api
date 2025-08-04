@@ -11,7 +11,7 @@ import {
     Section,
     Text,
 } from '@react-email/components';
-import { getEmailTranslator } from '../utils/getEmailTranslator';
+import { getEmailTranslator } from '../utils/getEmailTranslator.js';
 
 interface AccountActivationEmailProps {
     assetsUrl: string,
@@ -72,8 +72,8 @@ export default function AccountActivationEmail({
 }    
 
 AccountActivationEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3001',
-    frontendUrl: 'http://localhost:3001',
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     t: getEmailTranslator(),
 } satisfies AccountActivationEmailProps;
 

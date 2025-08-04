@@ -10,7 +10,7 @@ jest.mock('csrf-sync', () => {
 });
 
 // Now import after mocking
-import { csrfTokenHandler, csrfProtection } from '../csrf';
+import { csrfTokenHandler, csrfProtection } from '../csrf.js';
 
 describe('csrfTokenHandler', () => {
   let req: Partial<Request>;

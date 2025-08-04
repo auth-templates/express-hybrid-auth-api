@@ -1,12 +1,12 @@
-import { Prisma } from '../../generated/prisma';
-import { AppError } from '../lib/error';
-import { prismaClient } from '../lib/prisma-client';
-import { PrismaErrorCode } from '../lib/prisma-error-codes';
-import { TokenType, VerificationToken } from '../models/verification-token';
+import { Prisma } from '../../generated/prisma/index.js';
+import { AppError } from '../lib/error.js';
+import { prismaClient } from '../lib/prisma-client.js';
+import { PrismaErrorCode } from '../lib/prisma-error-codes.js';
+import { TokenType, VerificationToken } from '../models/verification-token.js';
 
-import { createTokenFingerprint } from '../lib/token';
-import logger from '@/lib/logger'
-import { AppStatusCode } from '@/@types/status-code';
+import { createTokenFingerprint } from '../lib/token.js';
+import logger from '@/lib/logger/index.js'
+import { AppStatusCode } from '@/@types/status-code.js';
 
 type CreateVerificationTokenInput = Omit<VerificationToken, 'id' | 'createdAt' | 'usedAt' | 'token'> & { tokenHash: string, tokenFingerprint: string }
 

@@ -1,5 +1,5 @@
-import { AppStatusCode } from '@/@types/status-code';
-import { AppError } from '../error';
+import { AppStatusCode } from '@/@types/status-code.js';
+import { AppError } from '../error.js';
 
 describe('AppError', () => {
   it('should create an instance with the provided translationKey, params, and statusCode', () => {

@@ -11,7 +11,7 @@ import {
     Section,
     Text,
 } from '@react-email/components';
-import { getEmailTranslator } from '../utils/getEmailTranslator';
+import { getEmailTranslator } from '../utils/getEmailTranslator.js';
 
 interface PasswordChangedEmailProps {
     assetsUrl: string,
@@ -77,8 +77,8 @@ export default function PasswordChangedEmail({
 }    
 
 PasswordChangedEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3001',
-    frontendUrl: 'http://localhost:3001',
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     userEmail: 'user@example.com',
     t: getEmailTranslator(),
 } satisfies PasswordChangedEmailProps;

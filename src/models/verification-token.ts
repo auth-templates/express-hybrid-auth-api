@@ -1,4 +1,4 @@
-import { resetPassword } from "../controllers/authController";
+import { resetPassword } from "../controllers/authController.js";
 
 export interface VerificationToken {
     id: number,

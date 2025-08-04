@@ -11,7 +11,7 @@ import {
     Section,
     Text,
 } from '@react-email/components';
-import { getEmailTranslator } from '../utils/getEmailTranslator';
+import { getEmailTranslator } from '../utils/getEmailTranslator.js';
 
 interface EmailAddressChangedEmailProps {
     assetsUrl: string,
@@ -88,11 +88,11 @@ export default function EmailAddressChangedEmail({
     
 
 EmailAddressChangedEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3001',
-    frontendUrl: 'http://localhost:3001',
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     oldEmail: 'old@example.com',
     newEmail: 'new@example.com',
-    confirmLink: 'http://localhost:3001/confirm-email-change',
+    confirmLink: 'http://localhost:3000/confirm-email-change',
     t: getEmailTranslator(),
 } satisfies EmailAddressChangedEmailProps;
 

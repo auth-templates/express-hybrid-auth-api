@@ -11,7 +11,7 @@ import {
     Section,
     Text,
 } from '@react-email/components';
-import { getEmailTranslator } from '../utils/getEmailTranslator';
+import { getEmailTranslator } from '../utils/getEmailTranslator.js';
 
 interface TwoFactorDisabledEmailProps {
     assetsUrl: string,
@@ -68,8 +68,8 @@ export default function TwoFactorDisabledEmail({
 }
 
 TwoFactorDisabledEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3001',
-    frontendUrl: 'http://localhost:3001',
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     t: getEmailTranslator(),
 } satisfies TwoFactorDisabledEmailProps;
 

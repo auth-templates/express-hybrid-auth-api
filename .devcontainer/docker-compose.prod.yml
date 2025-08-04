@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    image: express-hybrid-auth-api:latest
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production.local
+    restart: always
+
+  migrate:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    env_file:
+      - .env.production.local
+    command: >
+      sh -c "
+        echo 'Waiting 2 seconds for Postgres to be ready...'
+        sleep 3
+        npx prisma migrate reset --force
+      "
+    restart: "no"
+    
+
+  postgres:
+    image: postgres:13.16-bookworm
+    environment:
+      POSTGRES_USER: admin_pg
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: express-hybrid-auth-api-local-prod-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:6.0.18-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  smtp4dev:
+    container_name: local-smtp4dev
+    image: rnwood/smtp4dev
+    ports:
+      - "5000:80"
+      - "2525:25"
+    restart: unless-stopped
+    environment:
+      - Logging__LogLevel__Default=Information
+
+volumes:
+  postgres_data:

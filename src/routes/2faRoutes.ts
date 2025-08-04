@@ -5,8 +5,8 @@ import {
   disable2FA,
   recover2FA,
   confirm2FARecover
-} from '../controllers/2faController';
-import { authenticate } from '../middlewares/authenticate';
+} from '../controllers/2faController.js';
+import { authenticate } from '../middlewares/authenticate.js';
 
 const router = express.Router();
 

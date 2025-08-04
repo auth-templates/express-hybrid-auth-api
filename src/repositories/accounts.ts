@@ -1,8 +1,8 @@
-import { AppError } from '../lib/error';
-import logger from '@/lib/logger';
-import { prismaClient } from '../lib/prisma-client';
-import { Role, User, UserStatus } from '../models/user';
-import { AppStatusCode } from '@/@types/status-code';
+import { AppError } from '../lib/error.js';
+import logger from '@/lib/logger/index.js';
+import { prismaClient } from '../lib/prisma-client.js';
+import { Role, User, UserStatus } from '../models/user.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 export type createAccountInput = {
     id: string,

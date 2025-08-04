@@ -1,4 +1,4 @@
-import { AppStatusCode } from "./status-code";
+import { AppStatusCode } from "./status-code.js";
 
 export type Message = {
     text: string;

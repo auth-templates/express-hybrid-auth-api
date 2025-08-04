@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { ValidationIssue } from './validation-issue';
+import { ValidationIssue } from './validation-issue.js';
 
 export const createVerify2FASchema = () => {
   return v.object({

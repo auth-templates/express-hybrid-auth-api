@@ -1,6 +1,6 @@
-import GlobalConfig from "../../../config";
-import { RedisController } from "../redis-controller";
-import { RefreshTokenStore } from "../redis-token";
+import GlobalConfig from "../../../config.js";
+import { RedisController } from "../redis-controller.js";
+import { RefreshTokenStore } from "../redis-token.js";
 
 jest.mock('../redis-controller');
 

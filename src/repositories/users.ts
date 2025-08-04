@@ -1,11 +1,11 @@
-import { Prisma } from '../../generated/prisma';
-import { AppError } from '../lib/error';
-import logger from '@/lib/logger';
-import { verifyPasswordHash } from '../lib/password';
-import { prismaClient } from '../lib/prisma-client';
-import { PrismaErrorCode } from '../lib/prisma-error-codes';
-import { Role, User, UserStatus } from '../models/user';
-import { AppStatusCode } from '@/@types/status-code';
+import { Prisma } from '../../generated/prisma/index.js';
+import { AppError } from '../lib/error.js';
+import logger from '@/lib/logger/index.js';
+import { verifyPasswordHash } from '../lib/password.js';
+import { prismaClient } from '../lib/prisma-client.js';
+import { PrismaErrorCode } from '../lib/prisma-error-codes.js';
+import { Role, User, UserStatus } from '../models/user.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 type CreateUserInput = Omit<User, 'id' | 'createdAt'> & { passwordHash: string }
 

@@ -2,11 +2,11 @@ import request from 'supertest';
 import express from 'express';
 import session from 'express-session';
 import { UserRepository } from '../../../repositories/users';
-import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
-import GlobalConfig from '../../../config';
-import { getSession } from '../../authController';
-import { AppError } from '../../../lib/error';
-import { AppStatusCode } from '@/@types/status-code';
+import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n.js';
+import GlobalConfig from '../../../config.js';
+import { getSession } from '../../authController.js';
+import { AppError } from '../../../lib/error.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 jest.mock('../../../repositories/users');
 

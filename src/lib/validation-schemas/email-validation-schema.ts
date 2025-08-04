@@ -1,6 +1,6 @@
 import * as v from 'valibot';
-import { UserCredentials } from '../../models/user';
-import { ValidationIssue } from './validation-issue';
+import { UserCredentials } from '../../models/user.js';
+import { ValidationIssue } from './validation-issue.js';
 
 export const createEmailValidationSchema = () => {
   return v.object({

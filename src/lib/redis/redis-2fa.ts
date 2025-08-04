@@ -1,10 +1,10 @@
 import { authenticator } from 'otplib';
 import qrcode from 'qrcode';
-import { RedisController } from './redis-controller';
-import config from '../../config';
-import { AppError } from '../error';
-import { redisClient } from './client';
-import { AppStatusCode } from '@/@types/status-code';
+import { RedisController } from './redis-controller.js';
+import config from '../../config.js';
+import { AppError } from '../error.js';
+import { redisClient } from './client.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 const redisController = new RedisController(redisClient);
 

@@ -1,4 +1,4 @@
-import GlobalConfig from "../config";
+import GlobalConfig from "../config.js";
 import nodemailer from 'nodemailer';
 
 export const transporter = nodemailer.createTransport({

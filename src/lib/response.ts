@@ -1,5 +1,5 @@
-import { AppStatusCode } from "@/@types/status-code";
-import { ApiMessageResponse, Message } from "../@types/message";
+import { AppStatusCode } from "@/@types/status-code.js";
+import { ApiMessageResponse, Message } from "../@types/message.js";
 
 interface ExtendedApiMessageResponse extends ApiMessageResponse {
   code?: AppStatusCode;

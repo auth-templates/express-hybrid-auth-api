@@ -1,5 +1,5 @@
 import { encodeHexLowerCase } from '@oslojs/encoding';
-import { hashPassword, verifyPasswordHash } from '../password';
+import { hashPassword, verifyPasswordHash } from '../password.js';
 import { hash, verify } from '@node-rs/argon2';
 import { sha256 } from '@oslojs/crypto/sha2';
 

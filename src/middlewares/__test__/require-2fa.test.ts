@@ -1,5 +1,5 @@
-import { AppStatusCode } from "@/@types/status-code";
-import { require2FA } from "../require-2fa";
+import { AppStatusCode } from "@/@types/status-code.js";
+import { require2FA } from "../require-2fa.js";
 
 describe('require2FA middleware', () => {
   let req: any;

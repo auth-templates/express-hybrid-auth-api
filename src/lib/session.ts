@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { User } from '../models/user';
-import { createAccessToken, createSecureRandomToken } from '../lib/token';
+import { User } from '../models/user.js';
+import { createAccessToken, createSecureRandomToken } from '../lib/token.js';
 
-import GlobalConfig from '../config';
-import { RefreshTokenStore } from '../lib/redis/redis-token';
+import GlobalConfig from '../config.js';
+import { RefreshTokenStore } from '../lib/redis/redis-token.js';
 
 export function setCookieTokens(response: Response, tokens: { name: string; value: string; maxAge: number }[]) {
     const isProduction = process.env.NODE_ENV === 'production';

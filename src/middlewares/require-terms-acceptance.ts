@@ -1,7 +1,7 @@
 
 import { Request, Response, NextFunction } from 'express';
-import { createMessageResponse } from '../lib/response';
-import { AppStatusCode } from '@/@types/status-code';
+import { createMessageResponse } from '../lib/response.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 /**
  * Blocks access to protected routes if session has termsAccepted = true.

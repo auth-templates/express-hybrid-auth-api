@@ -1,4 +1,4 @@
-import Redis from "ioredis";
+import { type Redis } from "ioredis";
 
 export interface Controller {
 	add(key: string, value: string, expiresInMilliseconds: number): Promise<void>;

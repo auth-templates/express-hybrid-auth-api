@@ -1,2 +1,2 @@
-export * from './logger'
-export { default } from './logger'
+export * from './logger.js'
+export { default } from './logger.js'

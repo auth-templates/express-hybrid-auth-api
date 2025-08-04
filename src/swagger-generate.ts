@@ -1,5 +1,5 @@
 import { writeFileSync } from 'fs';
-import swaggerSpec from './swagger-config';
+import swaggerSpec from './swagger-config.js';
 import * as yaml from 'js-yaml';
 
 // Convert the Swagger JSON to YAML

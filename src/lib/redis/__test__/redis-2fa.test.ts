@@ -1,11 +1,11 @@
 
 import { authenticator } from 'otplib';
-import { RedisController } from '../redis-controller';
-import { get2faSetup, verify2faSetup } from '../redis-2fa';
-import { AppError } from '../../error';
+import { RedisController } from '../redis-controller.js';
+import { get2faSetup, verify2faSetup } from '../redis-2fa.js';
+import { AppError } from '../../error.js';
 import qrcode from 'qrcode';
-import config from '../../../config';
-import { AppStatusCode } from '@/@types/status-code';
+import config from '../../../config.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 jest.mock('qrcode', () => ({
   __esModule: true, // <- Important for default export mocking

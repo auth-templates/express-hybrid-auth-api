@@ -11,7 +11,7 @@ import {
     Section,
     Text,
 } from '@react-email/components';
-import { getEmailTranslator } from '../utils/getEmailTranslator';
+import { getEmailTranslator } from '../utils/getEmailTranslator.js';
 
 interface PasswordResetEmailProps {
     assetsUrl: string,
@@ -86,10 +86,10 @@ export default function PasswordResetEmail({
     
 
 PasswordResetEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3001',
-    frontendUrl: 'http://localhost:3001',
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     expiresInMinutes: 30,
-    resetUrl: 'http://localhost:3001/reset-password?token=abc123',
+    resetUrl: 'http://localhost:3000/reset-password?token=abc123',
     t: getEmailTranslator(),
 } satisfies PasswordResetEmailProps;
 

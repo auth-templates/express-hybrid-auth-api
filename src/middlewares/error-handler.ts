@@ -1,7 +1,7 @@
 import type { ErrorRequestHandler } from 'express';
-import { createMessageResponse } from '../lib/response';
-import logger from '@/lib/logger'
-import { AppStatusCode } from '@/@types/status-code';
+import { createMessageResponse } from '../lib/response.js';
+import logger from '@/lib/logger/index.js'
+import { AppStatusCode } from '@/@types/status-code.js';
 
 // Underscore prefix (_) marks parameters as intentionally unused
 export const errorHandler: ErrorRequestHandler = (error, request, response, _next) => {

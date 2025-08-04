@@ -1,4 +1,4 @@
-import { AppStatusCode } from "@/@types/status-code";
+import { AppStatusCode } from "@/@types/status-code.js";
 
 export class AppError extends Error {
     translationKey: string;

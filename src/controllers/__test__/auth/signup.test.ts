@@ -1,14 +1,14 @@
 import request from 'supertest';
 import express from 'express';
-import { signup } from '../../authController'; // Import your controller function
-import { UserRepository } from '../../../repositories/users'; // Mocked repository
-import { hashPassword } from '../../../lib/password';
-import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
-import { CreateUserInput, Role } from '../../../models/user';
-import { AppError } from '../../../lib/error';
-import { VerificationTokensRepository } from '../../../repositories/verification-tokens';
-import * as emailService from '../../../lib/mailer';
-import { AppStatusCode } from '@/@types/status-code';
+import { signup } from '../../authController.js'; // Import your controller function
+import { UserRepository } from '../../../repositories/users.js'; // Mocked repository
+import { hashPassword } from '../../../lib/password.js';
+import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n.js';
+import { CreateUserInput, Role } from '../../../models/user.js';
+import { AppError } from '../../../lib/error.js';
+import { VerificationTokensRepository } from '../../../repositories/verification-tokens.js';
+import * as emailService from '../../../lib/mailer.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 jest.mock('../../../repositories/users');
 jest.mock('../../../lib/password');

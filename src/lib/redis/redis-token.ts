@@ -1,6 +1,6 @@
-import { RedisController } from "./redis-controller";
-import GlobalConfig from "../../config";
-import { redisClient } from "./client";
+import { RedisController } from "./redis-controller.js";
+import GlobalConfig from "../../config.js";
+import { redisClient } from "./client.js";
 
 const redisController = new RedisController(redisClient);
 

@@ -1,6 +1,6 @@
 import i18next, { TFunction } from 'i18next';
-import enTranslation from '../../src/locales/en/translation.json';
-import roTranslation from '../../src/locales/ro/translation.json';
+import enTranslation from '../../src/locales/en/translation.json' with { type: 'json' };
+import roTranslation from '../../src/locales/ro/translation.json' with { type: 'json' };
 
 const instances: Record<string, TFunction> = {};
 

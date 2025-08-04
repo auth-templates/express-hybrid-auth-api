@@ -1,16 +1,16 @@
 import request from 'supertest';
 import express from 'express';
-import { resendActivationEmail } from '../../authController';
-import { AppError } from '../../../lib/error';
-import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
-import { UserRepository } from '../../../repositories/users';
+import { resendActivationEmail } from '../../authController.js';
+import { AppError } from '../../../lib/error.js';
+import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n.js';
+import { UserRepository } from '../../../repositories/users.js';
 import session from 'express-session';
-import GlobalConfig from '../../../config';
-import { VerificationTokensRepository } from '../../../repositories/verification-tokens';
-import * as emailService from '../../../lib/mailer';
-import * as Token from '../../../lib/token';
-import { UserStatus } from '../../../models/user';
-import { AppStatusCode } from '@/@types/status-code';
+import GlobalConfig from '../../../config.js';
+import { VerificationTokensRepository } from '../../../repositories/verification-tokens.js';
+import * as emailService from '../../../lib/mailer.js';
+import * as Token from '../../../lib/token.js';
+import { UserStatus } from '../../../models/user.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');

@@ -1,5 +1,5 @@
-import { RedisController } from '../redis-controller';
-import type Redis from 'ioredis';
+import { RedisController } from '../redis-controller.js';
+import {type Redis} from 'ioredis';
 
 describe('RedisController', () => {
   let mockRedisClient: jest.Mocked<Redis>;

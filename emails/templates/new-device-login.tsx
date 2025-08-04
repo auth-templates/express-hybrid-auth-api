@@ -11,7 +11,7 @@ import {
     Section,
     Text,
 } from '@react-email/components';
-import { getEmailTranslator } from '../utils/getEmailTranslator';
+import { getEmailTranslator } from '../utils/getEmailTranslator.js';
 
 interface NewDeviceLoginEmailProps {
     assetsUrl: string,
@@ -95,8 +95,8 @@ export default function NewDeviceLoginEmail({
     
 
 NewDeviceLoginEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3001',
-    frontendUrl: 'http://localhost:3001',
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     userEmail: 'user@example.com',
     location: 'San Francisco, CA, USA',
     device: 'Chrome on Windows',

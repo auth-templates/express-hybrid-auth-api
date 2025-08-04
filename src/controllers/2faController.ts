@@ -1,18 +1,18 @@
 import { Request, Response } from 'express';
-import { UserRepository } from '../repositories/users';
-import { get2faSetup, verify2faSetup } from '../lib/redis/redis-2fa';
-import { AppError } from '../lib/error';
-import { generateToken } from '../lib/token';
-import { VerificationTokensRepository } from '../repositories/verification-tokens';
-import { send2FADisabledEmail, send2FARecoverEmail } from '../lib/mailer';
-import { validate2FAData } from '../lib/validation-schemas/2fa-schema';
-import GlobalConfig from '../config';
-import { TokenType } from '../models/verification-token';
-import { UserStatus } from '../models/user';
-import { createMessageResponse } from '../lib/response';
-import logger from '@/lib/logger';
-import { AppStatusCode } from '@/@types/status-code';
-import { validateEmail } from '@/lib/validation-schemas/email-validation-schema';
+import { UserRepository } from '../repositories/users.js';
+import { get2faSetup, verify2faSetup } from '../lib/redis/redis-2fa.js';
+import { AppError } from '../lib/error.js';
+import { generateToken } from '../lib/token.js';
+import { VerificationTokensRepository } from '../repositories/verification-tokens.js';
+import { send2FADisabledEmail, send2FARecoverEmail } from '../lib/mailer.js';
+import { validate2FAData } from '../lib/validation-schemas/2fa-schema.js';
+import GlobalConfig from '../config.js';
+import { TokenType } from '../models/verification-token.js';
+import { UserStatus } from '../models/user.js';
+import { createMessageResponse } from '../lib/response.js';
+import logger from '@/lib/logger/index.js';
+import { AppStatusCode } from '@/@types/status-code.js';
+import { validateEmail } from '@/lib/validation-schemas/email-validation-schema.js';
 
 export async function save2FAToken(userId: number, tokenFingerprint: string, hashedToken: string, expiresInMinutes: number): Promise<void> {
     const expiresAt = new Date();

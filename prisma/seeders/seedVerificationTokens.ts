@@ -1,4 +1,4 @@
-import { PrismaClient, TokenType, UserStatus } from '../../generated/prisma';
+import { PrismaClient, TokenType, UserStatus } from '../../generated/prisma/index.js';
 import { hash } from '@node-rs/argon2';
 import { createHash } from 'node:crypto';
 

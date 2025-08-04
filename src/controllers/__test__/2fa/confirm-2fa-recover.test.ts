@@ -1,15 +1,15 @@
 import request from 'supertest';
 import express from 'express';
-import { confirm2FARecover } from '../../2faController';
-import { AppError } from '../../../lib/error';
-import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
-import { UserRepository } from '../../../repositories/users';
+import { confirm2FARecover } from '../../2faController.js';
+import { AppError } from '../../../lib/error.js';
+import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n.js';
+import { UserRepository } from '../../../repositories/users.js';
 import session from 'express-session';
-import GlobalConfig from '../../../config';
-import { VerificationTokensRepository } from '../../../repositories/verification-tokens';
-import * as emailService from '../../../lib/mailer';
-import { Role, UserStatus } from '../../../models/user';
-import { AppStatusCode } from '@/@types/status-code';
+import GlobalConfig from '../../../config.js';
+import { VerificationTokensRepository } from '../../../repositories/verification-tokens.js';
+import * as emailService from '../../../lib/mailer.js';
+import { Role, UserStatus } from '../../../models/user.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');

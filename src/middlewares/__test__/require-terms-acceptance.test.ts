@@ -1,5 +1,5 @@
-import { AppStatusCode } from "@/@types/status-code";
-import { requireTermsAcceptance } from "../require-terms-acceptance";
+import { AppStatusCode } from "@/@types/status-code.js";
+import { requireTermsAcceptance } from "../require-terms-acceptance.js";
 
 describe('requireTermsAcceptance middleware', () => {
   let req: any;

@@ -1,5 +1,5 @@
-import { AppStatusCode } from '@/@types/status-code';
-import { errorHandler } from '../error-handler';
+import { AppStatusCode } from '@/@types/status-code.js';
+import { errorHandler } from '../error-handler.js';
 import type { Request, Response, NextFunction } from 'express';
 
 describe('errorHandler middleware', () => {

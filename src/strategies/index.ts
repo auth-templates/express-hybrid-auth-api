@@ -1,9 +1,9 @@
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import GlobalConfig from '../config';
+import GlobalConfig from '../config.js';
 import passport from 'passport';
-import { googleVerifyCallback } from './callbacks';
+import { googleVerifyCallback } from './callbacks.js';
 import { Strategy as GitHubStrategy } from 'passport-github2';
-import { githubVerifyCallback } from './callbacks';
+import { githubVerifyCallback } from './callbacks.js';
 
 passport.use('google', new GoogleStrategy(
     {

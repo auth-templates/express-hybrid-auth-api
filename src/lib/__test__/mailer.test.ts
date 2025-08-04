@@ -1,8 +1,8 @@
-import * as emailModule from '../mailer';
+import * as emailModule from '../mailer.js';
 import { render } from '@react-email/render';
 
-import GlobalConfig from '../../config';
-import { transporter } from '../mail-transporter';
+import GlobalConfig from '../../config.js';
+import { transporter } from '../mail-transporter.js';
 
 jest.mock('@react-email/render');
 jest.mock('../mail-transporter');

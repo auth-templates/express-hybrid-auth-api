@@ -11,7 +11,7 @@ import {
     Section,
     Text,
 } from '@react-email/components';
-import { getEmailTranslator } from '../utils/getEmailTranslator';
+import { getEmailTranslator } from '../utils/getEmailTranslator.js';
 
 interface TwoFactorAuthEmailProps {
     assetsUrl: string,
@@ -80,8 +80,8 @@ export default function TwoFactorAuthEmail({
 }
 
 TwoFactorAuthEmail.PreviewProps = {
-    assetsUrl: 'http://localhost:3001',
-    frontendUrl: 'http://localhost:3001',
+    assetsUrl: 'http://localhost:3000',
+    frontendUrl: 'http://localhost:3000',
     verificationCode: '123456',
     expiresInMinutes: 30,
     t: getEmailTranslator(),

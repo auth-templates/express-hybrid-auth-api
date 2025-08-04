@@ -1,8 +1,8 @@
 import * as v from 'valibot';
-import { ValibotIssueReason } from '../valibot-issue-reason';
-import { CreateUserInput, Role } from '../../models/user';
-import { ValidationIssue } from './validation-issue';
-import { passwordValidationSchema } from './password-schema';
+import { ValibotIssueReason } from '../valibot-issue-reason.js';
+import { CreateUserInput, Role } from '../../models/user.js';
+import { ValidationIssue } from './validation-issue.js';
+import { passwordValidationSchema } from './password-schema.js';
 
 const commonString = (min: number, max: number, fieldName: string) => v.pipe(
     v.string(), 

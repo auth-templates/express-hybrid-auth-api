@@ -1,12 +1,12 @@
 import { render } from '@react-email/components';
-import VerificationEmail from '../../emails/templates/verification-email'
+import VerificationEmail from '../../emails/templates/verification-email.js'
 
-import AccountActivationEmail from '../../emails/templates/account-activation-email';
-import TwoFactorAuthEmail from '../../emails/templates/2fa-code-email';
-import TwoFactorDisabledEmail from '../../emails/templates/2fa-disabled-email';
-import PasswordResetEmail from '../../emails/templates/password-reset-email';
-import GlobalConfig from '../config';
-import { transporter } from './mail-transporter';
+import AccountActivationEmail from '../../emails/templates/account-activation-email.js';
+import TwoFactorAuthEmail from '../../emails/templates/2fa-code-email.js';
+import TwoFactorDisabledEmail from '../../emails/templates/2fa-disabled-email.js';
+import PasswordResetEmail from '../../emails/templates/password-reset-email.js';
+import GlobalConfig from '../config.js';
+import { transporter } from './mail-transporter.js';
 
 export async function sendVerificationEmail({token, userEmail, expiresInMinutes, t}:{token: string, userEmail: string, expiresInMinutes: number, t: (key: string, options?: any) => string}) {
     const emailHtml = await render(

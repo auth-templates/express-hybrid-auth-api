@@ -1,7 +1,7 @@
 
 ### Valid token
 
-POST http://localhost:3001/auth/verify-signup
+POST http://localhost:3000/auth/verify-signup
 content-type: application/json
 
 {
@@ -11,7 +11,7 @@ content-type: application/json
 
 ### Used token
 
-POST http://localhost:3001/auth/verify-signup
+POST http://localhost:3000/auth/verify-signup
 content-type: application/json
 
 {
@@ -21,7 +21,7 @@ content-type: application/json
 
 ### Expired token
 
-POST http://localhost:3001/auth/verify-signup
+POST http://localhost:3000/auth/verify-signup
 content-type: application/json
 
 {
@@ -30,7 +30,7 @@ content-type: application/json
 
 ### Not found token
 
-POST http://localhost:3001/auth/verify-signup
+POST http://localhost:3000/auth/verify-signup
 content-type: application/json
 
 {

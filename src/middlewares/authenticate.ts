@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { NextFunction } from "express";
 import jwt from 'jsonwebtoken';
-import GlobalConfig from '../config';
-import { createMessageResponse } from '../lib/response';
-import { AppStatusCode } from '@/@types/status-code';
+import GlobalConfig from '../config.js';
+import { createMessageResponse } from '../lib/response.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 export function authenticate(request: Request, response: Response, next: NextFunction): void {
   try {

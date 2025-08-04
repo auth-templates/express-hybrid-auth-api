@@ -1,14 +1,14 @@
 import request from 'supertest';
 import express from 'express';
-import { login } from '../../authController';
-import { AppError } from '../../../lib/error';
-import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
-import { UserRepository } from '../../../repositories/users';
+import { login } from '../../authController.js';
+import { AppError } from '../../../lib/error.js';
+import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n.js';
+import { UserRepository } from '../../../repositories/users.js';
 import session from 'express-session';
-import GlobalConfig from '../../../config';
-import { RefreshTokenStore } from '../../../lib/redis/redis-token';
+import GlobalConfig from '../../../config.js';
+import { RefreshTokenStore } from '../../../lib/redis/redis-token.js';
 import jwt from 'jsonwebtoken';
-import { AppStatusCode } from '@/@types/status-code';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');

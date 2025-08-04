@@ -1,13 +1,13 @@
 import request from 'supertest';
 import express from 'express';
-import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n';
+import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n.js';
 import session from 'express-session';
-import GlobalConfig from '../../../config';
+import GlobalConfig from '../../../config.js';
 import cookieParser from 'cookie-parser';
-import { verify2FASetup } from '../../2faController';
-import * as Redis2FA from '../../../lib/redis/redis-2fa';
-import { UserRepository } from '../../../repositories/users';
-import { AppStatusCode } from '@/@types/status-code';
+import { verify2FASetup } from '../../2faController.js';
+import * as Redis2FA from '../../../lib/redis/redis-2fa.js';
+import { UserRepository } from '../../../repositories/users.js';
+import { AppStatusCode } from '@/@types/status-code.js';
 
 jest.mock('../../../lib/redis/redis-token');
 jest.mock('../../../repositories/users');

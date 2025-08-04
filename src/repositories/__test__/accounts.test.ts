@@ -1,7 +1,7 @@
-import { AppStatusCode } from "@/@types/status-code";
-import { AppError } from "../../lib/error";
-import { prismaClient } from "../../lib/prisma-client";
-import { AccountsRepository, createAccountInput } from "../accounts";
+import { AppStatusCode } from "@/@types/status-code.js";
+import { AppError } from "../../lib/error.js";
+import { prismaClient } from "../../lib/prisma-client.js";
+import { AccountsRepository, createAccountInput } from "../accounts.js";
 
 jest.mock('../../lib/prisma-client', () => ({
   prismaClient: {
