@@ -10,8 +10,8 @@ import { RefreshTokenStore } from '../../../lib/redis/redis-token.js';
 import jwt from 'jsonwebtoken';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
 
 const app = express();
 app.use(session({
@@ -55,8 +55,8 @@ describe('POST /auth/login', () => {
     });
 
     it('should set refresh_token, access_token, and connect.sid cookies', async () => {
-        (UserRepository.login as jest.Mock).mockResolvedValue(validUser);
-        (RefreshTokenStore.storeRefreshToken as jest.Mock).mockResolvedValue(undefined);
+        (UserRepository.login as vi.Mock).mockResolvedValue(validUser);
+        (RefreshTokenStore.storeRefreshToken as vi.Mock).mockResolvedValue(undefined);
         const response = await request(app)
             .post('/auth/login')
             .set('Accept-Language', 'en')
@@ -77,11 +77,11 @@ describe('POST /auth/login', () => {
 
     it('should set correct 2FA user jwt access token payload', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        jest.useFakeTimers({ legacyFakeTimers: false });
-        jest.setSystemTime(fakeTime);
+        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.setSystemTime(fakeTime);
 
-        (UserRepository.login as jest.Mock).mockResolvedValue(validUser2FA);
-        (RefreshTokenStore.storeRefreshToken as jest.Mock).mockResolvedValue(undefined);
+        (UserRepository.login as vi.Mock).mockResolvedValue(validUser2FA);
+        (RefreshTokenStore.storeRefreshToken as vi.Mock).mockResolvedValue(undefined);
         const response = await request(app)
             .post('/auth/login')
             .set('Accept-Language', 'en')
@@ -106,12 +106,12 @@ describe('POST /auth/login', () => {
         expect(decoded).toHaveProperty('exp', fakeTime.getTime()/1000 + GlobalConfig.ACCESS_TOKEN_MAX_AGE);
         expect(decoded).toHaveProperty('iat', fakeTime.getTime()/1000);
 
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it('should return 200 and user data for valid credentials', async () => {
-        (UserRepository.login as jest.Mock).mockResolvedValue(validUser);
-        (RefreshTokenStore.storeRefreshToken as jest.Mock).mockResolvedValue(undefined);
+        (UserRepository.login as vi.Mock).mockResolvedValue(validUser);
+        (RefreshTokenStore.storeRefreshToken as vi.Mock).mockResolvedValue(undefined);
         const response = await request(app)
             .post('/auth/login')
             .set('Accept-Language', 'en')
@@ -148,7 +148,7 @@ describe('POST /auth/login', () => {
     });
 
     it('should return 400 for invalid credentials (wrong password but valid)', async () => {
-        (UserRepository.login as jest.Mock).mockRejectedValue(
+        (UserRepository.login as vi.Mock).mockRejectedValue(
             new AppError('errors.invalid_credentials', {}, AppStatusCode.INVALID_CREDENTIALS, 400)
         );
 
@@ -165,7 +165,7 @@ describe('POST /auth/login', () => {
     });
 
     it('should return 500 for internal errors', async () => {
-        (UserRepository.login as jest.Mock).mockRejectedValue(new Error('Unexpected failure'));
+        (UserRepository.login as vi.Mock).mockRejectedValue(new Error('Unexpected failure'));
 
         const response = await request(app)
             .post('/auth/login')

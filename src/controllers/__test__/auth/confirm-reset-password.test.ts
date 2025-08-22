@@ -10,8 +10,8 @@ import { Role, UserStatus } from '../../../models/user.js';
 import { hashPassword } from '../../../lib/password.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../repositories/verification-tokens');
-jest.mock('../../../lib/password');
+vi.mock('../../../repositories/verification-tokens.js');
+vi.mock('../../../lib/password.js');
 
 const app = express();
 app.use(i18nMiddleware);
@@ -35,11 +35,11 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 204 for a valid token', async () => {
-        (hashPassword as jest.Mock).mockResolvedValue('hashedPassword123');
-        (VerificationTokensRepository.verifyPasswordResetToken as jest.Mock).mockResolvedValue({ userId: 1 });
-        jest.spyOn(UserRepository, 'getUserById').mockResolvedValue(validUser);
-        jest.spyOn(UserRepository, 'updatePassword').mockResolvedValue();
-        jest.spyOn(emailService, 'sendPasswordChangedEmail').mockResolvedValue(undefined);
+        (hashPassword as vi.Mock).mockResolvedValue('hashedPassword123');
+        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockResolvedValue({ userId: 1 });
+        vi.spyOn(UserRepository, 'getUserById').mockResolvedValue(validUser);
+        vi.spyOn(UserRepository, 'updatePassword').mockResolvedValue();
+        vi.spyOn(emailService, 'sendPasswordChangedEmail').mockResolvedValue(undefined);
 
         const response = await request(app)
             .post('/auth/reset-password')
@@ -62,7 +62,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 400 for a used token', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as jest.Mock).mockRejectedValue(
+        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockRejectedValue(
             new AppError('tokens.password-reset.already_used', {}, AppStatusCode.PASSWORD_RESET_TOKEN_ALREADY_USED, 400)
         );
 
@@ -75,7 +75,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 400 for an expired token', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as jest.Mock).mockRejectedValue(
+        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockRejectedValue(
             new AppError('tokens.password-reset.expired', {}, AppStatusCode.PASSWORD_RESET_TOKEN_EXPIRED, 400)
         );
 
@@ -88,7 +88,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 400 for a non-existent token or invalid token', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as jest.Mock).mockRejectedValue(
+        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockRejectedValue(
             new AppError('tokens.password-reset.invalid', {}, AppStatusCode.PASSWORD_RESET_TOKEN_INVALID, 400)
         );
 
@@ -102,8 +102,8 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 200 when user status is not active', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as jest.Mock).mockResolvedValue({ userId: 1 });
-        jest.spyOn(UserRepository, 'getUserById').mockResolvedValue({...validUser, status: UserStatus.Deactivated});
+        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockResolvedValue({ userId: 1 });
+        vi.spyOn(UserRepository, 'getUserById').mockResolvedValue({...validUser, status: UserStatus.Deactivated});
 
         const response = await request(app)
             .post('/auth/reset-password')
@@ -115,7 +115,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 500 for unexpected error', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as jest.Mock).mockRejectedValue(
+        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockRejectedValue(
             new Error('Some unexpected DB failure')
         );
 

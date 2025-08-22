@@ -1,4 +1,4 @@
-import { render } from '@react-email/components';
+import { render } from '@react-email/render';
 import VerificationEmail from '../../emails/templates/verification-email.js'
 
 import AccountActivationEmail from '../../emails/templates/account-activation-email.js';

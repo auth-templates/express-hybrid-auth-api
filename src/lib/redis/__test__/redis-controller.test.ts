@@ -2,20 +2,20 @@ import { RedisController } from '../redis-controller.js';
 import {type Redis} from 'ioredis';
 
 describe('RedisController', () => {
-  let mockRedisClient: jest.Mocked<Redis>;
+  let mockRedisClient: vi.Mocked<Redis>;
   let controller: RedisController;
 
   beforeEach(() => {
     mockRedisClient = {
-      set: jest.fn(),
-      sadd: jest.fn(),
-      del: jest.fn(),
-      srem: jest.fn(),
-      get: jest.fn(),
-      smembers: jest.fn(),
-      sismember: jest.fn(),
-      pexpire: jest.fn(),
-      pipeline: jest.fn(),
+      set: vi.fn(),
+      sadd: vi.fn(),
+      del: vi.fn(),
+      srem: vi.fn(),
+      get: vi.fn(),
+      smembers: vi.fn(),
+      sismember: vi.fn(),
+      pexpire: vi.fn(),
+      pipeline: vi.fn(),
     } as any; // casting because ioredis types are complex
 
     controller = new RedisController(mockRedisClient);
@@ -73,8 +73,8 @@ describe('RedisController', () => {
   });
 
   it('removeMultiple() should call del in pipeline and exec', async () => {
-    const delMock = jest.fn();
-    const execMock = jest.fn().mockResolvedValue([]);
+    const delMock = vi.fn();
+    const execMock = vi.fn().mockResolvedValue([]);
     mockRedisClient.pipeline.mockReturnValue({ del: delMock, exec: execMock } as any);
 
     await controller.removeMultiple(['key1', 'key2']);

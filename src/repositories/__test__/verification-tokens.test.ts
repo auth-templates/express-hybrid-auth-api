@@ -6,20 +6,20 @@ import { VerificationTokensRepository } from "../verification-tokens.js";
 import * as tokenLib from '../../lib/token.js';
 import { AppStatusCode } from "@/@types/status-code.js";
 
-jest.mock('../../lib/token');
-jest.mock('../../lib/prisma-client', () => ({
+vi.mock('../../lib/token.js');
+vi.mock('../../lib/prisma-client.js', () => ({
     prismaClient: {
         verification_tokens: {
-            create: jest.fn(),
-            findFirst: jest.fn(),
-            update: jest.fn(),
+            create: vi.fn(),
+            findFirst: vi.fn(),
+            update: vi.fn(),
         },
     },
 }));
 
 describe('VerificationTokensRepository', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     describe('createToken', () => {
@@ -32,7 +32,7 @@ describe('VerificationTokensRepository', () => {
         };
 
         it('should create token successfully', async () => {
-            (prismaClient.verification_tokens.create as jest.Mock).mockResolvedValue({});
+            (prismaClient.verification_tokens.create as vi.Mock).mockResolvedValue({});
 
             await expect(VerificationTokensRepository.createToken(input)).resolves.toBeUndefined();
 
@@ -56,7 +56,7 @@ describe('VerificationTokensRepository', () => {
                     meta: { target: ['userId'] },
                 }
             );
-            (prismaClient.verification_tokens.create as jest.Mock).mockRejectedValue(prismaError);
+            (prismaClient.verification_tokens.create as vi.Mock).mockRejectedValue(prismaError);
 
             await expect(VerificationTokensRepository.createToken(input)).rejects.toMatchObject({
                 translationKey: 'errors.user_not_found',
@@ -66,7 +66,7 @@ describe('VerificationTokensRepository', () => {
         });
 
         it('should throw AppError 500 on other errors', async () => {
-            (prismaClient.verification_tokens.create as jest.Mock).mockRejectedValue(new Error('Some error'));
+            (prismaClient.verification_tokens.create as vi.Mock).mockRejectedValue(new Error('Some error'));
 
             await expect(VerificationTokensRepository.createToken(input)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
@@ -78,9 +78,9 @@ describe('VerificationTokensRepository', () => {
 
     // Helper function for token verification tests
     function mockTokenFindFirst(tokenType: TokenType, tokenFingerprint: string, tokenRecord: any) {
-        (tokenLib.createTokenFingerprint as jest.Mock).mockReturnValue(tokenFingerprint);
-        (prismaClient.verification_tokens.findFirst as jest.Mock).mockResolvedValue(tokenRecord);
-        (prismaClient.verification_tokens.update as jest.Mock).mockResolvedValue({});
+        (tokenLib.createTokenFingerprint as vi.Mock).mockReturnValue(tokenFingerprint);
+        (prismaClient.verification_tokens.findFirst as vi.Mock).mockResolvedValue(tokenRecord);
+        (prismaClient.verification_tokens.update as vi.Mock).mockResolvedValue({});
     }
 
     describe('verifySignupToken', () => {
@@ -148,7 +148,7 @@ describe('VerificationTokensRepository', () => {
         });
 
         it('should throw internal error on unexpected failure', async () => {
-            (tokenLib.createTokenFingerprint as jest.Mock).mockImplementation(() => {
+            (tokenLib.createTokenFingerprint as vi.Mock).mockImplementation(() => {
                 throw new Error('Unexpected');
             });
 
@@ -225,7 +225,7 @@ describe('VerificationTokensRepository', () => {
         });
 
         it('should throw internal error on unexpected failure', async () => {
-            (tokenLib.createTokenFingerprint as jest.Mock).mockImplementation(() => {
+            (tokenLib.createTokenFingerprint as vi.Mock).mockImplementation(() => {
                 throw new Error('Unexpected');
             });
 
@@ -302,7 +302,7 @@ describe('VerificationTokensRepository', () => {
         });
 
         it('should throw internal error on unexpected failure', async () => {
-            (tokenLib.createTokenFingerprint as jest.Mock).mockImplementation(() => {
+            (tokenLib.createTokenFingerprint as vi.Mock).mockImplementation(() => {
                 throw new Error('Unexpected');
             });
 

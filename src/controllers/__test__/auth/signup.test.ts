@@ -10,8 +10,8 @@ import { VerificationTokensRepository } from '../../../repositories/verification
 import * as emailService from '../../../lib/mailer.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../repositories/users');
-jest.mock('../../../lib/password');
+vi.mock('../../../repositories/users.js');
+vi.mock('../../../lib/password.js');
 
 // Create an Express app to test the route
 const app = express();
@@ -34,10 +34,10 @@ describe('POST /signup', () => {
     })
 
     it('should return 204 if signup data is correct', async () => {        
-        (hashPassword as jest.Mock).mockResolvedValue('hashedPassword123');
-        (UserRepository.createUser as jest.Mock).mockResolvedValue(100); // Simulate successful creation
-        jest.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined); // Since it's void
-        jest.spyOn(emailService, 'sendVerificationEmail').mockResolvedValue(undefined); // because it returns void
+        (hashPassword as vi.Mock).mockResolvedValue('hashedPassword123');
+        (UserRepository.createUser as vi.Mock).mockResolvedValue(100); // Simulate successful creation
+        vi.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined); // Since it's void
+        vi.spyOn(emailService, 'sendVerificationEmail').mockResolvedValue(undefined); // because it returns void
 
         const response = await request(app).post('/signup').set('Accept-Language', 'en').send(signupData);
 
@@ -57,7 +57,7 @@ describe('POST /signup', () => {
     });
 
     it('should return 409 if email is already in use', async () => {
-        (UserRepository.createUser as jest.Mock).mockRejectedValue(new AppError('errors.email_address_already_in_use', {}, AppStatusCode.EMAIL_ALREADY_IN_USE, 409));
+        (UserRepository.createUser as vi.Mock).mockRejectedValue(new AppError('errors.email_address_already_in_use', {}, AppStatusCode.EMAIL_ALREADY_IN_USE, 409));
 
         const response = await request(app)
         .post('/signup').set('Accept-Language', 'en')
@@ -68,7 +68,7 @@ describe('POST /signup', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (UserRepository.createUser as jest.Mock).mockRejectedValue(new Error('internal error'));
+        (UserRepository.createUser as vi.Mock).mockRejectedValue(new Error('internal error'));
 
         const response = await request(app)
         .post('/signup')

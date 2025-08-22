@@ -4,13 +4,13 @@ import { require2FA } from "../require-2fa.js";
 describe('require2FA middleware', () => {
   let req: any;
   let res: any;
-  let next: jest.Mock;
+  let next: vi.Mock;
 
   beforeEach(() => {
-    next = jest.fn();
+    next = vi.fn();
     res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn()
     };
   });
 
@@ -18,7 +18,7 @@ describe('require2FA middleware', () => {
     req = {
       session: { pending2FA: false },
       originalUrl: '/route',
-      t: jest.fn().mockImplementation((key) => key),
+      t: vi.fn().mockImplementation((key) => key),
     };
 
     require2FA(req, res, next);
@@ -31,7 +31,7 @@ describe('require2FA middleware', () => {
     req = {
       session: { pending2FA: true },
       originalUrl: '/auth/verify-2fa',
-      t: jest.fn().mockImplementation((key) => key),
+      t: vi.fn().mockImplementation((key) => key),
     };
 
     require2FA(req, res, next);
@@ -44,7 +44,7 @@ describe('require2FA middleware', () => {
     req = {
       session: { pending2FA: true },
       originalUrl: '/route',
-      t: jest.fn().mockImplementation((key) => `Translated: ${key}`),
+      t: vi.fn().mockImplementation((key) => `Translated: ${key}`),
     };
 
     require2FA(req, res, next);
@@ -57,7 +57,7 @@ describe('require2FA middleware', () => {
   test('handles missing session gracefully and calls next', () => {
     req = {
       originalUrl: '/route',
-      t: jest.fn().mockImplementation((key) => key),
+      t: vi.fn().mockImplementation((key) => key),
     };
 
     require2FA(req, res, next);

@@ -11,14 +11,14 @@ import { RefreshTokenStore } from '../../../lib/redis/redis-token.js';
 import * as otplib from 'otplib';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('otplib', () => ({
+vi.mock('otplib', () => ({
     authenticator: {
-        verify: jest.fn(),
+        verify: vi.fn(),
     },
 }));
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
 
 const app = express();
 app.use(session({
@@ -64,21 +64,21 @@ describe('POST /auth/verify-2fa', () => {
     });
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('should return 204, update session, and set access_token cookie when successful', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        jest.useFakeTimers({ legacyFakeTimers: false });
-        jest.setSystemTime(fakeTime);
+        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.setSystemTime(fakeTime);
 
         const twofaSecret = 'twofasecret';
         const validToken = 'good-token';
-        (otplib.authenticator.verify as jest.Mock).mockReturnValue(true);
-        (UserRepository.getUser2FASecretById as jest.Mock).mockResolvedValue(twofaSecret);
-        (UserRepository.getUserById as jest.Mock).mockResolvedValue(validUser2FA);
-        (RefreshTokenStore.getStoredRefreshToken as jest.Mock).mockResolvedValue('good-token');
-        (RefreshTokenStore.resetRefreshTokenExpiration as jest.Mock).mockResolvedValue(undefined);
+        (otplib.authenticator.verify as vi.Mock).mockReturnValue(true);
+        (UserRepository.getUser2FASecretById as vi.Mock).mockResolvedValue(twofaSecret);
+        (UserRepository.getUserById as vi.Mock).mockResolvedValue(validUser2FA);
+        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue('good-token');
+        (RefreshTokenStore.resetRefreshTokenExpiration as vi.Mock).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
 
@@ -112,7 +112,7 @@ describe('POST /auth/verify-2fa', () => {
         const sessionCheck = await agent.get('/test/session');
         expect(sessionCheck.body.pending2FA).toBe(false);
 
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     
@@ -129,8 +129,8 @@ describe('POST /auth/verify-2fa', () => {
     });
 
     it('should return 400 if 2FA code is invalid', async () => {
-        (UserRepository.getUser2FASecretById as jest.Mock).mockResolvedValue('secret');
-        (otplib.authenticator.verify as jest.Mock).mockReturnValue(false);
+        (UserRepository.getUser2FASecretById as vi.Mock).mockResolvedValue('secret');
+        (otplib.authenticator.verify as vi.Mock).mockReturnValue(false);
 
         const agent = request.agent(app);
         const userSession = { user: { id: 1, email: 'test@example.com' }, pending2FA: true };
@@ -143,7 +143,7 @@ describe('POST /auth/verify-2fa', () => {
     });
 
     it('should return 500 if unexpected error occurs', async () => {
-        (UserRepository.getUser2FASecretById as jest.Mock).mockRejectedValue(new Error('db error'));
+        (UserRepository.getUser2FASecretById as vi.Mock).mockRejectedValue(new Error('db error'));
 
         const agent = request.agent(app);
         const userSession = { user: { id: 1, email: 'test@example.com' }, pending2FA: true };

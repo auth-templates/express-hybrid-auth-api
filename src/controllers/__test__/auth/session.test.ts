@@ -1,14 +1,14 @@
 import request from 'supertest';
 import express from 'express';
 import session from 'express-session';
-import { UserRepository } from '../../../repositories/users';
+import { UserRepository } from '../../../repositories/users.js';
 import { i18nMiddleware, i18nReady } from '../../../middlewares/i18n.js';
 import GlobalConfig from '../../../config.js';
 import { getSession } from '../../authController.js';
 import { AppError } from '../../../lib/error.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../repositories/users');
+vi.mock('../../../repositories/users.js');
 
 const app = express();
 
@@ -50,7 +50,7 @@ describe('GET /auth/session', () => {
     });
 
     it('should return 200 and user data when session user id is valid', async () => {
-        (UserRepository.getUserById as jest.Mock).mockResolvedValue(validUser);
+        (UserRepository.getUserById as vi.Mock).mockResolvedValue(validUser);
 
         const agent = request.agent(app);
 
@@ -66,7 +66,7 @@ describe('GET /auth/session', () => {
 
     it('should return AppError status code and translation message', async () => {
         const appError = new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404);
-        (UserRepository.getUserById as jest.Mock).mockRejectedValue(appError);
+        (UserRepository.getUserById as vi.Mock).mockRejectedValue(appError);
 
         const response = await request(app).get('/auth/session').set('Accept-Language', 'en');
 
@@ -75,7 +75,7 @@ describe('GET /auth/session', () => {
     });
 
     it('should return 500 with generic message if unknown error thrown', async () => {
-        (UserRepository.getUserById as jest.Mock).mockRejectedValue(new Error('Unexpected failure'));
+        (UserRepository.getUserById as vi.Mock).mockRejectedValue(new Error('Unexpected failure'));
 
         const response = await request(app).get('/auth/session').set('Accept-Language', 'en');
 

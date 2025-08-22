@@ -3,10 +3,10 @@ import { AppError } from "../../lib/error.js";
 import { prismaClient } from "../../lib/prisma-client.js";
 import { AccountsRepository, createAccountInput } from "../accounts.js";
 
-jest.mock('../../lib/prisma-client', () => ({
+vi.mock('../../lib/prisma-client.js', () => ({
   prismaClient: {
     accounts: {
-      upsert: jest.fn(),
+      upsert: vi.fn(),
     },
   },
 }));
@@ -34,11 +34,11 @@ describe('AccountsRepository', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return user data on successful upsert', async () => {
-    (prismaClient.accounts.upsert as jest.Mock).mockResolvedValue(prismaResponse);
+    (prismaClient.accounts.upsert as vi.Mock).mockResolvedValue(prismaResponse);
 
     const result = await AccountsRepository.findOrCreate(input);
 
@@ -91,7 +91,7 @@ describe('AccountsRepository', () => {
   });
 
   it('should throw AppError on prisma upsert failure', async () => {
-    (prismaClient.accounts.upsert as jest.Mock).mockRejectedValue(new Error('DB error'));
+    (prismaClient.accounts.upsert as vi.Mock).mockRejectedValue(new Error('DB error'));
 
     await expect(AccountsRepository.findOrCreate(input)).rejects.toThrow(AppError);
     await expect(AccountsRepository.findOrCreate(input)).rejects.toMatchObject({

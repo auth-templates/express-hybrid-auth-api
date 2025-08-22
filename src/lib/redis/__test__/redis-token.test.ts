@@ -2,8 +2,6 @@ import GlobalConfig from "../../../config.js";
 import { RedisController } from "../redis-controller.js";
 import { RefreshTokenStore } from "../redis-token.js";
 
-jest.mock('../redis-controller');
-
 describe('RefreshTokenStore', () => {
   const userId = 42;
   const token = 'mock-refresh-token';
@@ -11,11 +9,11 @@ describe('RefreshTokenStore', () => {
   const maxAge = GlobalConfig.SESSION_MAX_AGE;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('storeRefreshToken calls redisController.add with correct args', async () => {
-    const addSpy = jest.spyOn(RedisController.prototype, 'add').mockResolvedValue(undefined);
+    const addSpy = vi.spyOn(RedisController.prototype, 'add').mockResolvedValue(undefined);
 
     await RefreshTokenStore.storeRefreshToken(userId, token);
 
@@ -24,7 +22,7 @@ describe('RefreshTokenStore', () => {
 
   it('getStoredRefreshToken calls redisController.get with correct args and returns value', async () => {
     const expectedValue = token;
-    jest.spyOn(RedisController.prototype, 'get').mockResolvedValue(expectedValue);
+    vi.spyOn(RedisController.prototype, 'get').mockResolvedValue(expectedValue);
 
     const result = await RefreshTokenStore.getStoredRefreshToken(userId, token);
 
@@ -33,7 +31,7 @@ describe('RefreshTokenStore', () => {
   });
 
   it('resetRefreshTokenExpiration calls redisController.resetExpiration with correct args', async () => {
-    const expireSpy = jest.spyOn(RedisController.prototype, 'resetExpiration').mockResolvedValue(undefined);
+    const expireSpy = vi.spyOn(RedisController.prototype, 'resetExpiration').mockResolvedValue(undefined);
 
     await RefreshTokenStore.resetRefreshTokenExpiration(userId, token);
 
@@ -41,7 +39,7 @@ describe('RefreshTokenStore', () => {
   });
 
   it('removeRefreshToken calls redisController.remove with correct args', async () => {
-    const removeSpy = jest.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
+    const removeSpy = vi.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
 
     await RefreshTokenStore.removeRefreshToken(userId, token);
 

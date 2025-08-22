@@ -8,8 +8,8 @@ import { RefreshTokenStore } from '../../../lib/redis/redis-token.js';
 import cookieParser from 'cookie-parser';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
 
 const app = express();
 app.use(session({
@@ -41,11 +41,11 @@ describe('POST /auth/logout', () => {
     });
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('should 204 and clear cookies on successful logout', async () => {
-        (RefreshTokenStore.removeRefreshToken as jest.Mock).mockResolvedValue('stored-token');
+        (RefreshTokenStore.removeRefreshToken as vi.Mock).mockResolvedValue('stored-token');
 
         const agent = request.agent(app);
         
@@ -72,7 +72,7 @@ describe('POST /auth/logout', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (RefreshTokenStore.removeRefreshToken as jest.Mock).mockRejectedValue(new Error('internal error'));
+        (RefreshTokenStore.removeRefreshToken as vi.Mock).mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
 

@@ -3,17 +3,17 @@ import { AccountsRepository } from '../../repositories/accounts.js';
 import { Profile as GoogleProfile } from 'passport-google-oauth20';
 import { Profile as GithubProfile } from 'passport-github2';
 
-jest.mock('../../repositories/accounts');
+vi.mock('../../repositories/accounts.js');
 
 describe('OAuth verify callbacks', () => {
     const mockUser = { id: 123, email: 'test@example.com' };
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     describe('githubVerifyCallback', () => {
-        const done = jest.fn();
+        const done = vi.fn();
 
         const baseProfile: GithubProfile = {
             id: 'github-id-1',
@@ -26,7 +26,7 @@ describe('OAuth verify callbacks', () => {
         };
 
         it('calls done with user on success', async () => {
-            (AccountsRepository.findOrCreate as jest.Mock).mockResolvedValue(mockUser);
+            (AccountsRepository.findOrCreate as vi.Mock).mockResolvedValue(mockUser);
 
             await githubVerifyCallback('access-token', 'refresh-token', baseProfile, done);
 
@@ -44,7 +44,7 @@ describe('OAuth verify callbacks', () => {
         it('uses fallback email if none provided', async () => {
             const profileNoEmail = { ...baseProfile, emails: undefined };
 
-            (AccountsRepository.findOrCreate as jest.Mock).mockResolvedValue(mockUser);
+            (AccountsRepository.findOrCreate as vi.Mock).mockResolvedValue(mockUser);
 
             await githubVerifyCallback('access-token', 'refresh-token', profileNoEmail, done);
 
@@ -58,7 +58,7 @@ describe('OAuth verify callbacks', () => {
 
         it('calls done with error on failure', async () => {
             const error = new Error('fail');
-            (AccountsRepository.findOrCreate as jest.Mock).mockRejectedValue(error);
+            (AccountsRepository.findOrCreate as vi.Mock).mockRejectedValue(error);
 
             await githubVerifyCallback('access-token', 'refresh-token', baseProfile, done);
 
@@ -67,7 +67,7 @@ describe('OAuth verify callbacks', () => {
     });
 
     describe('googleVerifyCallback', () => {
-        const done = jest.fn();
+        const done = vi.fn();
 
         const baseProfile: GoogleProfile = {
             id: 'google-id-123',
@@ -85,7 +85,7 @@ describe('OAuth verify callbacks', () => {
         };
 
         it('calls done with user on success', async () => {
-            (AccountsRepository.findOrCreate as jest.Mock).mockResolvedValue(mockUser);
+            (AccountsRepository.findOrCreate as vi.Mock).mockResolvedValue(mockUser);
 
             await googleVerifyCallback('access-token', 'refresh-token', baseProfile, done);
 
@@ -102,7 +102,7 @@ describe('OAuth verify callbacks', () => {
 
         it('calls done with error on failure', async () => {
             const error = new Error('fail');
-            (AccountsRepository.findOrCreate as jest.Mock).mockRejectedValue(error);
+            (AccountsRepository.findOrCreate as vi.Mock).mockRejectedValue(error);
 
             await googleVerifyCallback('access-token', 'refresh-token', baseProfile, done);
 

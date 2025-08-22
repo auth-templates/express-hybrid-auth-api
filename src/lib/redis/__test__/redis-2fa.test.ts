@@ -7,18 +7,18 @@ import qrcode from 'qrcode';
 import config from '../../../config.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('qrcode', () => ({
+vi.mock('qrcode', () => ({
   __esModule: true, // <- Important for default export mocking
   default: {
-    toDataURL: jest.fn(),
+    toDataURL: vi.fn(),
   },
 }));
 
-jest.mock('otplib', () => ({
+vi.mock('otplib', () => ({
     authenticator: {
-        verify: jest.fn(),
-        generateSecret: jest.fn(),
-        keyuri: jest.fn(),
+        verify: vi.fn(),
+        generateSecret: vi.fn(),
+        keyuri: vi.fn(),
     },
 }));
 
@@ -28,13 +28,13 @@ describe('verify2faSetup', () => {
     const tempSecret = 'TEST_SECRET';
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('returns tempSecret on successful verification', async () => {
-        jest.spyOn(RedisController.prototype, 'get').mockResolvedValue(tempSecret);
-        jest.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
-        (authenticator.verify as jest.Mock).mockReturnValue(true);
+        vi.spyOn(RedisController.prototype, 'get').mockResolvedValue(tempSecret);
+        vi.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
+        (authenticator.verify as vi.Mock).mockReturnValue(true);
 
         const result = await verify2faSetup(userId, code);
 
@@ -45,8 +45,8 @@ describe('verify2faSetup', () => {
     });
 
     it('throws AppError if 2FA setup token is missing', async () => {
-        jest.spyOn(RedisController.prototype, 'get').mockResolvedValue(null);
-        jest.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
+        vi.spyOn(RedisController.prototype, 'get').mockResolvedValue(null);
+        vi.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
 
         await expect(verify2faSetup(userId, code)).rejects.toThrow(AppError);
         await expect(verify2faSetup(userId, code)).rejects.toMatchObject({
@@ -60,9 +60,9 @@ describe('verify2faSetup', () => {
     })
 
     it('throws AppError if 2FA setup token is invalid', async () => {
-        jest.spyOn(RedisController.prototype, 'get').mockResolvedValue(tempSecret);
-        jest.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
-        (authenticator.verify as jest.Mock).mockReturnValue(false);
+        vi.spyOn(RedisController.prototype, 'get').mockResolvedValue(tempSecret);
+        vi.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
+        (authenticator.verify as vi.Mock).mockReturnValue(false);
 
         await expect(verify2faSetup(userId, code)).rejects.toThrow(AppError);
         await expect(verify2faSetup(userId, code)).rejects.toMatchObject({
@@ -86,16 +86,16 @@ describe('get2faSetup', () => {
     const TEMP_SECRET_EXPIRY = 600;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('generates secret, stores it, and returns qrCodeUrl and secret', async () => {
-        (authenticator.generateSecret as jest.Mock).mockReturnValue(secret);
-        (authenticator.keyuri as jest.Mock).mockReturnValue(otpauth);
+        (authenticator.generateSecret as vi.Mock).mockReturnValue(secret);
+        (authenticator.keyuri as vi.Mock).mockReturnValue(otpauth);
         
-        (qrcode.toDataURL as jest.Mock).mockResolvedValue(qrCodeUrl);
+        (qrcode.toDataURL as vi.Mock).mockResolvedValue(qrCodeUrl);
 
-        const redisAddSpy = jest.spyOn(RedisController.prototype, 'add').mockResolvedValue(undefined);
+        const redisAddSpy = vi.spyOn(RedisController.prototype, 'add').mockResolvedValue(undefined);
 
         const result = await get2faSetup(userId, userEmail);
 

@@ -4,12 +4,12 @@ import type { Request, Response, NextFunction } from 'express';
 
 describe('errorHandler middleware', () => {
     let res: Partial<Response>;
-    let jsonMock: jest.Mock;
-    let statusMock: jest.Mock;
+    let jsonMock: vi.Mock;
+    let statusMock: vi.Mock;
 
     beforeEach(() => {
-        jsonMock = jest.fn();
-        statusMock = jest.fn().mockReturnValue({ json: jsonMock });
+        jsonMock = vi.fn();
+        statusMock = vi.fn().mockReturnValue({ json: jsonMock });
 
         res = {
         status: statusMock,
@@ -36,7 +36,7 @@ describe('errorHandler middleware', () => {
 
     test('should respond with 500 and default message if no status/message', () => {
         const err = {} as any;
-        const req = { t: jest.fn().mockReturnValue('Internal Server Error') } as any;
+        const req = { t: vi.fn().mockReturnValue('Internal Server Error') } as any;
 
         errorHandler(err, req as Request, res as Response, {} as NextFunction);
 

@@ -9,8 +9,8 @@ import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
 
 const app = express();
 app.use(session({
@@ -42,7 +42,7 @@ describe('POST /auth/refresh', () => {
     });
 
     beforeEach(async () => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('should 403 when no refresh_token cookie', async () => {
@@ -52,7 +52,7 @@ describe('POST /auth/refresh', () => {
     });
 
     it('should 403 when refresh_token does not match stored', async () => {
-        (RefreshTokenStore.getStoredRefreshToken as jest.Mock).mockResolvedValue('stored-token');
+        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue('stored-token');
 
         const agent = request.agent(app);
 
@@ -69,7 +69,7 @@ describe('POST /auth/refresh', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (RefreshTokenStore.getStoredRefreshToken as jest.Mock).mockRejectedValue(new Error('internal error'));
+        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
 
@@ -86,12 +86,12 @@ describe('POST /auth/refresh', () => {
 
     it('should 204 and set new access_token cookie when valid', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        jest.useFakeTimers({ legacyFakeTimers: false });
-        jest.setSystemTime(fakeTime);
+        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.setSystemTime(fakeTime);
 
         const validToken = 'good-token';
-        (RefreshTokenStore.getStoredRefreshToken as jest.Mock).mockResolvedValue(validToken);
-        (RefreshTokenStore.resetRefreshTokenExpiration as jest.Mock).mockResolvedValue(undefined);
+        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue(validToken);
+        (RefreshTokenStore.resetRefreshTokenExpiration as vi.Mock).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
 
@@ -120,17 +120,17 @@ describe('POST /auth/refresh', () => {
         expect(decoded).toHaveProperty('exp', fakeTime.getTime()/1000 + GlobalConfig.ACCESS_TOKEN_MAX_AGE);
         expect(decoded).toHaveProperty('iat', fakeTime.getTime()/1000);
 
-        jest.useRealTimers();
+        vi.useRealTimers();
       });
 
     it('should handle pending 2FA true state correctly', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        jest.useFakeTimers({ legacyFakeTimers: false });
-        jest.setSystemTime(fakeTime);
+        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.setSystemTime(fakeTime);
 
         const validToken = 'good-token';
-        (RefreshTokenStore.getStoredRefreshToken as jest.Mock).mockResolvedValue(validToken);
-        (RefreshTokenStore.resetRefreshTokenExpiration as jest.Mock).mockResolvedValue(undefined);
+        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue(validToken);
+        (RefreshTokenStore.resetRefreshTokenExpiration as vi.Mock).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
 
@@ -156,6 +156,6 @@ describe('POST /auth/refresh', () => {
 
         expect(decoded).toHaveProperty('pending2FA', userSession.pending2FA);
 
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 });

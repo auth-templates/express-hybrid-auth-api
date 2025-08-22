@@ -11,9 +11,9 @@ import * as emailService from '../../../lib/mailer.js';
 import { Role, UserStatus } from '../../../models/user.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
-jest.mock('../../../repositories/verification-tokens');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
+vi.mock('../../../repositories/verification-tokens.js');
 
 const app = express();
 app.use(session({
@@ -49,10 +49,10 @@ describe('POST /2fa/confirm-recover', () => {
     });
 
     it('should return 204 when 2FA token is valid', async () => {
-        jest.spyOn(VerificationTokensRepository, 'verify2FAToken').mockResolvedValue({userId: validUser.id});
-        (UserRepository.disable2FA as jest.Mock).mockResolvedValue(undefined);
-        (UserRepository.getUserById as jest.Mock).mockResolvedValue(validUser);
-        jest.spyOn(emailService, 'send2FADisabledEmail').mockResolvedValue(undefined);
+        vi.spyOn(VerificationTokensRepository, 'verify2FAToken').mockResolvedValue({userId: validUser.id});
+        (UserRepository.disable2FA as vi.Mock).mockResolvedValue(undefined);
+        (UserRepository.getUserById as vi.Mock).mockResolvedValue(validUser);
+        vi.spyOn(emailService, 'send2FADisabledEmail').mockResolvedValue(undefined);
 
         const token = "ijklmnopqrstuvwxyz0123"
         const response = await request(app)
@@ -69,7 +69,7 @@ describe('POST /2fa/confirm-recover', () => {
 
     it('should return 400 when token is invalid', async () => {
         const userId = 10;
-        jest.spyOn(VerificationTokensRepository, 'verify2FAToken').mockRejectedValue(new AppError('tokens.2fa.invalid', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_INVALID, 400));
+        vi.spyOn(VerificationTokensRepository, 'verify2FAToken').mockRejectedValue(new AppError('tokens.2fa.invalid', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_INVALID, 400));
 
         const token = "invalid-token"
         const response = await request(app).post('/2fa/confirm-recover').set('Accept-Language', 'en').send({ token });
@@ -81,7 +81,7 @@ describe('POST /2fa/confirm-recover', () => {
 
     it('should return 400 when token is invalid', async () => {
         const userId = 10;
-        jest.spyOn(VerificationTokensRepository, 'verify2FAToken').mockRejectedValue(new AppError('tokens.2fa.expired', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_EXPIRED, 400));
+        vi.spyOn(VerificationTokensRepository, 'verify2FAToken').mockRejectedValue(new AppError('tokens.2fa.expired', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_EXPIRED, 400));
 
         const token = "expired-token"
         const response = await request(app).post('/2fa/confirm-recover').set('Accept-Language', 'en').send({ token });
@@ -93,7 +93,7 @@ describe('POST /2fa/confirm-recover', () => {
 
     it('should return 400 when token is already used', async () => {
         const userId = 10;
-        jest.spyOn(VerificationTokensRepository, 'verify2FAToken').mockRejectedValue(new AppError('tokens.2fa.already_used', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_ALREADY_USED, 400));
+        vi.spyOn(VerificationTokensRepository, 'verify2FAToken').mockRejectedValue(new AppError('tokens.2fa.already_used', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_ALREADY_USED, 400));
 
         const token = "token-used"
         const response = await request(app).post('/2fa/confirm-recover').set('Accept-Language', 'en').send({ token });
@@ -105,8 +105,8 @@ describe('POST /2fa/confirm-recover', () => {
 
     it('should return 500 for internal errors', async () => {
         const userId = 10;
-        jest.spyOn(VerificationTokensRepository, 'verify2FAToken').mockResolvedValue({userId});
-        (UserRepository.disable2FA as jest.Mock).mockRejectedValue(new AppError('errors.internal', {},  AppStatusCode.INTERNAL_SERVER_ERROR, 500));
+        vi.spyOn(VerificationTokensRepository, 'verify2FAToken').mockResolvedValue({userId});
+        (UserRepository.disable2FA as vi.Mock).mockRejectedValue(new AppError('errors.internal', {},  AppStatusCode.INTERNAL_SERVER_ERROR, 500));
 
         const token = "token-used"
         const response = await request(app).post('/2fa/confirm-recover').set('Accept-Language', 'en').send({ token });

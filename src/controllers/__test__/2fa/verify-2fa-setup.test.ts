@@ -9,8 +9,8 @@ import * as Redis2FA from '../../../lib/redis/redis-2fa.js';
 import { UserRepository } from '../../../repositories/users.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
 
 const app = express();
 app.use(session({
@@ -43,8 +43,8 @@ describe('POST /2fa/setup', () => {
 
     it('should return 200 when with 2FA setup data', async () => {
         const twoStepSecret = "secret";
-        jest.spyOn(Redis2FA, 'verify2faSetup').mockResolvedValue(twoStepSecret);
-        (UserRepository.verifyAndSaveSecret as jest.Mock).mockResolvedValue(undefined);
+        vi.spyOn(Redis2FA, 'verify2faSetup').mockResolvedValue(twoStepSecret);
+        (UserRepository.verifyAndSaveSecret as vi.Mock).mockResolvedValue(undefined);
         
         const code = "123456";
         const agent = request.agent(app);
@@ -66,8 +66,8 @@ describe('POST /2fa/setup', () => {
 
     it('should return 400 if an unexpected error occurs', async () => {
         const twoStepSecret = "secret";
-        jest.spyOn(Redis2FA, 'verify2faSetup').mockResolvedValue(twoStepSecret);
-        (UserRepository.verifyAndSaveSecret as jest.Mock).mockResolvedValue(undefined);
+        vi.spyOn(Redis2FA, 'verify2faSetup').mockResolvedValue(twoStepSecret);
+        (UserRepository.verifyAndSaveSecret as vi.Mock).mockResolvedValue(undefined);
         
         const code = "12345";
         const agent = request.agent(app);
@@ -86,7 +86,7 @@ describe('POST /2fa/setup', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        jest.spyOn(Redis2FA, 'verify2faSetup').mockRejectedValue(new Error('internal error'));
+        vi.spyOn(Redis2FA, 'verify2faSetup').mockRejectedValue(new Error('internal error'));
         
         const code = "123456";
         const agent = request.agent(app);

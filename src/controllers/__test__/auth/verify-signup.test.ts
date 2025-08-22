@@ -9,7 +9,7 @@ import * as emailService from '../../../lib/mailer.js';
 import { Role, UserStatus } from '../../../models/user.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../repositories/verification-tokens');
+vi.mock('../../../repositories/verification-tokens.js');
 
 const app = express();
 app.use(i18nMiddleware);
@@ -28,15 +28,15 @@ const activeUser = {
 
 describe('POST /auth/verify-signup', () => {
     beforeEach(async () => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         await i18nReady;
     });
 
     it('should return 204 for a valid token', async () => {
-        (VerificationTokensRepository.verifySignupToken as jest.Mock).mockResolvedValue({ userId: 1 });
-        jest.spyOn(UserRepository, 'updateUserStatus').mockResolvedValue(undefined); // Since it's void
-        jest.spyOn(UserRepository, 'getUserById').mockResolvedValue(activeUser); // Since it's void
-        jest.spyOn(emailService, 'sendAccountActivationEmail').mockResolvedValue(undefined); // because it returns void
+        (VerificationTokensRepository.verifySignupToken as vi.Mock).mockResolvedValue({ userId: 1 });
+        vi.spyOn(UserRepository, 'updateUserStatus').mockResolvedValue(undefined); // Since it's void
+        vi.spyOn(UserRepository, 'getUserById').mockResolvedValue(activeUser); // Since it's void
+        vi.spyOn(emailService, 'sendAccountActivationEmail').mockResolvedValue(undefined); // because it returns void
 
         const response = await request(app)
             .post('/auth/verify-signup')
@@ -49,7 +49,7 @@ describe('POST /auth/verify-signup', () => {
     });
 
     it('should return 400 for a used token', async () => {
-        (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
+        (VerificationTokensRepository.verifySignupToken as vi.Mock).mockRejectedValue(
             new AppError('tokens.signup.already_used', {}, AppStatusCode.SIGNUP_TOKEN_ALREADY_USED, 400)
         );
 
@@ -62,7 +62,7 @@ describe('POST /auth/verify-signup', () => {
     });
 
     it('should return 400 for an expired token', async () => {
-        (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
+        (VerificationTokensRepository.verifySignupToken as vi.Mock).mockRejectedValue(
             new AppError('tokens.signup.expired', {}, AppStatusCode.SIGNUP_TOKEN_EXPIRED, 400)
         );
 
@@ -75,7 +75,7 @@ describe('POST /auth/verify-signup', () => {
     });
 
     it('should return 400 for a non-existent token or invalid token', async () => {
-        (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
+        (VerificationTokensRepository.verifySignupToken as vi.Mock).mockRejectedValue(
             new AppError('tokens.signup.invalid', {}, AppStatusCode.SIGNUP_TOKEN_INVALID, 400)
         );
 
@@ -88,7 +88,7 @@ describe('POST /auth/verify-signup', () => {
     });
 
     it('should return 500 for unexpected error', async () => {
-        (VerificationTokensRepository.verifySignupToken as jest.Mock).mockRejectedValue(
+        (VerificationTokensRepository.verifySignupToken as vi.Mock).mockRejectedValue(
             new Error('Some unexpected DB failure')
         );
 

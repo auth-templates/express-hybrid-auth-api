@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 
-jest.mock('csrf-sync', () => {
+vi.mock('csrf-sync', () => {
   return {
     csrfSync: () => ({
-      csrfSynchronisedProtection: jest.fn(),
-      generateToken: jest.fn(() => 'fixed-token-123'),
+      csrfSynchronisedProtection: vi.fn(),
+      generateToken: vi.fn(() => 'fixed-token-123'),
     }),
   };
 });
@@ -15,12 +15,12 @@ import { csrfTokenHandler, csrfProtection } from '../csrf.js';
 describe('csrfTokenHandler', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
-  let cookieMock: jest.Mock;
-  let jsonMock: jest.Mock;
+  let cookieMock: vi.Mock;
+  let jsonMock: vi.Mock;
 
   beforeEach(() => {
-    jsonMock = jest.fn();
-    cookieMock = jest.fn().mockReturnValue({ json: jsonMock });
+    jsonMock = vi.fn();
+    cookieMock = vi.fn().mockReturnValue({ json: jsonMock });
 
     req = {} as Partial<Request>;
     res = {

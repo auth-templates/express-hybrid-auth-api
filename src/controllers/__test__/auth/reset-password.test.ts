@@ -12,9 +12,9 @@ import * as Token from '../../../lib/token.js';
 import { UserStatus } from '../../../models/user.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
-jest.mock('../../../repositories/verification-tokens');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
+vi.mock('../../../repositories/verification-tokens.js');
 
 const app = express();
 app.use(session({
@@ -51,14 +51,14 @@ describe('POST /auth/reset-password', () => {
 
     it('should return 204 when reset password email is sent', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        jest.useFakeTimers({ legacyFakeTimers: false });
-        jest.setSystemTime(fakeTime);
+        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.setSystemTime(fakeTime);
 
         const token = "ijklmnopqrstuvwxyz0123";
-        (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue(valid2FAUser);
-        jest.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
-        jest.spyOn(emailService, 'sendPasswordResetEmail').mockResolvedValue(undefined);
-        jest.spyOn(Token, 'generateToken').mockResolvedValue({
+        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue(valid2FAUser);
+        vi.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
+        vi.spyOn(emailService, 'sendPasswordResetEmail').mockResolvedValue(undefined);
+        vi.spyOn(Token, 'generateToken').mockResolvedValue({
             token: token,
             tokenFingerprint: "ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5",
             hashedToken: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo"
@@ -82,11 +82,11 @@ describe('POST /auth/reset-password', () => {
             token: token 
         });
 
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it('should return 200 when user status is not active', async () => {
-        (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue({validUser2FA: valid2FAUser, status: UserStatus.Deactivated});
+        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue({validUser2FA: valid2FAUser, status: UserStatus.Deactivated});
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
@@ -96,7 +96,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 401 with generic message when user is not found in the database', async () => {
-        (UserRepository.getUserByEmail as jest.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
+        (UserRepository.getUserByEmail as vi.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
             
 
         const userEmail = "user@mail.com"
@@ -107,8 +107,8 @@ describe('POST /auth/reset-password', () => {
     });
     
     it('should return 401 with generic message when user is not found when saving the token in database', async () => {
-        (UserRepository.getUserByEmail as jest.Mock).mockResolvedValue(valid2FAUser);
-        jest.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
+        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue(valid2FAUser);
+        vi.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });
@@ -118,7 +118,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 500 for internal errors', async () => {
-        (UserRepository.getUserByEmail as jest.Mock).mockRejectedValue(new Error('Unexpected failure'));
+        (UserRepository.getUserByEmail as vi.Mock).mockRejectedValue(new Error('Unexpected failure'));
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/auth/reset-password').set('Accept-Language', 'en').send({ userEmail });

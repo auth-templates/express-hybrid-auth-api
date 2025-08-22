@@ -4,7 +4,7 @@ import { authenticate } from '../authenticate.js';
 import GlobalConfig from '../../config.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('jsonwebtoken');
+vi.mock('jsonwebtoken');
 
 describe('authenticate middleware', () => {
   const mockRequest = (session = {}, cookies = {}, originalUrl = '/') =>
@@ -16,22 +16,22 @@ describe('authenticate middleware', () => {
 
   const mockResponse = () => {
     const res: Partial<Response> = {};
-    res.status = jest.fn().mockReturnValue(res);
-    res.json = jest.fn().mockReturnValue(res);
+    res.status = vi.fn().mockReturnValue(res);
+    res.json = vi.fn().mockReturnValue(res);
     return res as Response;
   };
 
-  const next: NextFunction = jest.fn();
+  const next: NextFunction = vi.fn();
 
   const validSession = { user: { id: 1 } };
   const validToken = 'valid.token.here';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call next() when session and valid token are present', () => {
-    (jwt.verify as jest.Mock).mockReturnValue({});
+    (jwt.verify as vi.Mock).mockReturnValue({});
 
     const req = mockRequest(validSession, { access_token: validToken });
     const res = mockResponse();
@@ -75,7 +75,7 @@ describe('authenticate middleware', () => {
   });
 
   it('should return 401 if token is expired', () => {
-    (jwt.verify as jest.Mock).mockImplementation(() => {
+    (jwt.verify as vi.Mock).mockImplementation(() => {
       throw new jwt.TokenExpiredError('jwt expired', new Date());
     });
 
@@ -89,7 +89,7 @@ describe('authenticate middleware', () => {
   });
 
   it('should return 403 if token is invalid', () => {
-    (jwt.verify as jest.Mock).mockImplementation(() => {
+    (jwt.verify as vi.Mock).mockImplementation(() => {
       throw new jwt.JsonWebTokenError('jwt malformed');
     });
 
@@ -103,7 +103,7 @@ describe('authenticate middleware', () => {
   });
 
   it('should return 500 for unexpected errors', () => {
-    (jwt.verify as jest.Mock).mockImplementation(() => {
+    (jwt.verify as vi.Mock).mockImplementation(() => {
       throw new Error('Unexpected failure');
     });
 

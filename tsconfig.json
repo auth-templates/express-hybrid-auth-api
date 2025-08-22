@@ -11,7 +11,7 @@
         "skipLibCheck": true,  // Skip library declaration file checks
         "sourceMap": true,
         "outDir": "dist",
-        "typeRoots": ["src/@types", "./node_modules/@types"],    
+        "typeRoots": ["vitest/globals", "src/@types", "./node_modules/@types"],    
         "baseUrl": "./",
         "paths": {
             "@/*": ["src/*"]
@@ -20,7 +20,8 @@
     "include": [
         "src", 
         "setupTests.ts", 
-        "emails/templates/*.tsx"
+        "emails/templates/*.tsx",
+         "**/*.test.ts"
     ],
     "exclude": ["node_modules", "dist"]
   }

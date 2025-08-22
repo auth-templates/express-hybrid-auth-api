@@ -1,3 +1,5 @@
+
+
 import { AppStatusCode } from "@/@types/status-code.js";
 import { Prisma } from "../../../generated/prisma/index.js";
 import { verifyPasswordHash } from "../../lib/password.js";
@@ -5,29 +7,29 @@ import { prismaClient } from "../../lib/prisma-client.js";
 import { Role, UserStatus } from "../../models/user.js";
 import { UserRepository } from "../users.js";
 
-jest.mock('../../lib/prisma-client', () => ({
+vi.mock('../../lib/prisma-client.js', () => ({
     prismaClient: {
         users: {
-            create: jest.fn(),
-            update: jest.fn(),
-            findUnique: jest.fn(),
+            create: vi.fn(),
+            update: vi.fn(),
+            findUnique: vi.fn(),
         },
     },
 }));
 
-jest.mock('../../lib/password', () => ({
-    verifyPasswordHash: jest.fn(),
+vi.mock('../../lib/password.js', () => ({
+    verifyPasswordHash: vi.fn(),
 }));
 
 describe('UserRepository', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     describe('getUser2FASecretById', () => {
         it('should return 2FA secret if user is found and secret exists', async () => {
             const mockSecret = 'SECRET123';
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue({ twofa_secret: mockSecret });
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue({ twofa_secret: mockSecret } as any);
 
             const result = await UserRepository.getUser2FASecretById(42);
 
@@ -40,7 +42,8 @@ describe('UserRepository', () => {
         });
 
         it('should throw 403 AppError if user not found', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(null);
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue(null);
+
 
             await expect(UserRepository.getUser2FASecretById(42)).rejects.toMatchObject({
                 translationKey: 'errors.2fa_not_configured',
@@ -50,7 +53,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw 403 AppError if twofa_secret is missing', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue({ twofa_secret: null });
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue({ twofa_secret: null } as any);
 
             await expect(UserRepository.getUser2FASecretById(42)).rejects.toMatchObject({
                 translationKey: 'errors.2fa_not_configured',
@@ -60,7 +63,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw internal AppError on unknown error', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockRejectedValue(new Error('DB exploded'));
+            vi.mocked(prismaClient.users.findUnique).mockRejectedValue(new Error('DB exploded'));
 
             await expect(UserRepository.getUser2FASecretById(42)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
@@ -72,11 +75,11 @@ describe('UserRepository', () => {
 
     describe('UserRepository.acceptTerms', () => {
         beforeEach(() => {
-            jest.clearAllMocks();
+            vi.clearAllMocks();
         });
 
         it('should update terms_accepted field for the user', async () => {
-            (prismaClient.users.update as jest.Mock).mockResolvedValue({});
+            vi.mocked(prismaClient.users.update).mockResolvedValue({} as any);
 
             await UserRepository.acceptTerms(42, true);
 
@@ -87,7 +90,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw AppError on failure', async () => {
-            (prismaClient.users.update as jest.Mock).mockRejectedValue(new Error('DB error'));
+            vi.mocked(prismaClient.users.update).mockRejectedValue(new Error('DB error'));
 
             await expect(UserRepository.acceptTerms(42, true)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
@@ -107,7 +110,7 @@ describe('UserRepository', () => {
         };
 
         it('should create user and return user id', async () => {
-            (prismaClient.users.create as jest.Mock).mockResolvedValue({ id: 1 });
+            vi.mocked(prismaClient.users.create).mockResolvedValue({ id: 1 } as any);
 
             const id = await UserRepository.createUser(userData);
 
@@ -124,7 +127,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw AppError with 500 on other errors', async () => {
-            (prismaClient.users.create as jest.Mock).mockRejectedValue(new Error('Unknown error'));
+            vi.mocked(prismaClient.users.create).mockRejectedValue(new Error('Unknown error'));
 
             await expect(UserRepository.createUser(userData)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
@@ -143,7 +146,7 @@ describe('UserRepository', () => {
                 }
             );
 
-            (prismaClient.users.create as jest.Mock).mockRejectedValue(prismaError);
+            vi.mocked(prismaClient.users.create).mockRejectedValue(prismaError);
 
             await expect(UserRepository.createUser(userData)).rejects.toMatchObject({
                 translationKey: 'errors.email_address_already_in_use',
@@ -155,7 +158,7 @@ describe('UserRepository', () => {
 
     describe('updatePassword', () => {
         it('should call prisma update', async () => {
-            (prismaClient.users.update as jest.Mock).mockResolvedValue({});
+            vi.mocked(prismaClient.users.update).mockResolvedValue({} as any);
             await UserRepository.updatePassword(1, 'newhash');
             expect(prismaClient.users.update).toHaveBeenCalledWith({
                 where: { id: 1 },
@@ -164,7 +167,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw AppError on error', async () => {
-            (prismaClient.users.update as jest.Mock).mockRejectedValue(new Error('fail'));
+           vi.mocked(prismaClient.users.update).mockRejectedValue(new Error('fail'));
             await expect(UserRepository.updatePassword(1, 'newhash')).rejects.toMatchObject({
                 translationKey: 'errors.internal',
                 httpStatusCode:500,
@@ -175,7 +178,7 @@ describe('UserRepository', () => {
 
     describe('updateUserStatus', () => {
         it('should update status with current date', async () => {
-            (prismaClient.users.update as jest.Mock).mockResolvedValue({});
+            vi.mocked(prismaClient.users.update).mockResolvedValue({} as any);
             const before = new Date();
             await UserRepository.updateUserStatus(1, UserStatus.Active);
             const after = new Date();
@@ -188,13 +191,13 @@ describe('UserRepository', () => {
                 }),
             });
 
-            const calledDate = (prismaClient.users.update as jest.Mock).mock.calls[0][0].data.status_changed_at;
-            expect(calledDate.getTime()).toBeGreaterThanOrEqual(before.getTime());
-            expect(calledDate.getTime()).toBeLessThanOrEqual(after.getTime());
+            const calledDate = vi.mocked(prismaClient.users.update).mock.calls[0][0].data.status_changed_at;
+            expect((calledDate as Date).getTime()).toBeGreaterThanOrEqual(before.getTime());
+            expect((calledDate as Date).getTime()).toBeLessThanOrEqual(after.getTime());
         });
 
         it('should throw AppError on error', async () => {
-            (prismaClient.users.update as jest.Mock).mockRejectedValue(new Error('fail'));
+            vi.mocked(prismaClient.users.update).mockRejectedValue(new Error('fail'));
             await expect(UserRepository.updateUserStatus(1, UserStatus.Active)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
                 httpStatusCode:500,
@@ -216,8 +219,8 @@ describe('UserRepository', () => {
         };
 
         it('should return user object on valid credentials', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(userRecord);
-            (verifyPasswordHash as jest.Mock).mockResolvedValue(true);
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue(userRecord as any);
+            vi.mocked(verifyPasswordHash).mockResolvedValue(true);
 
             const user = await UserRepository.login('john@example.com', 'password');
 
@@ -239,7 +242,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw invalid_credentials if user not found', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(null);
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue(null);
 
             await expect(UserRepository.login('john@example.com', 'password')).rejects.toMatchObject({
                 translationKey: 'errors.invalid_credentials',
@@ -249,10 +252,10 @@ describe('UserRepository', () => {
         });
 
         it('should throw social_login_required if password_hash is __OAUTH__', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue({
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue({
                 ...userRecord,
                 password_hash: '__OAUTH__',
-            });
+            } as any);
 
             await expect(UserRepository.login('john@example.com', 'password')).rejects.toMatchObject({
                 translationKey: 'errors.social_login_required',
@@ -262,8 +265,8 @@ describe('UserRepository', () => {
         });
 
         it('should throw invalid_credentials if password does not match', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(userRecord);
-            (verifyPasswordHash as jest.Mock).mockResolvedValue(false);
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue(userRecord as any);
+            vi.mocked(verifyPasswordHash).mockResolvedValue(false);
 
             await expect(UserRepository.login('john@example.com', 'wrongpassword')).rejects.toMatchObject({
                 translationKey: 'errors.invalid_credentials',
@@ -273,7 +276,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw internal error on unexpected error', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockRejectedValue(new Error('fail'));
+            vi.mocked(prismaClient.users.findUnique).mockRejectedValue(new Error('fail'));
 
             await expect(UserRepository.login('john@example.com', 'password')).rejects.toMatchObject({
                 translationKey: 'errors.internal',
@@ -296,7 +299,7 @@ describe('UserRepository', () => {
         };
 
         it('should return user if found', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(userRecord);
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue(userRecord as any);
 
             const user = await UserRepository.getUserById(1);
 
@@ -312,7 +315,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw user_not_found if no user', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(null);
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue(null);
 
             await expect(UserRepository.getUserById(1)).rejects.toMatchObject({
                 translationKey: 'errors.user_not_found',
@@ -322,7 +325,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw internal error on unexpected error', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockRejectedValue(new Error('fail'));
+            vi.mocked(prismaClient.users.findUnique).mockRejectedValue(new Error('fail'));
 
             await expect(UserRepository.getUserById(1)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
@@ -345,7 +348,7 @@ describe('UserRepository', () => {
         };
 
         it('should return user if found', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(userRecord);
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue(userRecord as any);
 
             const user = await UserRepository.getUserByEmail('jane@example.com');
 
@@ -361,7 +364,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw user_email_not_found if no user', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockResolvedValue(null);
+            vi.mocked(prismaClient.users.findUnique).mockResolvedValue(null);
 
             await expect(UserRepository.getUserByEmail('jane@example.com')).rejects.toMatchObject({
                 translationKey: 'errors.user_email_not_found',
@@ -371,7 +374,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw internal error on unexpected error', async () => {
-            (prismaClient.users.findUnique as jest.Mock).mockRejectedValue(new Error('fail'));
+            vi.mocked(prismaClient.users.findUnique).mockRejectedValue(new Error('fail'));
 
             await expect(UserRepository.getUserByEmail('jane@example.com')).rejects.toMatchObject({
                 translationKey: 'errors.internal',
@@ -383,7 +386,7 @@ describe('UserRepository', () => {
 
     describe('verifyAndSaveSecret', () => {
         it('should update twofa_secret and enable 2FA', async () => {
-            (prismaClient.users.update as jest.Mock).mockResolvedValue({});
+            vi.mocked(prismaClient.users.update).mockResolvedValue({} as any);
 
             await UserRepository.verifyAndSaveSecret(1, 'secret');
 
@@ -394,7 +397,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw internal error on failure', async () => {
-            (prismaClient.users.update as jest.Mock).mockRejectedValue(new Error('fail'));
+            vi.mocked(prismaClient.users.update).mockRejectedValue(new Error('fail'));
 
             await expect(UserRepository.verifyAndSaveSecret(1, 'secret')).rejects.toMatchObject({
                 translationKey: 'errors.internal',
@@ -406,7 +409,7 @@ describe('UserRepository', () => {
 
     describe('disable2FA', () => {
         it('should set twofa_secret to null', async () => {
-            (prismaClient.users.update as jest.Mock).mockResolvedValue({});
+            vi.mocked(prismaClient.users.update).mockResolvedValue({} as any);
 
             await UserRepository.disable2FA(1);
 
@@ -417,7 +420,7 @@ describe('UserRepository', () => {
         });
 
         it('should throw internal error on failure', async () => {
-            (prismaClient.users.update as jest.Mock).mockRejectedValue(new Error('fail'));
+            vi.mocked(prismaClient.users.update).mockRejectedValue(new Error('fail'));
 
             await expect(UserRepository.disable2FA(1)).rejects.toMatchObject({
                 translationKey: 'errors.internal',

@@ -10,8 +10,8 @@ import * as jwt from 'jsonwebtoken';
 import { RefreshTokenStore } from '../../../lib/redis/redis-token.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
 
 const app = express();
 app.use(session({
@@ -47,18 +47,18 @@ describe('POST /auth/accept-terms', () => {
     });
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('should 204, update session, and set access_token cookie when successful', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        jest.useFakeTimers({ legacyFakeTimers: false });
-        jest.setSystemTime(fakeTime);
+        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.setSystemTime(fakeTime);
 
         const validToken = 'good-token';
-        (UserRepository.acceptTerms as jest.Mock).mockResolvedValue(undefined);
-        (RefreshTokenStore.getStoredRefreshToken as jest.Mock).mockResolvedValue('good-token');
-        (RefreshTokenStore.resetRefreshTokenExpiration as jest.Mock).mockResolvedValue(undefined);
+        (UserRepository.acceptTerms as vi.Mock).mockResolvedValue(undefined);
+        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue('good-token');
+        (RefreshTokenStore.resetRefreshTokenExpiration as vi.Mock).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
 
@@ -88,7 +88,7 @@ describe('POST /auth/accept-terms', () => {
         const sessionCheck = await agent.get('/test/session');
         expect(sessionCheck.body.termsAccepted).toBe(true);
 
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it('should return 403 if terms already accepted', async () => {
@@ -108,7 +108,7 @@ describe('POST /auth/accept-terms', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (UserRepository.acceptTerms as jest.Mock).mockRejectedValue(new Error('internal error'));
+        (UserRepository.acceptTerms as vi.Mock).mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
         const userSession = { user: { id: 1, email: 'test@example.com' }, termsAccepted: false };

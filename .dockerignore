@@ -14,5 +14,6 @@ Dockerfile
 .devcontainer
 *.log
 npm-debug.log
-*.test.ts
+**/*.test.ts
 setupTests.js
+**/__test__

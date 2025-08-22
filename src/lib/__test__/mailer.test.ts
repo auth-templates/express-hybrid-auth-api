@@ -4,11 +4,16 @@ import { render } from '@react-email/render';
 import GlobalConfig from '../../config.js';
 import { transporter } from '../mail-transporter.js';
 
-jest.mock('@react-email/render');
-jest.mock('../mail-transporter');
+vi.mock('@react-email/render', () => ({
+    render: vi.fn()
+}));
+
+vi.mock('../mail-transporter.js');
+
+const mockedSendMail = transporter.sendMail as unknown as ReturnType<typeof vi.fn>;
 
 describe('Email sending functions', () => {
-  const mockT = jest.fn((key) => key);
+  const mockT = vi.fn((key) => key);
   const mockRenderHtml = '<html>mock email</html>';
 
   beforeAll(() => {
@@ -19,9 +24,10 @@ describe('Email sending functions', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (render as jest.Mock).mockResolvedValue(mockRenderHtml);
-    (transporter.sendMail as jest.Mock).mockResolvedValue(undefined);
+    vi.clearAllMocks();
+    vi.mocked(render).mockResolvedValue(mockRenderHtml);
+    
+    mockedSendMail.mockResolvedValue(undefined);
   });
 
   test('sendVerificationEmail sends email with correct options', async () => {

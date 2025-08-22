@@ -8,8 +8,8 @@ import { disable2FA } from '../../2faController.js';
 import { UserRepository } from '../../../repositories/users.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
 
 const app = express();
 app.use(session({
@@ -41,7 +41,7 @@ describe('POST /2fa/disable', () => {
     });
 
     it('should return 204 when 2FA is successfully disabled', async () => {
-        (UserRepository.disable2FA as jest.Mock).mockResolvedValue(undefined);
+        (UserRepository.disable2FA as vi.Mock).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
         await agent.get('/test-login');
@@ -57,7 +57,7 @@ describe('POST /2fa/disable', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (UserRepository.disable2FA as jest.Mock).mockRejectedValue(new Error('internal error'));
+        (UserRepository.disable2FA as vi.Mock).mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
         await agent.get('/test-login');

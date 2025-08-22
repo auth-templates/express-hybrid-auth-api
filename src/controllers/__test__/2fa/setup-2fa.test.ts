@@ -8,8 +8,8 @@ import { setup2FA } from '../../2faController.js';
 import * as Redis2FA from '../../../lib/redis/redis-2fa.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-jest.mock('../../../lib/redis/redis-token');
-jest.mock('../../../repositories/users');
+vi.mock('../../../lib/redis/redis-token.js');
+vi.mock('../../../repositories/users.js');
 
 const app = express();
 app.use(session({
@@ -46,7 +46,7 @@ describe('POST /2fa/setup', () => {
     });
 
     it('should return 200 with 2FA setup data', async () => {
-        jest.spyOn(Redis2FA, 'get2faSetup').mockResolvedValue(twoFASetupData);
+        vi.spyOn(Redis2FA, 'get2faSetup').mockResolvedValue(twoFASetupData);
 
         const agent = request.agent(app);
 
@@ -62,7 +62,7 @@ describe('POST /2fa/setup', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        jest.spyOn(Redis2FA, 'get2faSetup').mockRejectedValue(new Error('internal error'));
+        vi.spyOn(Redis2FA, 'get2faSetup').mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
 

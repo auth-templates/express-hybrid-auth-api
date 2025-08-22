@@ -4,13 +4,13 @@ import { requireTermsAcceptance } from "../require-terms-acceptance.js";
 describe('requireTermsAcceptance middleware', () => {
   let req: any;
   let res: any;
-  let next: jest.Mock;
+  let next: vi.Mock;
 
   beforeEach(() => {
-    next = jest.fn();
+    next = vi.fn();
     res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn()
     };
   });
 
@@ -18,7 +18,7 @@ describe('requireTermsAcceptance middleware', () => {
     req = {
       session: { termsAccepted: false },
       path: '/dashboard',
-      t: jest.fn().mockImplementation((key) => key),
+      t: vi.fn().mockImplementation((key) => key),
     };
 
     requireTermsAcceptance(req, res, next);
@@ -31,7 +31,7 @@ describe('requireTermsAcceptance middleware', () => {
     req = {
       session: { termsAccepted: true },
       path: '/auth/accept-terms',
-      t: jest.fn().mockImplementation((key) => key),
+      t: vi.fn().mockImplementation((key) => key),
     };
 
     requireTermsAcceptance(req, res, next);
@@ -44,7 +44,7 @@ describe('requireTermsAcceptance middleware', () => {
     req = {
       session: { termsAccepted: true },
       path: '/dashboard',
-      t: jest.fn().mockImplementation((key) => `Translated: ${key}`),
+      t: vi.fn().mockImplementation((key) => `Translated: ${key}`),
     };
 
     requireTermsAcceptance(req, res, next);
@@ -57,7 +57,7 @@ describe('requireTermsAcceptance middleware', () => {
   test('handles missing session gracefully and calls next', () => {
     req = {
       path: '/dashboard',
-      t: jest.fn().mockImplementation((key) => key),
+      t: vi.fn().mockImplementation((key) => key),
     };
 
     requireTermsAcceptance(req, res, next);
