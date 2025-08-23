@@ -1,142 +1,142 @@
 info:
-  title: Hybrid Session + JWT Auth API
-  version: 1.0.0
-  description: >
-    This API uses a hybrid authentication approach combining Express server-side
-    sessions and JWT-based access control, with all credentials stored in
-    HTTP-only cookies. This approach ensures security while allowing stateless
-    validation for route access.
+    title: Hybrid Session + JWT Auth API
+    version: 1.0.0
+    description: >
+        This API uses a hybrid authentication approach combining Express server-side
+        sessions and JWT-based access control, with all credentials stored in
+        HTTP-only cookies. This approach ensures security while allowing stateless
+        validation for route access.
 
-    ## 🔐 Authentication Model
+        ## 🔐 Authentication Model
 
-    - `connect.sid`: Express session ID (server-side session store)
-    - `access_token`: Short-lived JWT used for access control in frontend middleware (Next.js)
-    - `refresh_token`: Used to renew the access token via `/auth/token`
+        - `connect.sid`: Express session ID (server-side session store)
+        - `access_token`: Short-lived JWT used for access control in frontend middleware (Next.js)
+        - `refresh_token`: Used to renew the access token via `/auth/token`
 
-    ### Access Patterns
+        ### Access Patterns
 
-    - All **authenticated API requests** require both:
-      - `connect.sid`
-      - `access_token`
+        - All **authenticated API requests** require both:
+          - `connect.sid`
+          - `access_token`
 
-    - The **token refresh** flow (`POST /auth/token`) requires:
-      - `connect.sid`
-      - `refresh_token`
+        - The **token refresh** flow (`POST /auth/token`) requires:
+          - `connect.sid`
+          - `refresh_token`
 
-    All tokens are stored in secure cookies and are automatically included in
-    browser requests when the frontend and backend share the same origin.
+        All tokens are stored in secure cookies and are automatically included in
+        browser requests when the frontend and backend share the same origin.
 
-    When the frontend and backend are hosted on **different origins** (e.g., different ports or domains),  
-    the frontend **must** configure requests to include credentials by setting `credentials: 'include'`  
-    (in `fetch`) or `withCredentials: true` (in Axios or XHR). Additionally, the backend must allow credentialed  
-    CORS requests via appropriate headers (`Access-Control-Allow-Credentials: true` and matching `Access-Control-Allow-Origin`).
+        When the frontend and backend are hosted on **different origins** (e.g., different ports or domains),  
+        the frontend **must** configure requests to include credentials by setting `credentials: 'include'`  
+        (in `fetch`) or `withCredentials: true` (in Axios or XHR). Additionally, the backend must allow credentialed  
+        CORS requests via appropriate headers (`Access-Control-Allow-Credentials: true` and matching `Access-Control-Allow-Origin`).
 
-    ## ⚠️ Limitations of OpenAPI & Swagger UI
+        ## ⚠️ Limitations of OpenAPI & Swagger UI
 
-    - OpenAPI 3.0 supports requiring multiple security schemes simultaneously
-      (e.g., session cookie AND access token) by combining them in a single
-      security object. However, some tools or generators may have limited
-      support for this pattern.
+        - OpenAPI 3.0 supports requiring multiple security schemes simultaneously
+          (e.g., session cookie AND access token) by combining them in a single
+          security object. However, some tools or generators may have limited
+          support for this pattern.
 
-    - Swagger UI does not support setting multiple cookies through the
-      "Authorize" button, nor does it send cookies during "Try it out"
-      unless your frontend is hosted on the **same origin** and the browser
-      has valid cookies set.
+        - Swagger UI does not support setting multiple cookies through the
+          "Authorize" button, nor does it send cookies during "Try it out"
+          unless your frontend is hosted on the **same origin** and the browser
+          has valid cookies set.
 
-    - For this reason, Swagger UI's "Try it out" cannot simulate authenticated
-      requests correctly unless your app:
-        1. Runs on the same origin as the API
-        2. Has cookies already set by prior login (via browser)
+        - For this reason, Swagger UI's "Try it out" cannot simulate authenticated
+          requests correctly unless your app:
+            1. Runs on the same origin as the API
+            2. Has cookies already set by prior login (via browser)
 
-    ## 🧰 Purpose of this OpenAPI File
+        ## 🧰 Purpose of this OpenAPI File
 
-    This OpenAPI schema is not intended for interactive use in Swagger UI.
+        This OpenAPI schema is not intended for interactive use in Swagger UI.
 
-    Instead, it is used as input for **@7nohe/openapi-react-query-codegen** to generate:
-      - Typed React hooks for `react-query`
-      - Request/response type definitions
-      - A type-safe frontend API layer
+        Instead, it is used as input for **@7nohe/openapi-react-query-codegen** to generate:
+          - Typed React hooks for `react-query`
+          - Request/response type definitions
+          - A type-safe frontend API layer
 
-    By using this OpenAPI file, the frontend can safely call authenticated
-    endpoints, as long as cookies are properly sent by the browser —  
-    automatically on same-origin requests, or via `credentials: 'include'`  
-    on cross-origin requests with CORS properly configured on the backend.
+        By using this OpenAPI file, the frontend can safely call authenticated
+        endpoints, as long as cookies are properly sent by the browser —  
+        automatically on same-origin requests, or via `credentials: 'include'`  
+        on cross-origin requests with CORS properly configured on the backend.
 components:
-  securitySchemes:
-    SessionCookieAuth:
-      type: apiKey
-      in: cookie
-      name: connect.sid
-      description: Session ID cookie, manages session validity.
+    securitySchemes:
+        SessionCookieAuth:
+            type: apiKey
+            in: cookie
+            name: connect.sid
+            description: Session ID cookie, manages session validity.
 
-    AccessTokenCookieAuth:
-      type: apiKey
-      in: cookie
-      name: access_token
-      description: JWT access token cookie, used for access control in frontend middleware.
+        AccessTokenCookieAuth:
+            type: apiKey
+            in: cookie
+            name: access_token
+            description: JWT access token cookie, used for access control in frontend middleware.
 
-    RefreshTokenCookieAuth:
-      type: apiKey
-      in: cookie
-      name: refresh_token
-      description: JWT refresh token cookie, used to issue new access tokens via `/auth/refresh`.
-  parameters:
-    XCsrfTokenHeader:
-      name: x-csrf-token
-      in: header
-      description: CSRF token required for POST requests
-      required: true
-      schema:
-        type: string
-  responses:
-    UnauthorizedErrors:
-      description: Authentication errors
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiMessageResponse'
-          examples:
-            SessionInvalidOrExpired:
-              $ref: '#/components/examples/SessionInvalidOrExpired'
-            AccessTokenMissing:
-              $ref: '#/components/examples/AccessTokenMissing'
-            AccessTokenExpired:
-              $ref: '#/components/examples/AccessTokenExpired'
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
+        RefreshTokenCookieAuth:
+            type: apiKey
+            in: cookie
+            name: refresh_token
+            description: JWT refresh token cookie, used to issue new access tokens via `/auth/refresh`.
+    parameters:
+        XCsrfTokenHeader:
+            name: x-csrf-token
+            in: header
+            description: CSRF token required for POST requests
+            required: true
             schema:
-              $ref: '#/components/schemas/ApiMessageResponse'
-            example:
-              messages:
-              - text: An unexpected error occurred. Please try again later or contact support.
-                severity: error
-              code: INTERNAL_SERVER_ERROR
-  examples:
-    SessionInvalidOrExpired:
-      summary: Session invalid or expired
-      value:
-        messages:
-          - text: Session invalid or expired
-            severity: error
-        code: SESSION_INVALID_OR_EXPIRED
+                type: string
+    responses:
+        UnauthorizedErrors:
+            description: Authentication errors
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/ApiMessageResponse'
+                    examples:
+                        SessionInvalidOrExpired:
+                            $ref: '#/components/examples/SessionInvalidOrExpired'
+                        AccessTokenMissing:
+                            $ref: '#/components/examples/AccessTokenMissing'
+                        AccessTokenExpired:
+                            $ref: '#/components/examples/AccessTokenExpired'
+        InternalServerError:
+            description: Internal server error
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/ApiMessageResponse'
+                    example:
+                        messages:
+                            - text: An unexpected error occurred. Please try again later or contact support.
+                              severity: error
+                        code: INTERNAL_SERVER_ERROR
+    examples:
+        SessionInvalidOrExpired:
+            summary: Session invalid or expired
+            value:
+                messages:
+                    - text: Session invalid or expired
+                      severity: error
+                code: SESSION_INVALID_OR_EXPIRED
 
-    AccessTokenMissing:
-      summary: Access token missing
-      value:
-        messages:
-          - text: Access token missing
-            severity: error
-        code: ACCESS_TOKEN_MISSING
+        AccessTokenMissing:
+            summary: Access token missing
+            value:
+                messages:
+                    - text: Access token missing
+                      severity: error
+                code: ACCESS_TOKEN_MISSING
 
-    AccessTokenExpired:
-      summary: Access token expired
-      value:
-        messages:
-          - text: Access token expired
-            severity: error
-        code: ACCESS_TOKEN_EXPIRED
+        AccessTokenExpired:
+            summary: Access token expired
+            value:
+                messages:
+                    - text: Access token expired
+                      severity: error
+                code: ACCESS_TOKEN_EXPIRED
 security:
-  - SessionCookieAuth: []
-    AccessTokenCookieAuth: []
+    - SessionCookieAuth: []
+      AccessTokenCookieAuth: []

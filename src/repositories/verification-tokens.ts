@@ -5,162 +5,183 @@ import { PrismaErrorCode } from '../lib/prisma-error-codes.js';
 import { TokenType, VerificationToken } from '../models/verification-token.js';
 
 import { createTokenFingerprint } from '../lib/token.js';
-import logger from '@/lib/logger/index.js'
+import logger from '@/lib/logger/index.js';
 import { AppStatusCode } from '@/@types/status-code.js';
 
-type CreateVerificationTokenInput = Omit<VerificationToken, 'id' | 'createdAt' | 'usedAt' | 'token'> & { tokenHash: string, tokenFingerprint: string }
+type CreateVerificationTokenInput = Omit<VerificationToken, 'id' | 'createdAt' | 'usedAt' | 'token'> & {
+	tokenHash: string;
+	tokenFingerprint: string;
+};
 
 export class VerificationTokensRepository {
-    static async createToken(data: CreateVerificationTokenInput): Promise<void> {
-        const { type, userId, tokenHash, tokenFingerprint, expiresAt } = data;
-        try {
-            await prismaClient.verification_tokens.create({
-                data: { 
-                    user: { connect: { id: userId } },
-                    token_fingerprint: tokenFingerprint,
-                    token_hash: tokenHash,
-                    type: type as any,
-                    expires_at: expiresAt,
-                } as Prisma.verification_tokensCreateInput
-            });
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === PrismaErrorCode.RecordNotFound) {
-            throw new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404);
-          }
-        }
-        logger.error(error);
-        throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
-      }
-    }
+	static async createToken(data: CreateVerificationTokenInput): Promise<void> {
+		const { type, userId, tokenHash, tokenFingerprint, expiresAt } = data;
+		try {
+			await prismaClient.verification_tokens.create({
+				data: {
+					user: { connect: { id: userId } },
+					token_fingerprint: tokenFingerprint,
+					token_hash: tokenHash,
+					type: type as any,
+					expires_at: expiresAt,
+				} as Prisma.verification_tokensCreateInput,
+			});
+		} catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError) {
+				if (error.code === PrismaErrorCode.RecordNotFound) {
+					throw new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404);
+				}
+			}
+			logger.error(error);
+			throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
+		}
+	}
 
-    static async verifySignupToken(token: string): Promise<{userId: number}> {
-        try {
-            const now = new Date();
-    
-            const tokenRecord = await prismaClient.verification_tokens.findFirst({
-                where: {
-                    type: TokenType.SignUp,
-                    token_fingerprint: createTokenFingerprint(token)
-                },
-                orderBy: { created_at: 'desc' },
-            });
+	static async verifySignupToken(token: string): Promise<{ userId: number }> {
+		try {
+			const now = new Date();
 
-    
+			const tokenRecord = await prismaClient.verification_tokens.findFirst({
+				where: {
+					type: TokenType.SignUp,
+					token_fingerprint: createTokenFingerprint(token),
+				},
+				orderBy: { created_at: 'desc' },
+			});
 
-            if ( !tokenRecord ) {
-                throw new AppError('tokens.signup.invalid', {}, AppStatusCode.SIGNUP_TOKEN_INVALID, 400);
-            }
-    
-            // Check if token is expired
-            if (tokenRecord.expires_at < now) {
-                throw new AppError('tokens.signup.expired', {}, AppStatusCode.SIGNUP_TOKEN_EXPIRED, 400);
-            }
-    
-            // Check if token has already been used
-            if (tokenRecord.used_at !== null) {
-                throw new AppError('tokens.signup.already_used', {}, AppStatusCode.SIGNUP_TOKEN_ALREADY_USED, 400);
-            }
-    
-            // Token is valid — mark as used and activate user
-            await prismaClient.verification_tokens.update({
-                where: { id: tokenRecord.id },
-                data: { used_at: now },
-            });
+			if (!tokenRecord) {
+				throw new AppError('tokens.signup.invalid', {}, AppStatusCode.SIGNUP_TOKEN_INVALID, 400);
+			}
 
-            return { userId: tokenRecord.user_id };
-        } catch (error) {
-            if (error instanceof AppError) {
-                throw error;
-            }
-            logger.error(error);
-            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
-        }
-    }
-    
-    static async verify2FAToken(token: string): Promise<{userId: number}> {
-        try {
-            const now = new Date();
-    
-            // Find the most recently created signup token, regardless of status
-            const tokenRecord = await prismaClient.verification_tokens.findFirst({
-                where: {
-                    type: TokenType.TwoFA,
-                    token_fingerprint: createTokenFingerprint(token)
-                },
-                orderBy: { created_at: 'desc' },
-            });
-            
-            if ( !tokenRecord ) {
-                throw new AppError('tokens.2fa.invalid', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_INVALID, 400);
-            }
-    
-            // Check if token is expired
-            if (tokenRecord.expires_at < now) {
-                throw new AppError('tokens.2fa.expired', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_EXPIRED, 400);
-            }
-    
-            // Check if token has already been used
-            if (tokenRecord.used_at !== null) {
-                throw new AppError('tokens.2fa.already_used', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_ALREADY_USED, 400);
-            }
-    
-            // Token is valid — mark as used and activate user
-            await prismaClient.verification_tokens.update({
-                where: { id: tokenRecord.id },
-                data: { used_at: now },
-            });
+			// Check if token is expired
+			if (tokenRecord.expires_at < now) {
+				throw new AppError('tokens.signup.expired', {}, AppStatusCode.SIGNUP_TOKEN_EXPIRED, 400);
+			}
 
-            return { userId: tokenRecord.user_id };
-        } catch (error) {
-            if (error instanceof AppError) {
-                throw error;
-            }
-            logger.error(error);
-            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
-        }
-    }
-    
-    static async verifyPasswordResetToken(token: string): Promise<{userId: number}> {
-        try {
-            const now = new Date();
-    
-            // Find the most recently created signup token, regardless of status
-            const tokenRecord = await prismaClient.verification_tokens.findFirst({
-                where: {
-                    type: TokenType.PasswordReset,
-                    token_fingerprint: createTokenFingerprint(token)
-                },
-                orderBy: { created_at: 'desc' },
-            });
-            
-            if ( !tokenRecord ) {
-                throw new AppError('tokens.password-reset.invalid', {}, AppStatusCode.PASSWORD_RESET_TOKEN_INVALID, 400);
-            }
-    
-            // Check if token is expired
-            if (tokenRecord.expires_at < now) {
-                throw new AppError('tokens.password-reset.expired', {}, AppStatusCode.PASSWORD_RESET_TOKEN_EXPIRED, 400);
-            }
-    
-            // Check if token has already been used
-            if (tokenRecord.used_at !== null) {
-                throw new AppError('tokens.password-reset.already_used', {}, AppStatusCode.PASSWORD_RESET_TOKEN_ALREADY_USED, 400);
-            }
-    
-            // Token is valid — mark as used and activate user
-            await prismaClient.verification_tokens.update({
-                where: { id: tokenRecord.id },
-                data: { used_at: now },
-            });
+			// Check if token has already been used
+			if (tokenRecord.used_at !== null) {
+				throw new AppError('tokens.signup.already_used', {}, AppStatusCode.SIGNUP_TOKEN_ALREADY_USED, 400);
+			}
 
-            return { userId: tokenRecord.user_id };
-        } catch (error) {
-            if (error instanceof AppError) {
-                throw error;
-            }
-            logger.error(error);
-            throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR ,500);
-        }
-    }
+			// Token is valid — mark as used and activate user
+			await prismaClient.verification_tokens.update({
+				where: { id: tokenRecord.id },
+				data: { used_at: now },
+			});
+
+			return { userId: tokenRecord.user_id };
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw error;
+			}
+			logger.error(error);
+			throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
+		}
+	}
+
+	static async verify2FAToken(token: string): Promise<{ userId: number }> {
+		try {
+			const now = new Date();
+
+			// Find the most recently created signup token, regardless of status
+			const tokenRecord = await prismaClient.verification_tokens.findFirst({
+				where: {
+					type: TokenType.TwoFA,
+					token_fingerprint: createTokenFingerprint(token),
+				},
+				orderBy: { created_at: 'desc' },
+			});
+
+			if (!tokenRecord) {
+				throw new AppError('tokens.2fa.invalid', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_INVALID, 400);
+			}
+
+			// Check if token is expired
+			if (tokenRecord.expires_at < now) {
+				throw new AppError('tokens.2fa.expired', {}, AppStatusCode.TWO_FA_RECOVERY_TOKEN_EXPIRED, 400);
+			}
+
+			// Check if token has already been used
+			if (tokenRecord.used_at !== null) {
+				throw new AppError(
+					'tokens.2fa.already_used',
+					{},
+					AppStatusCode.TWO_FA_RECOVERY_TOKEN_ALREADY_USED,
+					400
+				);
+			}
+
+			// Token is valid — mark as used and activate user
+			await prismaClient.verification_tokens.update({
+				where: { id: tokenRecord.id },
+				data: { used_at: now },
+			});
+
+			return { userId: tokenRecord.user_id };
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw error;
+			}
+			logger.error(error);
+			throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
+		}
+	}
+
+	static async verifyPasswordResetToken(token: string): Promise<{ userId: number }> {
+		try {
+			const now = new Date();
+
+			// Find the most recently created signup token, regardless of status
+			const tokenRecord = await prismaClient.verification_tokens.findFirst({
+				where: {
+					type: TokenType.PasswordReset,
+					token_fingerprint: createTokenFingerprint(token),
+				},
+				orderBy: { created_at: 'desc' },
+			});
+
+			if (!tokenRecord) {
+				throw new AppError(
+					'tokens.password-reset.invalid',
+					{},
+					AppStatusCode.PASSWORD_RESET_TOKEN_INVALID,
+					400
+				);
+			}
+
+			// Check if token is expired
+			if (tokenRecord.expires_at < now) {
+				throw new AppError(
+					'tokens.password-reset.expired',
+					{},
+					AppStatusCode.PASSWORD_RESET_TOKEN_EXPIRED,
+					400
+				);
+			}
+
+			// Check if token has already been used
+			if (tokenRecord.used_at !== null) {
+				throw new AppError(
+					'tokens.password-reset.already_used',
+					{},
+					AppStatusCode.PASSWORD_RESET_TOKEN_ALREADY_USED,
+					400
+				);
+			}
+
+			// Token is valid — mark as used and activate user
+			await prismaClient.verification_tokens.update({
+				where: { id: tokenRecord.id },
+				data: { used_at: now },
+			});
+
+			return { userId: tokenRecord.user_id };
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw error;
+			}
+			logger.error(error);
+			throw new AppError('errors.internal', {}, AppStatusCode.INTERNAL_SERVER_ERROR, 500);
+		}
+	}
 }

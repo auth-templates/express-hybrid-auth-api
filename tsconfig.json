@@ -1,27 +1,22 @@
 {
-    "compilerOptions": {
-        "allowJs": true,
-        "resolveJsonModule": true,
-        "jsx": "react-jsx",
-        "target": "esnext",
-        "module": "nodenext",
-        "esModuleInterop": true,
-        "moduleResolution": "nodenext",
-        // "strict": true,  // Enable strict type-checking
-        "skipLibCheck": true,  // Skip library declaration file checks
-        "sourceMap": true,
-        "outDir": "dist",
-        "typeRoots": ["vitest/globals", "src/@types", "./node_modules/@types"],    
-        "baseUrl": "./",
-        "paths": {
-            "@/*": ["src/*"]
-        }
-    },
-    "include": [
-        "src", 
-        "setupTests.ts", 
-        "emails/templates/*.tsx",
-         "**/*.test.ts"
-    ],
-    "exclude": ["node_modules", "dist"]
-  }
+	"compilerOptions": {
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"jsx": "react-jsx",
+		"target": "esnext",
+		"module": "nodenext",
+		"esModuleInterop": true,
+		"moduleResolution": "nodenext",
+		// "strict": true,  // Enable strict type-checking
+		"skipLibCheck": true, // Skip library declaration file checks
+		"sourceMap": true,
+		"outDir": "dist",
+		"typeRoots": ["vitest/globals", "src/@types", "./node_modules/@types"],
+		"baseUrl": "./",
+		"paths": {
+			"@/*": ["src/*"]
+		}
+	},
+	"include": ["src", "setupTests.ts", "emails/templates/*.tsx", "**/*.test.ts"],
+	"exclude": ["node_modules", "dist"]
+}

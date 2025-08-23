@@ -12,78 +12,85 @@ vi.mock('../../../lib/redis/redis-token.js');
 vi.mock('../../../repositories/users.js');
 
 const app = express();
-app.use(session({
-    secret: GlobalConfig.SESSION_SECRET,
-    resave: false,
-    rolling: true, // This enables automatic touch
-    saveUninitialized: false,
-    cookie: {
-        secure: false, // secure: true requires HTTPS, which is usually off in dev
-        httpOnly: true,
-        maxAge: GlobalConfig.SESSION_MAX_AGE
-    }
-}));
+app.use(
+	session({
+		secret: GlobalConfig.SESSION_SECRET,
+		resave: false,
+		rolling: true, // This enables automatic touch
+		saveUninitialized: false,
+		cookie: {
+			secure: false, // secure: true requires HTTPS, which is usually off in dev
+			httpOnly: true,
+			maxAge: GlobalConfig.SESSION_MAX_AGE,
+		},
+	})
+);
 
 app.use(i18nMiddleware);
 app.use(express.json());
 app.use(cookieParser());
 
 app.post('/test/session', (req, res) => {
-    Object.assign(req.session, req.body);
-    res.status(200).end();
+	Object.assign(req.session, req.body);
+	res.status(200).end();
 });
 
 app.post('/auth/logout', logout);
 
 describe('POST /auth/logout', () => {
-    beforeAll(async () => {
-        await i18nReady;
-    });
+	beforeAll(async () => {
+		await i18nReady;
+	});
 
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
 
-    it('should 204 and clear cookies on successful logout', async () => {
-        vi.mocked(RefreshTokenStore.removeRefreshToken).mockResolvedValue('stored-token' as any);
+	it('should 204 and clear cookies on successful logout', async () => {
+		vi.mocked(RefreshTokenStore.removeRefreshToken).mockResolvedValue('stored-token' as any);
 
-        const agent = request.agent(app);
-        
-        const refreshToken = 'token';
-        const userSession = { user: { id: 1, email: 'test@example.com' } };
-        
-        // Setup session dynamically
-        await agent.post('/test/session').send(userSession);
+		const agent = request.agent(app);
 
-        const response = await agent.post('/auth/logout').set('Cookie', `refresh_token=${refreshToken}; connect.sid=session-id`)
+		const refreshToken = 'token';
+		const userSession = { user: { id: 1, email: 'test@example.com' } };
 
-        expect(RefreshTokenStore.removeRefreshToken).toHaveBeenCalledWith(userSession.user.id, refreshToken);
-        expect(response.status).toBe(204);
+		// Setup session dynamically
+		await agent.post('/test/session').send(userSession);
 
-        const cookies = response.headers['set-cookie'] as unknown as string[];
-        expect(cookies).toBeDefined();
-        expect(cookies.length).toBeGreaterThanOrEqual(3);
+		const response = await agent
+			.post('/auth/logout')
+			.set('Cookie', `refresh_token=${refreshToken}; connect.sid=session-id`);
 
-        const cookieString = cookies.join(';');
+		expect(RefreshTokenStore.removeRefreshToken).toHaveBeenCalledWith(userSession.user.id, refreshToken);
+		expect(response.status).toBe(204);
 
-        expect(cookieString).toContain('refresh_token=;');
-        expect(cookieString).toContain('access_token=;');
-        expect(cookieString).toContain('connect.sid=;');
-    });
+		const cookies = response.headers['set-cookie'] as unknown as string[];
+		expect(cookies).toBeDefined();
+		expect(cookies.length).toBeGreaterThanOrEqual(3);
 
-    it('should return 500 if an unexpected error occurs', async () => {
-        vi.mocked(RefreshTokenStore.removeRefreshToken).mockRejectedValue(new Error('internal error'));
+		const cookieString = cookies.join(';');
 
-        const agent = request.agent(app);
+		expect(cookieString).toContain('refresh_token=;');
+		expect(cookieString).toContain('access_token=;');
+		expect(cookieString).toContain('connect.sid=;');
+	});
 
-        // Setup session dynamically
-        await agent
-            .post('/test/session')
-            .send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
+	it('should return 500 if an unexpected error occurs', async () => {
+		vi.mocked(RefreshTokenStore.removeRefreshToken).mockRejectedValue(new Error('internal error'));
 
-        const response = await agent.post('/auth/logout').set('Cookie', `refresh_token=token; connect.sid=session-id`)
+		const agent = request.agent(app);
 
-        expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages: [{ text:'An unexpected error occurred. Please try again later or contact support.', severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
-    });
+		// Setup session dynamically
+		await agent.post('/test/session').send({ user: { id: 1, email: 'test@example.com' }, pending2FA: false });
+
+		const response = await agent.post('/auth/logout').set('Cookie', `refresh_token=token; connect.sid=session-id`);
+
+		expect(response.status).toBe(500);
+		expect(response.body).toEqual({
+			messages: [
+				{ text: 'An unexpected error occurred. Please try again later or contact support.', severity: 'error' },
+			],
+			code: AppStatusCode.INTERNAL_SERVER_ERROR,
+		});
+	});
 });

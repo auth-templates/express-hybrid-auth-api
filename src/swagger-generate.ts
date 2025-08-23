@@ -5,7 +5,7 @@ import * as yaml from 'js-yaml';
 // Ensure the directory exists
 const outputDir = './.swagger';
 if (!existsSync(outputDir)) {
-  mkdirSync(outputDir, { recursive: true }); // recursive ensures parent directories are created
+	mkdirSync(outputDir, { recursive: true }); // recursive ensures parent directories are created
 }
 
 // Convert the Swagger JSON to YAML

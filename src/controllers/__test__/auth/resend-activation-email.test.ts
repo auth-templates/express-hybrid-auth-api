@@ -17,113 +17,167 @@ vi.mock('../../../repositories/users.js');
 vi.mock('../../../repositories/verification-tokens.js');
 
 const app = express();
-app.use(session({
-    secret: GlobalConfig.SESSION_SECRET,
-    resave: false,
-    rolling: true, // This enables automatic touch
-    saveUninitialized: false,
-    cookie: {
-        secure: false, // secure: true requires HTTPS, which is usually off in dev
-        httpOnly: true,
-        maxAge: GlobalConfig.SESSION_MAX_AGE
-    }
-}));
+app.use(
+	session({
+		secret: GlobalConfig.SESSION_SECRET,
+		resave: false,
+		rolling: true, // This enables automatic touch
+		saveUninitialized: false,
+		cookie: {
+			secure: false, // secure: true requires HTTPS, which is usually off in dev
+			httpOnly: true,
+			maxAge: GlobalConfig.SESSION_MAX_AGE,
+		},
+	})
+);
 
 app.use(i18nMiddleware);
 app.use(express.json());
 app.post('/auth/resend-activation-email', resendActivationEmail);
 
 const validUser = {
-    id: 2,
-    firstName: 'Dev',
-    lastName: 'Tester',
-    email: 'dev@mail.com',
-    role: 'admin',
-    createdAt: new Date(),
-    enabled2FA: false,
-    status: UserStatus.Pending
+	id: 2,
+	firstName: 'Dev',
+	lastName: 'Tester',
+	email: 'dev@mail.com',
+	role: 'admin',
+	createdAt: new Date(),
+	enabled2FA: false,
+	status: UserStatus.Pending,
 };
 
 describe('POST /auth/resend-activation-email', () => {
-    beforeAll(async () => {
-        await i18nReady;
-    });
-    
-    it('should return 204 when reset password email is sent', async () => {
-        const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers();
-        vi.setSystemTime(fakeTime);
+	beforeAll(async () => {
+		await i18nReady;
+	});
 
-        const token = "ijklmnopqrstuvwxyz0123";
-        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser as any);
-        vi.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
-        vi.spyOn(emailService, 'sendVerificationEmail').mockResolvedValue(undefined);
-        vi.spyOn(Token, 'generateToken').mockResolvedValue({
-            token: token,
-            tokenFingerprint: "ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5",
-            hashedToken: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo"
-        });
+	it('should return 204 when reset password email is sent', async () => {
+		const fakeTime = new Date('2025-05-15T00:00:00Z');
+		vi.useFakeTimers();
+		vi.setSystemTime(fakeTime);
 
-        const userEmail = "dev@mail.com"
-        const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
+		const token = 'ijklmnopqrstuvwxyz0123';
+		vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser as any);
+		vi.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
+		vi.spyOn(emailService, 'sendVerificationEmail').mockResolvedValue(undefined);
+		vi.spyOn(Token, 'generateToken').mockResolvedValue({
+			token: token,
+			tokenFingerprint: 'ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5',
+			hashedToken:
+				'$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo',
+		});
 
-        expect(response.status).toBe(204);
-        expect(UserRepository.getUserByEmail).toHaveBeenCalledWith(userEmail);
-        expect(VerificationTokensRepository.createToken).toHaveBeenCalledWith({
-            expiresAt: new Date("2025-05-15T00:30:00.000Z"),
-            tokenFingerprint: "ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5",
-            tokenHash: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo",
-            type: "signup",
-            userId: 2
-        });
-        expect(emailService.sendVerificationEmail).toHaveBeenCalledWith({t: expect.anything(), 
-            userEmail, 
-            expiresInMinutes: 30, 
-            token: token 
-        });
+		const userEmail = 'dev@mail.com';
+		const response = await request(app)
+			.post('/auth/resend-activation-email')
+			.set('Accept-Language', 'en')
+			.send({ userEmail });
 
-        vi.useRealTimers();
-    });
+		expect(response.status).toBe(204);
+		expect(UserRepository.getUserByEmail).toHaveBeenCalledWith(userEmail);
+		expect(VerificationTokensRepository.createToken).toHaveBeenCalledWith({
+			expiresAt: new Date('2025-05-15T00:30:00.000Z'),
+			tokenFingerprint: 'ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5',
+			tokenHash:
+				'$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo',
+			type: 'signup',
+			userId: 2,
+		});
+		expect(emailService.sendVerificationEmail).toHaveBeenCalledWith({
+			t: expect.anything(),
+			userEmail,
+			expiresInMinutes: 30,
+			token: token,
+		});
 
-    it('should return 200 when user status is not active', async () => {
-        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue({validUser2FA: validUser, status: UserStatus.Deactivated} as any);
-        const userEmail = "dev@mail.com"
-        const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
+		vi.useRealTimers();
+	});
 
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual({ messages:[{text:"If your email still needs to be verified, a confirmation link has been sent.",  severity: "info"}], code: AppStatusCode.CONFIRMATION_EMAIL_SENT_IF_NEEDED});
-    });
+	it('should return 200 when user status is not active', async () => {
+		vi.mocked(UserRepository.getUserByEmail).mockResolvedValue({
+			validUser2FA: validUser,
+			status: UserStatus.Deactivated,
+		} as any);
+		const userEmail = 'dev@mail.com';
+		const response = await request(app)
+			.post('/auth/resend-activation-email')
+			.set('Accept-Language', 'en')
+			.send({ userEmail });
 
-    it('should return 401 with generic message when user is not found in the database', async () => {
-        vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
-            
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({
+			messages: [
+				{
+					text: 'If your email still needs to be verified, a confirmation link has been sent.',
+					severity: 'info',
+				},
+			],
+			code: AppStatusCode.CONFIRMATION_EMAIL_SENT_IF_NEEDED,
+		});
+	});
 
-        const userEmail = "dev@mail.com"
-        const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
+	it('should return 401 with generic message when user is not found in the database', async () => {
+		vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(
+			new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404)
+		);
 
-        expect(response.status).toBe(401);
-        expect(response.body).toEqual({ messages:[{text:"Failed to send the verification email. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.EMAIL_VERIFICATION_SEND_FAILED});
-    });
-    
-    it('should return 401 with generic message when user is not found when saving the token in database', async () => {
-        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser as any);
-        vi.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
+		const userEmail = 'dev@mail.com';
+		const response = await request(app)
+			.post('/auth/resend-activation-email')
+			.set('Accept-Language', 'en')
+			.send({ userEmail });
 
-        const userEmail = "dev@mail.com"
-        const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
+		expect(response.status).toBe(401);
+		expect(response.body).toEqual({
+			messages: [
+				{
+					text: 'Failed to send the verification email. Please try again later or contact support.',
+					severity: 'error',
+				},
+			],
+			code: AppStatusCode.EMAIL_VERIFICATION_SEND_FAILED,
+		});
+	});
 
-        expect(response.status).toBe(401);
-        expect(response.body).toEqual({ messages: [{text: "Failed to send the verification email. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.EMAIL_VERIFICATION_SEND_FAILED});
-    });
+	it('should return 401 with generic message when user is not found when saving the token in database', async () => {
+		vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser as any);
+		vi.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(
+			new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404)
+		);
 
-    it('should return 500 for internal errors', async () => {
-        vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new Error('Unexpected failure'));
+		const userEmail = 'dev@mail.com';
+		const response = await request(app)
+			.post('/auth/resend-activation-email')
+			.set('Accept-Language', 'en')
+			.send({ userEmail });
 
-        const userEmail = "dev@mail.com"
-        const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
+		expect(response.status).toBe(401);
+		expect(response.body).toEqual({
+			messages: [
+				{
+					text: 'Failed to send the verification email. Please try again later or contact support.',
+					severity: 'error',
+				},
+			],
+			code: AppStatusCode.EMAIL_VERIFICATION_SEND_FAILED,
+		});
+	});
 
+	it('should return 500 for internal errors', async () => {
+		vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new Error('Unexpected failure'));
 
-        expect(response.status).toBe(500);
-        expect(response.body).toEqual({ messages: [{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
-    });
+		const userEmail = 'dev@mail.com';
+		const response = await request(app)
+			.post('/auth/resend-activation-email')
+			.set('Accept-Language', 'en')
+			.send({ userEmail });
+
+		expect(response.status).toBe(500);
+		expect(response.body).toEqual({
+			messages: [
+				{ text: 'An unexpected error occurred. Please try again later or contact support.', severity: 'error' },
+			],
+			code: AppStatusCode.INTERNAL_SERVER_ERROR,
+		});
+	});
 });

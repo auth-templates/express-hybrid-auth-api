@@ -1,6 +1,6 @@
-import { hash, verify } from "@node-rs/argon2";
-import { sha256 } from "@oslojs/crypto/sha2";
-import { encodeHexLowerCase } from "@oslojs/encoding";
+import { hash, verify } from '@node-rs/argon2';
+import { sha256 } from '@oslojs/crypto/sha2';
+import { encodeHexLowerCase } from '@oslojs/encoding';
 
 export async function hashPassword(password: string): Promise<string> {
 	return await hash(password);

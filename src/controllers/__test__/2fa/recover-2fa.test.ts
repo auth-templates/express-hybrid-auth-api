@@ -17,125 +17,171 @@ vi.mock('../../../repositories/users.js');
 vi.mock('../../../repositories/verification-tokens.js');
 
 const app = express();
-app.use(session({
-    secret: GlobalConfig.SESSION_SECRET,
-    resave: false,
-    rolling: true, // This enables automatic touch
-    saveUninitialized: false,
-    cookie: {
-        secure: false, // secure: true requires HTTPS, which is usually off in dev
-        httpOnly: true,
-        maxAge: GlobalConfig.SESSION_MAX_AGE
-    }
-}));
+app.use(
+	session({
+		secret: GlobalConfig.SESSION_SECRET,
+		resave: false,
+		rolling: true, // This enables automatic touch
+		saveUninitialized: false,
+		cookie: {
+			secure: false, // secure: true requires HTTPS, which is usually off in dev
+			httpOnly: true,
+			maxAge: GlobalConfig.SESSION_MAX_AGE,
+		},
+	})
+);
 
 app.use(i18nMiddleware);
 app.use(express.json());
 app.post('/2fa/recover', recover2FA);
 
 const validUser2FA = {
-    id: 2,
-    firstName: 'Dev',
-    lastName: 'Tester',
-    email: 'dev@mail.com',
-    role: Role.Admin,
-    createdAt: new Date(),
-    enabled2FA: true,
-    status: UserStatus.Active
+	id: 2,
+	firstName: 'Dev',
+	lastName: 'Tester',
+	email: 'dev@mail.com',
+	role: Role.Admin,
+	createdAt: new Date(),
+	enabled2FA: true,
+	status: UserStatus.Active,
 };
 
 describe('POST /2fa/recover', () => {
-    beforeAll(async () => {
-        await i18nReady;
-    });
+	beforeAll(async () => {
+		await i18nReady;
+	});
 
-    it('should return 204 when 2FA recovery email is sent', async () => {
-        const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers();
-        vi.setSystemTime(fakeTime);
+	it('should return 204 when 2FA recovery email is sent', async () => {
+		const fakeTime = new Date('2025-05-15T00:00:00Z');
+		vi.useFakeTimers();
+		vi.setSystemTime(fakeTime);
 
-        const token = "ijklmnopqrstuvwxyz0123";
-        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser2FA);
-        vi.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
-        vi.spyOn(emailService, 'send2FARecoverEmail').mockResolvedValue(undefined);
-        vi.spyOn(Token, 'generateToken').mockResolvedValue({
-            token,
-            tokenFingerprint: "ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5",
-            hashedToken: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo"
-        });
+		const token = 'ijklmnopqrstuvwxyz0123';
+		vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser2FA);
+		vi.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
+		vi.spyOn(emailService, 'send2FARecoverEmail').mockResolvedValue(undefined);
+		vi.spyOn(Token, 'generateToken').mockResolvedValue({
+			token,
+			tokenFingerprint: 'ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5',
+			hashedToken:
+				'$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo',
+		});
 
-        const userEmail = "dev@mail.com"
-        const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
+		const userEmail = 'dev@mail.com';
+		const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
 
-        expect(response.status).toBe(204);
-        expect(UserRepository.getUserByEmail).toHaveBeenCalledWith(userEmail);
-        expect(VerificationTokensRepository.createToken).toHaveBeenCalledWith({
-            expiresAt: new Date("2025-05-15T00:30:00.000Z"),
-            tokenFingerprint: "ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5",
-            tokenHash: "$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo",
-            type: "twofa",
-            userId: 2
-        });
-        expect(emailService.send2FARecoverEmail).toHaveBeenCalledWith({t: 
-            expect.anything(), 
-            userEmail: validUser2FA.email,
-            expiresInMinutes: 30,
-            verificationCode: token,
-        });
+		expect(response.status).toBe(204);
+		expect(UserRepository.getUserByEmail).toHaveBeenCalledWith(userEmail);
+		expect(VerificationTokensRepository.createToken).toHaveBeenCalledWith({
+			expiresAt: new Date('2025-05-15T00:30:00.000Z'),
+			tokenFingerprint: 'ff4a9bd4ac116633d2c22443d3eec36d1715a3eefabc150a36a6bcf6bacab1e5',
+			tokenHash:
+				'$argon2id$v=19$m=19456,t=2,p=1$+PT78sDEcPVtQBXtn/MGfw$qaximLFDb28eyAGOLygHNvX5aKu0lVdf0doxCQ3xIjo',
+			type: 'twofa',
+			userId: 2,
+		});
+		expect(emailService.send2FARecoverEmail).toHaveBeenCalledWith({
+			t: expect.anything(),
+			userEmail: validUser2FA.email,
+			expiresInMinutes: 30,
+			verificationCode: token,
+		});
 
-        vi.useRealTimers();
-    });
+		vi.useRealTimers();
+	});
 
-    it('should return 200 when user status is not active', async () => {
-        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue({validUser2FA, status: UserStatus.Deactivated} as any);
+	it('should return 200 when user status is not active', async () => {
+		vi.mocked(UserRepository.getUserByEmail).mockResolvedValue({
+			validUser2FA,
+			status: UserStatus.Deactivated,
+		} as any);
 
-        const userEmail = "user@mail.com"
-        const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
+		const userEmail = 'user@mail.com';
+		const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
 
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual({ messages: [{ text: "Two-step verification recovery could not be initiated. Please contact support if the issue persists.", severity: "error"}], code: AppStatusCode.TWO_FA_RECOVERY_NOT_INITIATED});
-    });
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({
+			messages: [
+				{
+					text: 'Two-step verification recovery could not be initiated. Please contact support if the issue persists.',
+					severity: 'error',
+				},
+			],
+			code: AppStatusCode.TWO_FA_RECOVERY_NOT_INITIATED,
+		});
+	});
 
-    it('should return 200 when user does not have 2FA activated', async () => {
-        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue({validUser2FA, enabled2FA: false} as any);
+	it('should return 200 when user does not have 2FA activated', async () => {
+		vi.mocked(UserRepository.getUserByEmail).mockResolvedValue({ validUser2FA, enabled2FA: false } as any);
 
-        const userEmail = "user@mail.com"
-        const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
+		const userEmail = 'user@mail.com';
+		const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
 
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual({ messages: [{text: "Two-step verification recovery could not be initiated. Please contact support if the issue persists.", severity: "error"}], code: AppStatusCode.TWO_FA_RECOVERY_NOT_INITIATED});
-    });
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({
+			messages: [
+				{
+					text: 'Two-step verification recovery could not be initiated. Please contact support if the issue persists.',
+					severity: 'error',
+				},
+			],
+			code: AppStatusCode.TWO_FA_RECOVERY_NOT_INITIATED,
+		});
+	});
 
-    it('should return 401 with generic message when user is not found in the database', async () => {
-        vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
-            
-        const userEmail = "user@mail.com"
-        const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
+	it('should return 401 with generic message when user is not found in the database', async () => {
+		vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(
+			new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404)
+		);
 
-        expect(response.status).toBe(401);
-        expect(response.body).toEqual({ messages: [{ text: "Failed to send the two-factor authentication recovery email. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.EMAIL_TWO_FA_RECOVERY_SEND_FAILED});
-    });
-    
-    it('should return 401 with generic message when user is not found when saving the token in database', async () => {
-        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser2FA);
-        vi.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
+		const userEmail = 'user@mail.com';
+		const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
 
-        const userEmail = "user@mail.com"
-        const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
+		expect(response.status).toBe(401);
+		expect(response.body).toEqual({
+			messages: [
+				{
+					text: 'Failed to send the two-factor authentication recovery email. Please try again later or contact support.',
+					severity: 'error',
+				},
+			],
+			code: AppStatusCode.EMAIL_TWO_FA_RECOVERY_SEND_FAILED,
+		});
+	});
 
-        expect(response.status).toBe(401);
-        expect(response.body).toEqual({ messages: [{ text: "Failed to send the two-factor authentication recovery email. Please try again later or contact support.", severity: "error" }], code: AppStatusCode.EMAIL_TWO_FA_RECOVERY_SEND_FAILED});
-    });
+	it('should return 401 with generic message when user is not found when saving the token in database', async () => {
+		vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser2FA);
+		vi.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(
+			new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404)
+		);
 
+		const userEmail = 'user@mail.com';
+		const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
 
-    it('should return 500 for internal errors', async () => {
-        vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new Error('Unexpected failure'));
+		expect(response.status).toBe(401);
+		expect(response.body).toEqual({
+			messages: [
+				{
+					text: 'Failed to send the two-factor authentication recovery email. Please try again later or contact support.',
+					severity: 'error',
+				},
+			],
+			code: AppStatusCode.EMAIL_TWO_FA_RECOVERY_SEND_FAILED,
+		});
+	});
 
-        const userEmail = "user@mail.com"
-        const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
+	it('should return 500 for internal errors', async () => {
+		vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new Error('Unexpected failure'));
 
+		const userEmail = 'user@mail.com';
+		const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
 
-        expect(response.status).toBe(500);
-        expect(response.body).toEqual({ messages: [{ text: "An unexpected error occurred. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
-    });
-})
+		expect(response.status).toBe(500);
+		expect(response.body).toEqual({
+			messages: [
+				{ text: 'An unexpected error occurred. Please try again later or contact support.', severity: 'error' },
+			],
+			code: AppStatusCode.INTERNAL_SERVER_ERROR,
+		});
+	});
+});

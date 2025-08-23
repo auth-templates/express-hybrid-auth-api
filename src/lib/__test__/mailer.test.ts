@@ -5,7 +5,7 @@ import GlobalConfig from '../../config.js';
 import { transporter } from '../mail-transporter.js';
 
 vi.mock('@react-email/render', () => ({
-    render: vi.fn()
+	render: vi.fn(),
 }));
 
 vi.mock('../mail-transporter.js');
@@ -13,176 +13,188 @@ vi.mock('../mail-transporter.js');
 const mockedSendMail = transporter.sendMail as unknown as ReturnType<typeof vi.fn>;
 
 describe('Email sending functions', () => {
-  const mockT = vi.fn((key) => key);
-  const mockRenderHtml = '<html>mock email</html>';
+	const mockT = vi.fn((key) => key);
+	const mockRenderHtml = '<html>mock email</html>';
 
-  beforeAll(() => {
-    // Mock GlobalConfig values
-    GlobalConfig.EMAIL_FRONTEND_BASE_URL = 'https://frontend.example.com';
-    GlobalConfig.EMAIL_ASSETS_BASE_URL = 'https://assets.example.com';
-    GlobalConfig.SUPPORT_EMAIL = 'support@example.com';
-  });
+	beforeAll(() => {
+		// Mock GlobalConfig values
+		GlobalConfig.EMAIL_FRONTEND_BASE_URL = 'https://frontend.example.com';
+		GlobalConfig.EMAIL_ASSETS_BASE_URL = 'https://assets.example.com';
+		GlobalConfig.SUPPORT_EMAIL = 'support@example.com';
+	});
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(render).mockResolvedValue(mockRenderHtml);
-    
-    mockedSendMail.mockResolvedValue(undefined);
-  });
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(render).mockResolvedValue(mockRenderHtml);
 
-  test('sendVerificationEmail sends email with correct options', async () => {
-    const args = {
-      token: 'token123',
-      userEmail: 'user@example.com',
-      expiresInMinutes: 10,
-      t: mockT,
-    };
+		mockedSendMail.mockResolvedValue(undefined);
+	});
 
-    await emailModule.sendVerificationEmail(args);
+	test('sendVerificationEmail sends email with correct options', async () => {
+		const args = {
+			token: 'token123',
+			userEmail: 'user@example.com',
+			expiresInMinutes: 10,
+			t: mockT,
+		};
 
-    expect(render).toHaveBeenCalledWith(expect.objectContaining({
-      props: expect.objectContaining({
-        verificationUrl: `${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/verify?token=${args.token}`,
-        expiresInMinutes: args.expiresInMinutes,
-        t: args.t,
-        frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
-        assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
-      }),
-    }));
+		await emailModule.sendVerificationEmail(args);
 
-    expect(transporter.sendMail).toHaveBeenCalledWith({
-      from: GlobalConfig.SUPPORT_EMAIL,
-      to: args.userEmail,
-      subject: mockT("emails.verification.subject"),
-      html: mockRenderHtml,
-    });
-  });
+		expect(render).toHaveBeenCalledWith(
+			expect.objectContaining({
+				props: expect.objectContaining({
+					verificationUrl: `${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/verify?token=${args.token}`,
+					expiresInMinutes: args.expiresInMinutes,
+					t: args.t,
+					frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
+					assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
+				}),
+			})
+		);
 
-  test('sendAccountActivationEmail sends email with correct options', async () => {
-    const args = {
-      userEmail: 'user@example.com',
-      t: mockT,
-    };
+		expect(transporter.sendMail).toHaveBeenCalledWith({
+			from: GlobalConfig.SUPPORT_EMAIL,
+			to: args.userEmail,
+			subject: mockT('emails.verification.subject'),
+			html: mockRenderHtml,
+		});
+	});
 
-    await emailModule.sendAccountActivationEmail(args);
+	test('sendAccountActivationEmail sends email with correct options', async () => {
+		const args = {
+			userEmail: 'user@example.com',
+			t: mockT,
+		};
 
-    expect(render).toHaveBeenCalledWith(expect.objectContaining({
-      props: expect.objectContaining({
-        t: args.t,
-        frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
-        assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
-      }),
-    }));
+		await emailModule.sendAccountActivationEmail(args);
 
-    expect(transporter.sendMail).toHaveBeenCalledWith({
-      from: GlobalConfig.SUPPORT_EMAIL,
-      to: args.userEmail,
-      subject: mockT('emails.account-activation-email.subject'),
-      html: mockRenderHtml,
-    });
-  });
+		expect(render).toHaveBeenCalledWith(
+			expect.objectContaining({
+				props: expect.objectContaining({
+					t: args.t,
+					frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
+					assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
+				}),
+			})
+		);
 
-  test('send2FARecoverEmail sends email with correct options', async () => {
-    const args = {
-      verificationCode: '123456',
-      userEmail: 'user@example.com',
-      expiresInMinutes: 15,
-      t: mockT,
-    };
+		expect(transporter.sendMail).toHaveBeenCalledWith({
+			from: GlobalConfig.SUPPORT_EMAIL,
+			to: args.userEmail,
+			subject: mockT('emails.account-activation-email.subject'),
+			html: mockRenderHtml,
+		});
+	});
 
-    await emailModule.send2FARecoverEmail(args);
+	test('send2FARecoverEmail sends email with correct options', async () => {
+		const args = {
+			verificationCode: '123456',
+			userEmail: 'user@example.com',
+			expiresInMinutes: 15,
+			t: mockT,
+		};
 
-    expect(render).toHaveBeenCalledWith(expect.objectContaining({
-      props: expect.objectContaining({
-        expiresInMinutes: args.expiresInMinutes,
-        verificationCode: args.verificationCode,
-        t: args.t,
-        frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
-        assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
-      }),
-    }));
+		await emailModule.send2FARecoverEmail(args);
 
-    expect(transporter.sendMail).toHaveBeenCalledWith({
-      from: GlobalConfig.SUPPORT_EMAIL,
-      to: args.userEmail,
-      subject: mockT("emails.2fa-code-email.subject"),
-      html: mockRenderHtml,
-    });
-  });
+		expect(render).toHaveBeenCalledWith(
+			expect.objectContaining({
+				props: expect.objectContaining({
+					expiresInMinutes: args.expiresInMinutes,
+					verificationCode: args.verificationCode,
+					t: args.t,
+					frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
+					assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
+				}),
+			})
+		);
 
-  test('send2FADisabledEmail sends email with correct options', async () => {
-    const args = {
-      userEmail: 'user@example.com',
-      t: mockT,
-    };
+		expect(transporter.sendMail).toHaveBeenCalledWith({
+			from: GlobalConfig.SUPPORT_EMAIL,
+			to: args.userEmail,
+			subject: mockT('emails.2fa-code-email.subject'),
+			html: mockRenderHtml,
+		});
+	});
 
-    await emailModule.send2FADisabledEmail(args);
+	test('send2FADisabledEmail sends email with correct options', async () => {
+		const args = {
+			userEmail: 'user@example.com',
+			t: mockT,
+		};
 
-    expect(render).toHaveBeenCalledWith(expect.objectContaining({
-      props: expect.objectContaining({
-        t: args.t,
-        frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
-        assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
-      }),
-    }));
+		await emailModule.send2FADisabledEmail(args);
 
-    expect(transporter.sendMail).toHaveBeenCalledWith({
-      from: GlobalConfig.SUPPORT_EMAIL,
-      to: args.userEmail,
-      subject: mockT("emails.2fa-disabled.subject"),
-      html: mockRenderHtml,
-    });
-  });
+		expect(render).toHaveBeenCalledWith(
+			expect.objectContaining({
+				props: expect.objectContaining({
+					t: args.t,
+					frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
+					assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
+				}),
+			})
+		);
 
-  test('sendPasswordResetEmail sends email with correct options', async () => {
-    const args = {
-      t: mockT,
-      userEmail: 'user@example.com',
-      expiresInMinutes: 30,
-      token: 'reset-token-123',
-    };
+		expect(transporter.sendMail).toHaveBeenCalledWith({
+			from: GlobalConfig.SUPPORT_EMAIL,
+			to: args.userEmail,
+			subject: mockT('emails.2fa-disabled.subject'),
+			html: mockRenderHtml,
+		});
+	});
 
-    await emailModule.sendPasswordResetEmail(args);
+	test('sendPasswordResetEmail sends email with correct options', async () => {
+		const args = {
+			t: mockT,
+			userEmail: 'user@example.com',
+			expiresInMinutes: 30,
+			token: 'reset-token-123',
+		};
 
-    expect(render).toHaveBeenCalledWith(expect.objectContaining({
-      props: expect.objectContaining({
-        resetUrl: `${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/reset-password?token=${args.token}`,
-        expiresInMinutes: args.expiresInMinutes,
-        t: args.t,
-        frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
-        assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
-      }),
-    }));
+		await emailModule.sendPasswordResetEmail(args);
 
-    expect(transporter.sendMail).toHaveBeenCalledWith({
-      from: GlobalConfig.SUPPORT_EMAIL,
-      to: args.userEmail,
-      subject: mockT("emails.password-reset-email.subject"),
-      html: mockRenderHtml,
-    });
-  });
+		expect(render).toHaveBeenCalledWith(
+			expect.objectContaining({
+				props: expect.objectContaining({
+					resetUrl: `${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/reset-password?token=${args.token}`,
+					expiresInMinutes: args.expiresInMinutes,
+					t: args.t,
+					frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
+					assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
+				}),
+			})
+		);
 
-  test('sendPasswordChangedEmail sends email with correct options', async () => {
-    const args = {
-      t: mockT,
-      userEmail: 'user@example.com',
-    };
+		expect(transporter.sendMail).toHaveBeenCalledWith({
+			from: GlobalConfig.SUPPORT_EMAIL,
+			to: args.userEmail,
+			subject: mockT('emails.password-reset-email.subject'),
+			html: mockRenderHtml,
+		});
+	});
 
-    await emailModule.sendPasswordChangedEmail(args);
+	test('sendPasswordChangedEmail sends email with correct options', async () => {
+		const args = {
+			t: mockT,
+			userEmail: 'user@example.com',
+		};
 
-    expect(render).toHaveBeenCalledWith(expect.objectContaining({
-      props: expect.objectContaining({
-        t: args.t,
-        frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
-        assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
-      }),
-    }));
+		await emailModule.sendPasswordChangedEmail(args);
 
-    expect(transporter.sendMail).toHaveBeenCalledWith({
-      from: GlobalConfig.SUPPORT_EMAIL,
-      to: args.userEmail,
-      subject: mockT("emails.password-changed-email.subject"),
-      html: mockRenderHtml,
-    });
-  });
+		expect(render).toHaveBeenCalledWith(
+			expect.objectContaining({
+				props: expect.objectContaining({
+					t: args.t,
+					frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
+					assetsUrl: GlobalConfig.EMAIL_ASSETS_BASE_URL,
+				}),
+			})
+		);
+
+		expect(transporter.sendMail).toHaveBeenCalledWith({
+			from: GlobalConfig.SUPPORT_EMAIL,
+			to: args.userEmail,
+			subject: mockT('emails.password-changed-email.subject'),
+			html: mockRenderHtml,
+		});
+	});
 });

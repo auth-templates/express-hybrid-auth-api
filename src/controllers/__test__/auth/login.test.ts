@@ -14,168 +14,159 @@ vi.mock('../../../lib/redis/redis-token.js');
 vi.mock('../../../repositories/users.js');
 
 const app = express();
-app.use(session({
-    secret: GlobalConfig.SESSION_SECRET,
-    resave: false,
-    rolling: true, // This enables automatic touch
-    saveUninitialized: false,
-    cookie: {
-        secure: false, // secure: true requires HTTPS, which is usually off in dev
-        httpOnly: true,
-        maxAge: GlobalConfig.SESSION_MAX_AGE
-    }
-}));
+app.use(
+	session({
+		secret: GlobalConfig.SESSION_SECRET,
+		resave: false,
+		rolling: true, // This enables automatic touch
+		saveUninitialized: false,
+		cookie: {
+			secure: false, // secure: true requires HTTPS, which is usually off in dev
+			httpOnly: true,
+			maxAge: GlobalConfig.SESSION_MAX_AGE,
+		},
+	})
+);
 
 app.use(i18nMiddleware);
 app.use(express.json());
 app.post('/auth/login', login);
 
 const validUser = {
-    id: 1,
-    firstName: 'Dev',
-    lastName: 'Tester',
-    email: 'dev@mail.com',
-    role: 'admin',
-    createdAt: new Date(),
+	id: 1,
+	firstName: 'Dev',
+	lastName: 'Tester',
+	email: 'dev@mail.com',
+	role: 'admin',
+	createdAt: new Date(),
 };
 
 const validUser2FA = {
-    id: 2,
-    firstName: 'Dev',
-    lastName: 'Tester',
-    email: 'dev@mail.com',
-    role: 'admin',
-    createdAt: new Date(),
-    enabled2FA: true
+	id: 2,
+	firstName: 'Dev',
+	lastName: 'Tester',
+	email: 'dev@mail.com',
+	role: 'admin',
+	createdAt: new Date(),
+	enabled2FA: true,
 };
 
 describe('POST /auth/login', () => {
-    beforeAll(async () => {
-        await i18nReady;
-    });
+	beforeAll(async () => {
+		await i18nReady;
+	});
 
-    it('should set refresh_token, access_token, and connect.sid cookies', async () => {
-        vi.mocked(UserRepository.login).mockResolvedValue(validUser as any);
-        vi.mocked(RefreshTokenStore.storeRefreshToken).mockResolvedValue(undefined);
-        const response = await request(app)
-            .post('/auth/login')
-            .set('Accept-Language', 'en')
-            .send({
-                email: 'dev@mail.com',
-                password: '$SuperSecurePassword45',
-            });
+	it('should set refresh_token, access_token, and connect.sid cookies', async () => {
+		vi.mocked(UserRepository.login).mockResolvedValue(validUser as any);
+		vi.mocked(RefreshTokenStore.storeRefreshToken).mockResolvedValue(undefined);
+		const response = await request(app).post('/auth/login').set('Accept-Language', 'en').send({
+			email: 'dev@mail.com',
+			password: '$SuperSecurePassword45',
+		});
 
-        const cookies = response.headers['set-cookie'] as unknown as string[];
-        expect(cookies).toBeDefined();
-        expect(cookies.length).toBeGreaterThanOrEqual(3);
+		const cookies = response.headers['set-cookie'] as unknown as string[];
+		expect(cookies).toBeDefined();
+		expect(cookies.length).toBeGreaterThanOrEqual(3);
 
-        const cookieString = cookies.join(';');
-        expect(cookieString).toContain('refresh_token=');
-        expect(cookieString).toContain('access_token=');
-        expect(cookieString).toContain('connect.sid=');
-    });
+		const cookieString = cookies.join(';');
+		expect(cookieString).toContain('refresh_token=');
+		expect(cookieString).toContain('access_token=');
+		expect(cookieString).toContain('connect.sid=');
+	});
 
-    it('should set correct 2FA user jwt access token payload', async () => {
-        const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers();
-        vi.setSystemTime(fakeTime);
+	it('should set correct 2FA user jwt access token payload', async () => {
+		const fakeTime = new Date('2025-05-15T00:00:00Z');
+		vi.useFakeTimers();
+		vi.setSystemTime(fakeTime);
 
-        vi.mocked(UserRepository.login).mockResolvedValue(validUser2FA as any);
-        vi.mocked(RefreshTokenStore.storeRefreshToken).mockResolvedValue(undefined);
-        const response = await request(app)
-            .post('/auth/login')
-            .set('Accept-Language', 'en')
-            .send({
-                email: 'dev@mail.com',
-                password: '$SuperSecurePassword45',
-            });
+		vi.mocked(UserRepository.login).mockResolvedValue(validUser2FA as any);
+		vi.mocked(RefreshTokenStore.storeRefreshToken).mockResolvedValue(undefined);
+		const response = await request(app).post('/auth/login').set('Accept-Language', 'en').send({
+			email: 'dev@mail.com',
+			password: '$SuperSecurePassword45',
+		});
 
-        const cookies = response.headers['set-cookie'] as unknown as string[];
-        expect(cookies).toBeDefined();
-        expect(cookies.length).toBeGreaterThanOrEqual(3);
-        
-        const accessTokenCookie = cookies.filter(x => x.startsWith("access_token="))[0];
-        const tokenMatch  = accessTokenCookie!.match(/access_token=([^;]+)/);
-        const accessToken = tokenMatch?.[1];
-        expect(accessToken).toBeDefined();
+		const cookies = response.headers['set-cookie'] as unknown as string[];
+		expect(cookies).toBeDefined();
+		expect(cookies.length).toBeGreaterThanOrEqual(3);
 
-        const decoded = jwt.decode(accessToken!) as jwt.JwtPayload;
+		const accessTokenCookie = cookies.filter((x) => x.startsWith('access_token='))[0];
+		const tokenMatch = accessTokenCookie!.match(/access_token=([^;]+)/);
+		const accessToken = tokenMatch?.[1];
+		expect(accessToken).toBeDefined();
 
-        expect(decoded).toHaveProperty('userId', 2);
-        expect(decoded).toHaveProperty('pending2FA', true);
-        expect(decoded).toHaveProperty('exp', fakeTime.getTime()/1000 + GlobalConfig.ACCESS_TOKEN_MAX_AGE);
-        expect(decoded).toHaveProperty('iat', fakeTime.getTime()/1000);
+		const decoded = jwt.decode(accessToken!) as jwt.JwtPayload;
 
-        vi.useRealTimers();
-    });
+		expect(decoded).toHaveProperty('userId', 2);
+		expect(decoded).toHaveProperty('pending2FA', true);
+		expect(decoded).toHaveProperty('exp', fakeTime.getTime() / 1000 + GlobalConfig.ACCESS_TOKEN_MAX_AGE);
+		expect(decoded).toHaveProperty('iat', fakeTime.getTime() / 1000);
 
-    it('should return 200 and user data for valid credentials', async () => {
-        vi.mocked(UserRepository.login).mockResolvedValue(validUser as any);
-        vi.mocked(RefreshTokenStore.storeRefreshToken).mockResolvedValue(undefined);
-        const response = await request(app)
-            .post('/auth/login')
-            .set('Accept-Language', 'en')
-            .send({
-                email: 'dev@mail.com',
-                password: '$SuperSecurePassword45',
-            });
+		vi.useRealTimers();
+	});
 
-        expect(response.status).toBe(200);
-        expect(response.body.email).toBe('dev@mail.com');
-    });
+	it('should return 200 and user data for valid credentials', async () => {
+		vi.mocked(UserRepository.login).mockResolvedValue(validUser as any);
+		vi.mocked(RefreshTokenStore.storeRefreshToken).mockResolvedValue(undefined);
+		const response = await request(app).post('/auth/login').set('Accept-Language', 'en').send({
+			email: 'dev@mail.com',
+			password: '$SuperSecurePassword45',
+		});
 
-    it('should return 400 for invalid email format', async () => {
-        const response = await request(app)
-            .post('/auth/login')
-            .set('Accept-Language', 'en')
-            .send({
-                email: 'dev.mail.com',
-                password: '$SuperSecurePassword45',
-            });
+		expect(response.status).toBe(200);
+		expect(response.body.email).toBe('dev@mail.com');
+	});
 
-        expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text: "Invalid email address", severity: "error"}]});
-    });
+	it('should return 400 for invalid email format', async () => {
+		const response = await request(app).post('/auth/login').set('Accept-Language', 'en').send({
+			email: 'dev.mail.com',
+			password: '$SuperSecurePassword45',
+		});
 
-    it('should return 400 for missing fields', async () => {
-        const response = await request(app)
-            .post('/auth/login')
-            .set('Accept-Language', 'en')
-            .send({});
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({ messages: [{ text: 'Invalid email address', severity: 'error' }] });
+	});
 
-        expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text: "Invalid email or password. Please try again.", severity: "error"}]});
-    });
+	it('should return 400 for missing fields', async () => {
+		const response = await request(app).post('/auth/login').set('Accept-Language', 'en').send({});
 
-    it('should return 400 for invalid credentials (wrong password but valid)', async () => {
-        vi.mocked(UserRepository.login).mockRejectedValue(
-            new AppError('errors.invalid_credentials', {}, AppStatusCode.INVALID_CREDENTIALS, 400)
-        );
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({
+			messages: [{ text: 'Invalid email or password. Please try again.', severity: 'error' }],
+		});
+	});
 
-        const response = await request(app)
-            .post('/auth/login')
-            .set('Accept-Language', 'en')
-            .send({
-                email: 'dev@mail.com',
-                password: '$SuperSecurePassword46',
-            });
+	it('should return 400 for invalid credentials (wrong password but valid)', async () => {
+		vi.mocked(UserRepository.login).mockRejectedValue(
+			new AppError('errors.invalid_credentials', {}, AppStatusCode.INVALID_CREDENTIALS, 400)
+		);
 
-        expect(response.status).toBe(400);
-        expect(response.body).toEqual({messages: [{text:"Invalid email or password. Please try again.", severity: "error"}], code: AppStatusCode.INVALID_CREDENTIALS});
-    });
+		const response = await request(app).post('/auth/login').set('Accept-Language', 'en').send({
+			email: 'dev@mail.com',
+			password: '$SuperSecurePassword46',
+		});
 
-    it('should return 500 for internal errors', async () => {
-        vi.mocked(UserRepository.login).mockRejectedValue(new Error('Unexpected failure'));
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({
+			messages: [{ text: 'Invalid email or password. Please try again.', severity: 'error' }],
+			code: AppStatusCode.INVALID_CREDENTIALS,
+		});
+	});
 
-        const response = await request(app)
-            .post('/auth/login')
-            .set('Accept-Language', 'en')
-            .send({
-                email: 'dev@mail.com',
-                password: '$SuperSecurePassword45',
-            });
+	it('should return 500 for internal errors', async () => {
+		vi.mocked(UserRepository.login).mockRejectedValue(new Error('Unexpected failure'));
 
-        expect(response.status).toBe(500);
-        expect(response.body).toEqual({messages:[{text: "An unexpected error occurred. Please try again later or contact support.", severity: "error"}], code: AppStatusCode.INTERNAL_SERVER_ERROR});
-    });
-})
+		const response = await request(app).post('/auth/login').set('Accept-Language', 'en').send({
+			email: 'dev@mail.com',
+			password: '$SuperSecurePassword45',
+		});
+
+		expect(response.status).toBe(500);
+		expect(response.body).toEqual({
+			messages: [
+				{ text: 'An unexpected error occurred. Please try again later or contact support.', severity: 'error' },
+			],
+			code: AppStatusCode.INTERNAL_SERVER_ERROR,
+		});
+	});
+});

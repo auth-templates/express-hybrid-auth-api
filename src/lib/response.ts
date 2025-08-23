@@ -1,8 +1,8 @@
-import { AppStatusCode } from "@/@types/status-code.js";
-import { ApiMessageResponse, Message } from "../@types/message.js";
+import { AppStatusCode } from '@/@types/status-code.js';
+import { ApiMessageResponse, Message } from '../@types/message.js';
 
 interface ExtendedApiMessageResponse extends ApiMessageResponse {
-  code?: AppStatusCode;
+	code?: AppStatusCode;
 }
 
 /**
@@ -42,13 +42,11 @@ interface ExtendedApiMessageResponse extends ApiMessageResponse {
  * ```
  */
 export function createMessageResponse(
-  text: string | string[],
-  severity: Message['severity'] = 'info',
-  code?: AppStatusCode
+	text: string | string[],
+	severity: Message['severity'] = 'info',
+	code?: AppStatusCode
 ): ExtendedApiMessageResponse {
-  const messages: Message[] = Array.isArray(text)
-    ? text.map((t) => ({ text: t, severity }))
-    : [{ text, severity }];
+	const messages: Message[] = Array.isArray(text) ? text.map((t) => ({ text: t, severity })) : [{ text, severity }];
 
-  return code ? { messages, code } : { messages };
+	return code ? { messages, code } : { messages };
 }

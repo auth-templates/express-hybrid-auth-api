@@ -1,11 +1,5 @@
 import express from 'express';
-import {
-  setup2FA,
-  verify2FASetup,
-  disable2FA,
-  recover2FA,
-  confirm2FARecover
-} from '../controllers/2faController.js';
+import { setup2FA, verify2FASetup, disable2FA, recover2FA, confirm2FARecover } from '../controllers/2faController.js';
 import { authenticate } from '../middlewares/authenticate.js';
 
 const router = express.Router();
@@ -112,7 +106,7 @@ router.post('/setup', authenticate, setup2FA);
  *                   messages:
  *                     - text: The verification code you entered is invalid. Please try again.
  *                       severity: error
- *                   code: TWO_FA_VERIFICATION_CODE_INVALID     
+ *                   code: TWO_FA_VERIFICATION_CODE_INVALID
  *       401:
  *         $ref: '#/components/responses/UnauthorizedErrors'
  *       500:
@@ -239,24 +233,24 @@ router.post('/recover', recover2FA);
  *     responses:
  *       204:
  *         description: Two-factor authentication recovery confirmed.
- *       400: 
+ *       400:
  *         description: One or more fields contain invalid input values.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ApiMessageResponse'
  *             examples:
- *               TwoFaRecoveryTokenInvalid: 
+ *               TwoFaRecoveryTokenInvalid:
  *                 summary: Two-factor recover token is invalid
  *                 value:
  *                   messages:
  *                     - text: The verification link is invalid or no longer available. Please check the link or request a new one.
  *                       severity: error
  *                   code: TWO_FA_RECOVERY_TOKEN_INVALID
- *               TwoFaRecoveryTokenExpired: 
+ *               TwoFaRecoveryTokenExpired:
  *                 summary: Two-factor recover token is expired
- *                 value: 
- *                   messages: 
+ *                 value:
+ *                   messages:
  *                     - text: Your verification link has expired. Please request a new one to continue.
  *                       severity: error
  *                   code: TWO_FA_RECOVERY_TOKEN_EXPIRED

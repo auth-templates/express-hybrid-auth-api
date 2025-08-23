@@ -1,69 +1,72 @@
-import { AppStatusCode } from "@/@types/status-code.js";
-import { require2FA } from "../require-2fa.js";
-import { Mock } from "vitest";
+import { AppStatusCode } from '@/@types/status-code.js';
+import { require2FA } from '../require-2fa.js';
+import { Mock } from 'vitest';
 
 describe('require2FA middleware', () => {
-  let req: any;
-  let res: any;
-  let next: Mock;
+	let req: any;
+	let res: any;
+	let next: Mock;
 
-  beforeEach(() => {
-    next = vi.fn();
-    res = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn()
-    };
-  });
+	beforeEach(() => {
+		next = vi.fn();
+		res = {
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+		};
+	});
 
-  test('calls next if session.pending2FA is falsy', () => {
-    req = {
-      session: { pending2FA: false },
-      originalUrl: '/route',
-      t: vi.fn().mockImplementation((key) => key),
-    };
+	test('calls next if session.pending2FA is falsy', () => {
+		req = {
+			session: { pending2FA: false },
+			originalUrl: '/route',
+			t: vi.fn().mockImplementation((key) => key),
+		};
 
-    require2FA(req, res, next);
+		require2FA(req, res, next);
 
-    expect(next).toHaveBeenCalled();
-    expect(res.status).not.toHaveBeenCalled();
-  });
+		expect(next).toHaveBeenCalled();
+		expect(res.status).not.toHaveBeenCalled();
+	});
 
-  test('allows /auth/verify-2fa route even if pending2FA is true', () => {
-    req = {
-      session: { pending2FA: true },
-      originalUrl: '/auth/verify-2fa',
-      t: vi.fn().mockImplementation((key) => key),
-    };
+	test('allows /auth/verify-2fa route even if pending2FA is true', () => {
+		req = {
+			session: { pending2FA: true },
+			originalUrl: '/auth/verify-2fa',
+			t: vi.fn().mockImplementation((key) => key),
+		};
 
-    require2FA(req, res, next);
+		require2FA(req, res, next);
 
-    expect(next).toHaveBeenCalled();
-    expect(res.status).not.toHaveBeenCalled();
-  });
+		expect(next).toHaveBeenCalled();
+		expect(res.status).not.toHaveBeenCalled();
+	});
 
-  test('blocks access with 403 if pending2FA is true and originalUrl is not /auth/verify-2fa', () => {
-    req = {
-      session: { pending2FA: true },
-      originalUrl: '/route',
-      t: vi.fn().mockImplementation((key) => `Translated: ${key}`),
-    };
+	test('blocks access with 403 if pending2FA is true and originalUrl is not /auth/verify-2fa', () => {
+		req = {
+			session: { pending2FA: true },
+			originalUrl: '/route',
+			t: vi.fn().mockImplementation((key) => `Translated: ${key}`),
+		};
 
-    require2FA(req, res, next);
+		require2FA(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ messages: [{text:'Translated: validation.2fa_required', severity: "error"}], code: AppStatusCode.TWO_FA_VERIFICATION_REQUIRED});
-    expect(next).not.toHaveBeenCalled();
-  });
+		expect(res.status).toHaveBeenCalledWith(403);
+		expect(res.json).toHaveBeenCalledWith({
+			messages: [{ text: 'Translated: validation.2fa_required', severity: 'error' }],
+			code: AppStatusCode.TWO_FA_VERIFICATION_REQUIRED,
+		});
+		expect(next).not.toHaveBeenCalled();
+	});
 
-  test('handles missing session gracefully and calls next', () => {
-    req = {
-      originalUrl: '/route',
-      t: vi.fn().mockImplementation((key) => key),
-    };
+	test('handles missing session gracefully and calls next', () => {
+		req = {
+			originalUrl: '/route',
+			t: vi.fn().mockImplementation((key) => key),
+		};
 
-    require2FA(req, res, next);
+		require2FA(req, res, next);
 
-    expect(next).toHaveBeenCalled();
-    expect(res.status).not.toHaveBeenCalled();
-  });
+		expect(next).toHaveBeenCalled();
+		expect(res.status).not.toHaveBeenCalled();
+	});
 });

@@ -1,14 +1,14 @@
-import { AppStatusCode } from "./status-code.js";
+import { AppStatusCode } from './status-code.js';
 
 export type Message = {
-    text: string;
-    severity: 'error' | 'warning' | 'info' | 'success';
+	text: string;
+	severity: 'error' | 'warning' | 'info' | 'success';
 };
 
 export type ApiMessageResponse = {
-    messages: Message[],
-    code?: AppStatusCode;
-}
+	messages: Message[];
+	code?: AppStatusCode;
+};
 
 /**
  * @swagger

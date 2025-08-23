@@ -1,4 +1,4 @@
 export type ValidationIssue = {
-    message: string, 
-    items?: Record<string, any>
-}
+	message: string;
+	items?: Record<string, any>;
+};

@@ -1,17 +1,17 @@
-import { resetPassword } from "../controllers/authController.js";
+import { resetPassword } from '../controllers/authController.js';
 
 export interface VerificationToken {
-    id: number,
-    userId: number,
-    token: string, 
-    type: TokenType,
-    expiresAt: Date,
-    usedAt?: Date,
-    createdAt: Date
+	id: number;
+	userId: number;
+	token: string;
+	type: TokenType;
+	expiresAt: Date;
+	usedAt?: Date;
+	createdAt: Date;
 }
 
 export enum TokenType {
-    SignUp = 'signup',
-    TwoFA = 'twofa',
-    PasswordReset = 'password_reset'
+	SignUp = 'signup',
+	TwoFA = 'twofa',
+	PasswordReset = 'password_reset',
 }

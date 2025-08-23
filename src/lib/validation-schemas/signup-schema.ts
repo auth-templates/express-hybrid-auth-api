@@ -4,35 +4,36 @@ import { CreateUserInput, Role } from '../../models/user.js';
 import { ValidationIssue } from './validation-issue.js';
 import { passwordValidationSchema } from './password-schema.js';
 
-const commonString = (min: number, max: number, fieldName: string) => v.pipe(
-    v.string(), 
-    v.minLength(min, `validation.${fieldName}.min`), 
-    v.maxLength(max, `validation.${fieldName}.max`)
-);
+const commonString = (min: number, max: number, fieldName: string) =>
+	v.pipe(
+		v.string(),
+		v.minLength(min, `validation.${fieldName}.min`),
+		v.maxLength(max, `validation.${fieldName}.max`)
+	);
 
 export const createSignupSchema = () => {
-  return v.object({
-    firstName: v.optional(commonString(1, 30, 'firstname')),
-    lastName: v.optional(commonString(1, 30, 'lastname')),
-    email: v.pipe(v.string(), v.email('validation.email')),
-    password: passwordValidationSchema(),
-    role: v.optional(v.enum(Role)),
-    termsAccepted: v.literal(true, 'validation.accept_terms')
-  });
+	return v.object({
+		firstName: v.optional(commonString(1, 30, 'firstname')),
+		lastName: v.optional(commonString(1, 30, 'lastname')),
+		email: v.pipe(v.string(), v.email('validation.email')),
+		password: passwordValidationSchema(),
+		role: v.optional(v.enum(Role)),
+		termsAccepted: v.literal(true, 'validation.accept_terms'),
+	});
 };
 
 export const validateSignupData = (data: CreateUserInput): ValidationIssue[] => {
-    try {
-        v.parse(createSignupSchema(), data);
-        return [];   
-    } catch (error) {
-        const issues = error.issues.map((x: any) => {
-            if ( x.type === ValibotIssueReason.MinLength || x.type === ValibotIssueReason.MaxLength ) {
-                return { message: x.message, items: { count: x.requirement } }; 
-            } else {
-                return { message: x.message }
-            }
-        });
-        return issues;
-    }
-}
+	try {
+		v.parse(createSignupSchema(), data);
+		return [];
+	} catch (error) {
+		const issues = error.issues.map((x: any) => {
+			if (x.type === ValibotIssueReason.MinLength || x.type === ValibotIssueReason.MaxLength) {
+				return { message: x.message, items: { count: x.requirement } };
+			} else {
+				return { message: x.message };
+			}
+		});
+		return issues;
+	}
+};

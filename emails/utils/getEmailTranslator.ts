@@ -5,29 +5,29 @@ import roTranslation from '../../src/locales/ro/translation.json' with { type: '
 const instances: Record<string, TFunction> = {};
 
 export function getEmailTranslator(lang: string = 'en'): TFunction {
-  if (instances[lang]) return instances[lang];
+	if (instances[lang]) return instances[lang];
 
-  const resources = {
-    en: {
-      emails: enTranslation,
-    },
-    ro: {
-      emails: roTranslation,
-    },
-    // Add more locales here
-  };
+	const resources = {
+		en: {
+			emails: enTranslation,
+		},
+		ro: {
+			emails: roTranslation,
+		},
+		// Add more locales here
+	};
 
-  const instance = i18next.createInstance();
-  instance.init({
-    lng: lang,
-    fallbackLng: 'en',
-    defaultNS: 'emails',
-    resources,
-    interpolation: { escapeValue: false },
-    initImmediate: false, // <- makes it synchronous
-  });
+	const instance = i18next.createInstance();
+	instance.init({
+		lng: lang,
+		fallbackLng: 'en',
+		defaultNS: 'emails',
+		resources,
+		interpolation: { escapeValue: false },
+		initImmediate: false, // <- makes it synchronous
+	});
 
-  const t = instance.t.bind(instance);
-  instances[lang] = t;
-  return t;
+	const t = instance.t.bind(instance);
+	instances[lang] = t;
+	return t;
 }

@@ -1,5 +1,17 @@
 import express from 'express';
-import { login, logout, signup, verifySignup, refresh, resetPassword, confirmResetPassword, acceptTerms, verifyLogin2FA, getSession, resendActivationEmail } from '../controllers/authController.js';
+import {
+	login,
+	logout,
+	signup,
+	verifySignup,
+	refresh,
+	resetPassword,
+	confirmResetPassword,
+	acceptTerms,
+	verifyLogin2FA,
+	getSession,
+	resendActivationEmail,
+} from '../controllers/authController.js';
 import { authenticate } from '../middlewares/authenticate.js';
 
 const router = express.Router();
@@ -48,7 +60,7 @@ const router = express.Router();
  *     responses:
  *       204:
  *         description: User successfully registered.
- *       400: 
+ *       400:
  *         description: One or more fields contain invalid input values.
  *         content:
  *           application/json:
@@ -104,24 +116,24 @@ router.post('/signup', signup);
  *     responses:
  *       204:
  *         description: Token verified and user activated.
- *       400: 
+ *       400:
  *         description: One or more fields contain invalid input values.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ApiMessageResponse'
  *             examples:
- *               TwoFaSignupTokenInvalid: 
+ *               TwoFaSignupTokenInvalid:
  *                 summary: Signup verification token is invalid
  *                 value:
  *                   messages:
  *                     - text: The verification link is invalid or no longer available. Please check the link or request a new one.
  *                       severity: error
  *                   code: SIGNUP_TOKEN_INVALID
- *               TwoFaSignupTokenExpired: 
+ *               TwoFaSignupTokenExpired:
  *                 summary: Signup verification token is expired
- *                 value: 
- *                   messages: 
+ *                 value:
+ *                   messages:
  *                     - text: Your verification link has expired. Please request a new one to continue.
  *                       severity: error
  *                   code: SIGNUP_TOKEN_EXPIRED
@@ -324,7 +336,7 @@ router.post('/login', login);
  *         $ref: '#/components/responses/InternalServerError'
  */
 
-router.post('/resend-activation-email', resendActivationEmail)
+router.post('/resend-activation-email', resendActivationEmail);
 
 /**
  * @swagger
@@ -501,7 +513,7 @@ router.post('/reset-password/request', resetPassword);
  *               code: PASSWORD_RESET_NOT_INITIATED
  *       204:
  *         description: Password successfully reset.
- *       400: 
+ *       400:
  *         description: One or more fields contain invalid input values.
  *         content:
  *           application/json:
@@ -522,17 +534,17 @@ router.post('/reset-password/request', resetPassword);
  *                   messages:
  *                     - text: Password must contain at least one special character
  *                       severity: error
- *               PasswordResetTokenInvalid: 
+ *               PasswordResetTokenInvalid:
  *                 summary: Password reset token is invalid
  *                 value:
  *                   messages:
  *                     - text: The password reset link is invalid or no longer available. Please request a new link to reset your password.
  *                       severity: error
  *                   code: PASSWORD_RESET_TOKEN_INVALID
- *               PasswordResetTokenExpired: 
+ *               PasswordResetTokenExpired:
  *                 summary: Password reset token is expired
- *                 value: 
- *                   messages: 
+ *                 value:
+ *                   messages:
  *                     - text: Your password reset link has expired. Please request a new one to reset your password.
  *                       severity: error
  *                   code: PASSWORD_RESET_TOKEN_EXPIRED
@@ -629,7 +641,7 @@ router.post('/accept-terms', authenticate, acceptTerms);
  *       properties:
  *         code:
  *           type: string
- *           example: "123456"  
+ *           example: "123456"
  * /auth/verify-2fa:
  *   parameters:
  *     - $ref: '#/components/parameters/XCsrfTokenHeader'
@@ -689,7 +701,7 @@ router.post('/accept-terms', authenticate, acceptTerms);
  *                   messages:
  *                     - text: Two-factor authentication is not configured for your account.
  *                       severity: error
- *                   code: TWO_FA_NOT_CONFIGURED       
+ *                   code: TWO_FA_NOT_CONFIGURED
  *               TwoFaVerificationNotPending:
  *                 summary: Two factor verification is not pending.
  *                 value:

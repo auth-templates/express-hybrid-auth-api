@@ -1,4 +1,3 @@
-
 import { Request, Response, NextFunction } from 'express';
 import { createMessageResponse } from '../lib/response.js';
 import { AppStatusCode } from '@/@types/status-code.js';
@@ -8,12 +7,20 @@ import { AppStatusCode } from '@/@types/status-code.js';
  * Allows /auth/accept-terms route to pass through.
  */
 export function requireTermsAcceptance(request: Request, response: Response, next: NextFunction): void {
-    const termsAccepted = request.session?.termsAccepted;
+	const termsAccepted = request.session?.termsAccepted;
 
-    if ( termsAccepted && request.path !== '/auth/accept-terms' ) {
-        response.status(403).json(createMessageResponse(request.t('validation.accept_terms'), 'error', AppStatusCode.TERMS_ACCEPTANCE_REQUIRED));
-        return
-    }
+	if (termsAccepted && request.path !== '/auth/accept-terms') {
+		response
+			.status(403)
+			.json(
+				createMessageResponse(
+					request.t('validation.accept_terms'),
+					'error',
+					AppStatusCode.TERMS_ACCEPTANCE_REQUIRED
+				)
+			);
+		return;
+	}
 
-    next();
+	next();
 }
