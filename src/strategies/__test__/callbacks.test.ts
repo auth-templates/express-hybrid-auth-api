@@ -26,7 +26,7 @@ describe('OAuth verify callbacks', () => {
         };
 
         it('calls done with user on success', async () => {
-            (AccountsRepository.findOrCreate as vi.Mock).mockResolvedValue(mockUser);
+            vi.mocked(AccountsRepository.findOrCreate).mockResolvedValue(mockUser as any);
 
             await githubVerifyCallback('access-token', 'refresh-token', baseProfile, done);
 
@@ -44,7 +44,7 @@ describe('OAuth verify callbacks', () => {
         it('uses fallback email if none provided', async () => {
             const profileNoEmail = { ...baseProfile, emails: undefined };
 
-            (AccountsRepository.findOrCreate as vi.Mock).mockResolvedValue(mockUser);
+            vi.mocked(AccountsRepository.findOrCreate).mockResolvedValue(mockUser as any);
 
             await githubVerifyCallback('access-token', 'refresh-token', profileNoEmail, done);
 
@@ -58,7 +58,7 @@ describe('OAuth verify callbacks', () => {
 
         it('calls done with error on failure', async () => {
             const error = new Error('fail');
-            (AccountsRepository.findOrCreate as vi.Mock).mockRejectedValue(error);
+            vi.mocked(AccountsRepository.findOrCreate).mockRejectedValue(error);
 
             await githubVerifyCallback('access-token', 'refresh-token', baseProfile, done);
 
@@ -85,7 +85,7 @@ describe('OAuth verify callbacks', () => {
         };
 
         it('calls done with user on success', async () => {
-            (AccountsRepository.findOrCreate as vi.Mock).mockResolvedValue(mockUser);
+            vi.mocked(AccountsRepository.findOrCreate).mockResolvedValue(mockUser as any);
 
             await googleVerifyCallback('access-token', 'refresh-token', baseProfile, done);
 
@@ -102,7 +102,7 @@ describe('OAuth verify callbacks', () => {
 
         it('calls done with error on failure', async () => {
             const error = new Error('fail');
-            (AccountsRepository.findOrCreate as vi.Mock).mockRejectedValue(error);
+           vi.mocked(AccountsRepository.findOrCreate).mockRejectedValue(error);
 
             await googleVerifyCallback('access-token', 'refresh-token', baseProfile, done);
 

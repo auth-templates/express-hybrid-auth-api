@@ -51,11 +51,11 @@ describe('POST /2fa/recover', () => {
 
     it('should return 204 when 2FA recovery email is sent', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.useFakeTimers();
         vi.setSystemTime(fakeTime);
 
         const token = "ijklmnopqrstuvwxyz0123";
-        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue(validUser2FA);
+        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser2FA);
         vi.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
         vi.spyOn(emailService, 'send2FARecoverEmail').mockResolvedValue(undefined);
         vi.spyOn(Token, 'generateToken').mockResolvedValue({
@@ -87,7 +87,7 @@ describe('POST /2fa/recover', () => {
     });
 
     it('should return 200 when user status is not active', async () => {
-        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue({validUser2FA, status: UserStatus.Deactivated});
+        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue({validUser2FA, status: UserStatus.Deactivated} as any);
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
@@ -97,7 +97,7 @@ describe('POST /2fa/recover', () => {
     });
 
     it('should return 200 when user does not have 2FA activated', async () => {
-        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue({validUser2FA, enabled2FA: false});
+        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue({validUser2FA, enabled2FA: false} as any);
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
@@ -107,7 +107,7 @@ describe('POST /2fa/recover', () => {
     });
 
     it('should return 401 with generic message when user is not found in the database', async () => {
-        (UserRepository.getUserByEmail as vi.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
+        vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
             
         const userEmail = "user@mail.com"
         const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });
@@ -117,7 +117,7 @@ describe('POST /2fa/recover', () => {
     });
     
     it('should return 401 with generic message when user is not found when saving the token in database', async () => {
-        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue(validUser2FA);
+        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser2FA);
         vi.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
 
         const userEmail = "user@mail.com"
@@ -129,7 +129,7 @@ describe('POST /2fa/recover', () => {
 
 
     it('should return 500 for internal errors', async () => {
-        (UserRepository.getUserByEmail as vi.Mock).mockRejectedValue(new Error('Unexpected failure'));
+        vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new Error('Unexpected failure'));
 
         const userEmail = "user@mail.com"
         const response = await request(app).post('/2fa/recover').set('Accept-Language', 'en').send({ userEmail });

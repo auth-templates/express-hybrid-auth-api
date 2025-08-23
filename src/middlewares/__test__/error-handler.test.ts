@@ -1,11 +1,12 @@
 import { AppStatusCode } from '@/@types/status-code.js';
 import { errorHandler } from '../error-handler.js';
 import type { Request, Response, NextFunction } from 'express';
+import { Mock } from 'vitest';
 
 describe('errorHandler middleware', () => {
     let res: Partial<Response>;
-    let jsonMock: vi.Mock;
-    let statusMock: vi.Mock;
+    let jsonMock: Mock;
+    let statusMock: Mock;
 
     beforeEach(() => {
         jsonMock = vi.fn();

@@ -50,8 +50,9 @@ describe('POST /2fa/confirm-recover', () => {
 
     it('should return 204 when 2FA token is valid', async () => {
         vi.spyOn(VerificationTokensRepository, 'verify2FAToken').mockResolvedValue({userId: validUser.id});
-        (UserRepository.disable2FA as vi.Mock).mockResolvedValue(undefined);
-        (UserRepository.getUserById as vi.Mock).mockResolvedValue(validUser);
+        
+        vi.mocked(UserRepository.disable2FA).mockResolvedValue(undefined);
+        vi.mocked(UserRepository.getUserById).mockResolvedValue(validUser);
         vi.spyOn(emailService, 'send2FADisabledEmail').mockResolvedValue(undefined);
 
         const token = "ijklmnopqrstuvwxyz0123"
@@ -106,7 +107,7 @@ describe('POST /2fa/confirm-recover', () => {
     it('should return 500 for internal errors', async () => {
         const userId = 10;
         vi.spyOn(VerificationTokensRepository, 'verify2FAToken').mockResolvedValue({userId});
-        (UserRepository.disable2FA as vi.Mock).mockRejectedValue(new AppError('errors.internal', {},  AppStatusCode.INTERNAL_SERVER_ERROR, 500));
+        vi.mocked(UserRepository.disable2FA).mockRejectedValue(new AppError('errors.internal', {},  AppStatusCode.INTERNAL_SERVER_ERROR, 500));
 
         const token = "token-used"
         const response = await request(app).post('/2fa/confirm-recover').set('Accept-Language', 'en').send({ token });

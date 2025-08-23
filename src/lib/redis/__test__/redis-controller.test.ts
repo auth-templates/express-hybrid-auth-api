@@ -1,8 +1,8 @@
 import { RedisController } from '../redis-controller.js';
 import {type Redis} from 'ioredis';
-
+import { Mocked } from 'vitest';
 describe('RedisController', () => {
-  let mockRedisClient: vi.Mocked<Redis>;
+  let mockRedisClient: Mocked<Redis>;
   let controller: RedisController;
 
   beforeEach(() => {

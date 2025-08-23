@@ -1,10 +1,11 @@
 import { AppStatusCode } from "@/@types/status-code.js";
 import { requireTermsAcceptance } from "../require-terms-acceptance.js";
+import { Mock } from 'vitest';
 
 describe('requireTermsAcceptance middleware', () => {
   let req: any;
   let res: any;
-  let next: vi.Mock;
+  let next: Mock;
 
   beforeEach(() => {
     next = vi.fn();

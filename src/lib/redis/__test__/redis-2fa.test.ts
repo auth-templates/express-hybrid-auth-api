@@ -34,7 +34,7 @@ describe('verify2faSetup', () => {
     it('returns tempSecret on successful verification', async () => {
         vi.spyOn(RedisController.prototype, 'get').mockResolvedValue(tempSecret);
         vi.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
-        (authenticator.verify as vi.Mock).mockReturnValue(true);
+        vi.mocked(authenticator.verify).mockReturnValue(true);
 
         const result = await verify2faSetup(userId, code);
 
@@ -62,7 +62,7 @@ describe('verify2faSetup', () => {
     it('throws AppError if 2FA setup token is invalid', async () => {
         vi.spyOn(RedisController.prototype, 'get').mockResolvedValue(tempSecret);
         vi.spyOn(RedisController.prototype, 'remove').mockResolvedValue(undefined);
-        (authenticator.verify as vi.Mock).mockReturnValue(false);
+        vi.mocked(authenticator.verify).mockReturnValue(false);
 
         await expect(verify2faSetup(userId, code)).rejects.toThrow(AppError);
         await expect(verify2faSetup(userId, code)).rejects.toMatchObject({
@@ -90,10 +90,10 @@ describe('get2faSetup', () => {
     });
 
     it('generates secret, stores it, and returns qrCodeUrl and secret', async () => {
-        (authenticator.generateSecret as vi.Mock).mockReturnValue(secret);
-        (authenticator.keyuri as vi.Mock).mockReturnValue(otpauth);
+        vi.mocked(authenticator.generateSecret).mockReturnValue(secret);
+        vi.mocked(authenticator.keyuri).mockReturnValue(otpauth);
         
-        (qrcode.toDataURL as vi.Mock).mockResolvedValue(qrCodeUrl);
+        vi.mocked(qrcode.toDataURL).mockResolvedValue(qrCodeUrl as any);
 
         const redisAddSpy = vi.spyOn(RedisController.prototype, 'add').mockResolvedValue(undefined);
 

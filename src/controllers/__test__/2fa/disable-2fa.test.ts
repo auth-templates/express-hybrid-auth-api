@@ -41,7 +41,7 @@ describe('POST /2fa/disable', () => {
     });
 
     it('should return 204 when 2FA is successfully disabled', async () => {
-        (UserRepository.disable2FA as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(UserRepository.disable2FA).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
         await agent.get('/test-login');
@@ -57,7 +57,7 @@ describe('POST /2fa/disable', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (UserRepository.disable2FA as vi.Mock).mockRejectedValue(new Error('internal error'));
+        vi.mocked(UserRepository.disable2FA).mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
         await agent.get('/test-login');

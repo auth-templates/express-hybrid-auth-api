@@ -32,7 +32,7 @@ describe('VerificationTokensRepository', () => {
         };
 
         it('should create token successfully', async () => {
-            (prismaClient.verification_tokens.create as vi.Mock).mockResolvedValue({});
+            vi.mocked(prismaClient.verification_tokens.create).mockResolvedValue({} as any);
 
             await expect(VerificationTokensRepository.createToken(input)).resolves.toBeUndefined();
 
@@ -56,7 +56,7 @@ describe('VerificationTokensRepository', () => {
                     meta: { target: ['userId'] },
                 }
             );
-            (prismaClient.verification_tokens.create as vi.Mock).mockRejectedValue(prismaError);
+            vi.mocked(prismaClient.verification_tokens.create).mockRejectedValue(prismaError);
 
             await expect(VerificationTokensRepository.createToken(input)).rejects.toMatchObject({
                 translationKey: 'errors.user_not_found',
@@ -66,7 +66,7 @@ describe('VerificationTokensRepository', () => {
         });
 
         it('should throw AppError 500 on other errors', async () => {
-            (prismaClient.verification_tokens.create as vi.Mock).mockRejectedValue(new Error('Some error'));
+            vi.mocked(prismaClient.verification_tokens.create).mockRejectedValue(new Error('Some error'));
 
             await expect(VerificationTokensRepository.createToken(input)).rejects.toMatchObject({
                 translationKey: 'errors.internal',
@@ -78,9 +78,9 @@ describe('VerificationTokensRepository', () => {
 
     // Helper function for token verification tests
     function mockTokenFindFirst(tokenType: TokenType, tokenFingerprint: string, tokenRecord: any) {
-        (tokenLib.createTokenFingerprint as vi.Mock).mockReturnValue(tokenFingerprint);
-        (prismaClient.verification_tokens.findFirst as vi.Mock).mockResolvedValue(tokenRecord);
-        (prismaClient.verification_tokens.update as vi.Mock).mockResolvedValue({});
+        vi.mocked(tokenLib.createTokenFingerprint).mockReturnValue(tokenFingerprint);
+        vi.mocked(prismaClient.verification_tokens.findFirst).mockResolvedValue(tokenRecord);
+        vi.mocked(prismaClient.verification_tokens.update).mockResolvedValue({} as any);
     }
 
     describe('verifySignupToken', () => {
@@ -148,7 +148,7 @@ describe('VerificationTokensRepository', () => {
         });
 
         it('should throw internal error on unexpected failure', async () => {
-            (tokenLib.createTokenFingerprint as vi.Mock).mockImplementation(() => {
+            vi.mocked(tokenLib.createTokenFingerprint).mockImplementation(() => {
                 throw new Error('Unexpected');
             });
 
@@ -225,7 +225,7 @@ describe('VerificationTokensRepository', () => {
         });
 
         it('should throw internal error on unexpected failure', async () => {
-            (tokenLib.createTokenFingerprint as vi.Mock).mockImplementation(() => {
+            vi.mocked(tokenLib.createTokenFingerprint).mockImplementation(() => {
                 throw new Error('Unexpected');
             });
 
@@ -302,7 +302,7 @@ describe('VerificationTokensRepository', () => {
         });
 
         it('should throw internal error on unexpected failure', async () => {
-            (tokenLib.createTokenFingerprint as vi.Mock).mockImplementation(() => {
+            vi.mocked(tokenLib.createTokenFingerprint).mockImplementation(() => {
                 throw new Error('Unexpected');
             });
 

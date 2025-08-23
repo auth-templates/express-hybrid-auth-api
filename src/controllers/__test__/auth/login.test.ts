@@ -55,8 +55,8 @@ describe('POST /auth/login', () => {
     });
 
     it('should set refresh_token, access_token, and connect.sid cookies', async () => {
-        (UserRepository.login as vi.Mock).mockResolvedValue(validUser);
-        (RefreshTokenStore.storeRefreshToken as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(UserRepository.login).mockResolvedValue(validUser as any);
+        vi.mocked(RefreshTokenStore.storeRefreshToken).mockResolvedValue(undefined);
         const response = await request(app)
             .post('/auth/login')
             .set('Accept-Language', 'en')
@@ -77,11 +77,11 @@ describe('POST /auth/login', () => {
 
     it('should set correct 2FA user jwt access token payload', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.useFakeTimers();
         vi.setSystemTime(fakeTime);
 
-        (UserRepository.login as vi.Mock).mockResolvedValue(validUser2FA);
-        (RefreshTokenStore.storeRefreshToken as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(UserRepository.login).mockResolvedValue(validUser2FA as any);
+        vi.mocked(RefreshTokenStore.storeRefreshToken).mockResolvedValue(undefined);
         const response = await request(app)
             .post('/auth/login')
             .set('Accept-Language', 'en')
@@ -110,8 +110,8 @@ describe('POST /auth/login', () => {
     });
 
     it('should return 200 and user data for valid credentials', async () => {
-        (UserRepository.login as vi.Mock).mockResolvedValue(validUser);
-        (RefreshTokenStore.storeRefreshToken as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(UserRepository.login).mockResolvedValue(validUser as any);
+        vi.mocked(RefreshTokenStore.storeRefreshToken).mockResolvedValue(undefined);
         const response = await request(app)
             .post('/auth/login')
             .set('Accept-Language', 'en')
@@ -148,7 +148,7 @@ describe('POST /auth/login', () => {
     });
 
     it('should return 400 for invalid credentials (wrong password but valid)', async () => {
-        (UserRepository.login as vi.Mock).mockRejectedValue(
+        vi.mocked(UserRepository.login).mockRejectedValue(
             new AppError('errors.invalid_credentials', {}, AppStatusCode.INVALID_CREDENTIALS, 400)
         );
 
@@ -165,7 +165,7 @@ describe('POST /auth/login', () => {
     });
 
     it('should return 500 for internal errors', async () => {
-        (UserRepository.login as vi.Mock).mockRejectedValue(new Error('Unexpected failure'));
+        vi.mocked(UserRepository.login).mockRejectedValue(new Error('Unexpected failure'));
 
         const response = await request(app)
             .post('/auth/login')

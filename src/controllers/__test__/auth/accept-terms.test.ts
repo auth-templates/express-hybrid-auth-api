@@ -52,13 +52,13 @@ describe('POST /auth/accept-terms', () => {
 
     it('should 204, update session, and set access_token cookie when successful', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.useFakeTimers();
         vi.setSystemTime(fakeTime);
 
         const validToken = 'good-token';
-        (UserRepository.acceptTerms as vi.Mock).mockResolvedValue(undefined);
-        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue('good-token');
-        (RefreshTokenStore.resetRefreshTokenExpiration as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(UserRepository.acceptTerms).mockResolvedValue(undefined);
+        vi.mocked(RefreshTokenStore.getStoredRefreshToken).mockResolvedValue('good-token');
+        vi.mocked(RefreshTokenStore.resetRefreshTokenExpiration).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
 
@@ -108,7 +108,7 @@ describe('POST /auth/accept-terms', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (UserRepository.acceptTerms as vi.Mock).mockRejectedValue(new Error('internal error'));
+        vi.mocked(UserRepository.acceptTerms).mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
         const userSession = { user: { id: 1, email: 'test@example.com' }, termsAccepted: false };

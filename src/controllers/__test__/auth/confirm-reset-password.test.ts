@@ -35,8 +35,8 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 204 for a valid token', async () => {
-        (hashPassword as vi.Mock).mockResolvedValue('hashedPassword123');
-        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockResolvedValue({ userId: 1 });
+        vi.mocked(hashPassword).mockResolvedValue('hashedPassword123');
+        vi.mocked(VerificationTokensRepository.verifyPasswordResetToken).mockResolvedValue({ userId: 1 });
         vi.spyOn(UserRepository, 'getUserById').mockResolvedValue(validUser);
         vi.spyOn(UserRepository, 'updatePassword').mockResolvedValue();
         vi.spyOn(emailService, 'sendPasswordChangedEmail').mockResolvedValue(undefined);
@@ -62,7 +62,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 400 for a used token', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockRejectedValue(
+        vi.mocked(VerificationTokensRepository.verifyPasswordResetToken).mockRejectedValue(
             new AppError('tokens.password-reset.already_used', {}, AppStatusCode.PASSWORD_RESET_TOKEN_ALREADY_USED, 400)
         );
 
@@ -75,7 +75,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 400 for an expired token', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockRejectedValue(
+        vi.mocked(VerificationTokensRepository.verifyPasswordResetToken).mockRejectedValue(
             new AppError('tokens.password-reset.expired', {}, AppStatusCode.PASSWORD_RESET_TOKEN_EXPIRED, 400)
         );
 
@@ -88,7 +88,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 400 for a non-existent token or invalid token', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockRejectedValue(
+        vi.mocked(VerificationTokensRepository.verifyPasswordResetToken).mockRejectedValue(
             new AppError('tokens.password-reset.invalid', {}, AppStatusCode.PASSWORD_RESET_TOKEN_INVALID, 400)
         );
 
@@ -102,7 +102,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 200 when user status is not active', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockResolvedValue({ userId: 1 });
+        vi.mocked(VerificationTokensRepository.verifyPasswordResetToken).mockResolvedValue({ userId: 1 });
         vi.spyOn(UserRepository, 'getUserById').mockResolvedValue({...validUser, status: UserStatus.Deactivated});
 
         const response = await request(app)
@@ -115,7 +115,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     it('should return 500 for unexpected error', async () => {
-        (VerificationTokensRepository.verifyPasswordResetToken as vi.Mock).mockRejectedValue(
+        vi.mocked(VerificationTokensRepository.verifyPasswordResetToken).mockRejectedValue(
             new Error('Some unexpected DB failure')
         );
 

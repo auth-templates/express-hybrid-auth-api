@@ -38,7 +38,7 @@ describe('AccountsRepository', () => {
   });
 
   it('should return user data on successful upsert', async () => {
-    (prismaClient.accounts.upsert as vi.Mock).mockResolvedValue(prismaResponse);
+    vi.mocked(prismaClient.accounts.upsert).mockResolvedValue(prismaResponse as any);
 
     const result = await AccountsRepository.findOrCreate(input);
 
@@ -91,7 +91,7 @@ describe('AccountsRepository', () => {
   });
 
   it('should throw AppError on prisma upsert failure', async () => {
-    (prismaClient.accounts.upsert as vi.Mock).mockRejectedValue(new Error('DB error'));
+    vi.mocked(prismaClient.accounts.upsert).mockRejectedValue(new Error('DB error'));
 
     await expect(AccountsRepository.findOrCreate(input)).rejects.toThrow(AppError);
     await expect(AccountsRepository.findOrCreate(input)).rejects.toMatchObject({

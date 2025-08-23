@@ -69,16 +69,16 @@ describe('POST /auth/verify-2fa', () => {
 
     it('should return 204, update session, and set access_token cookie when successful', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.useFakeTimers();
         vi.setSystemTime(fakeTime);
 
         const twofaSecret = 'twofasecret';
         const validToken = 'good-token';
-        (otplib.authenticator.verify as vi.Mock).mockReturnValue(true);
-        (UserRepository.getUser2FASecretById as vi.Mock).mockResolvedValue(twofaSecret);
-        (UserRepository.getUserById as vi.Mock).mockResolvedValue(validUser2FA);
-        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue('good-token');
-        (RefreshTokenStore.resetRefreshTokenExpiration as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(otplib.authenticator.verify).mockReturnValue(true);
+        vi.mocked(UserRepository.getUser2FASecretById).mockResolvedValue(twofaSecret);
+        vi.mocked(UserRepository.getUserById).mockResolvedValue(validUser2FA as any);
+        vi.mocked(RefreshTokenStore.getStoredRefreshToken).mockResolvedValue('good-token');
+        vi.mocked(RefreshTokenStore.resetRefreshTokenExpiration).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
 
@@ -129,8 +129,8 @@ describe('POST /auth/verify-2fa', () => {
     });
 
     it('should return 400 if 2FA code is invalid', async () => {
-        (UserRepository.getUser2FASecretById as vi.Mock).mockResolvedValue('secret');
-        (otplib.authenticator.verify as vi.Mock).mockReturnValue(false);
+        vi.mocked(UserRepository.getUser2FASecretById).mockResolvedValue('secret');
+        vi.mocked(otplib.authenticator.verify).mockReturnValue(false);
 
         const agent = request.agent(app);
         const userSession = { user: { id: 1, email: 'test@example.com' }, pending2FA: true };
@@ -143,7 +143,7 @@ describe('POST /auth/verify-2fa', () => {
     });
 
     it('should return 500 if unexpected error occurs', async () => {
-        (UserRepository.getUser2FASecretById as vi.Mock).mockRejectedValue(new Error('db error'));
+        vi.mocked(UserRepository.getUser2FASecretById).mockRejectedValue(new Error('db error'));
 
         const agent = request.agent(app);
         const userSession = { user: { id: 1, email: 'test@example.com' }, pending2FA: true };

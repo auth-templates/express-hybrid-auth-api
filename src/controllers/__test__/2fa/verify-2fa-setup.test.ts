@@ -44,7 +44,7 @@ describe('POST /2fa/setup', () => {
     it('should return 200 when with 2FA setup data', async () => {
         const twoStepSecret = "secret";
         vi.spyOn(Redis2FA, 'verify2faSetup').mockResolvedValue(twoStepSecret);
-        (UserRepository.verifyAndSaveSecret as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(UserRepository.verifyAndSaveSecret).mockResolvedValue(undefined);
         
         const code = "123456";
         const agent = request.agent(app);
@@ -67,7 +67,7 @@ describe('POST /2fa/setup', () => {
     it('should return 400 if an unexpected error occurs', async () => {
         const twoStepSecret = "secret";
         vi.spyOn(Redis2FA, 'verify2faSetup').mockResolvedValue(twoStepSecret);
-        (UserRepository.verifyAndSaveSecret as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(UserRepository.verifyAndSaveSecret).mockResolvedValue(undefined);
         
         const code = "12345";
         const agent = request.agent(app);

@@ -52,7 +52,7 @@ describe('POST /auth/refresh', () => {
     });
 
     it('should 403 when refresh_token does not match stored', async () => {
-        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue('stored-token');
+        vi.mocked(RefreshTokenStore.getStoredRefreshToken).mockResolvedValue('stored-token');
 
         const agent = request.agent(app);
 
@@ -69,7 +69,7 @@ describe('POST /auth/refresh', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockRejectedValue(new Error('internal error'));
+        vi.mocked(RefreshTokenStore.getStoredRefreshToken).mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
 
@@ -86,12 +86,12 @@ describe('POST /auth/refresh', () => {
 
     it('should 204 and set new access_token cookie when valid', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.useFakeTimers();
         vi.setSystemTime(fakeTime);
 
         const validToken = 'good-token';
-        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue(validToken);
-        (RefreshTokenStore.resetRefreshTokenExpiration as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(RefreshTokenStore.getStoredRefreshToken).mockResolvedValue(validToken);
+        vi.mocked(RefreshTokenStore.resetRefreshTokenExpiration).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
 
@@ -125,12 +125,12 @@ describe('POST /auth/refresh', () => {
 
     it('should handle pending 2FA true state correctly', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.useFakeTimers();
         vi.setSystemTime(fakeTime);
 
         const validToken = 'good-token';
-        (RefreshTokenStore.getStoredRefreshToken as vi.Mock).mockResolvedValue(validToken);
-        (RefreshTokenStore.resetRefreshTokenExpiration as vi.Mock).mockResolvedValue(undefined);
+        vi.mocked(RefreshTokenStore.getStoredRefreshToken).mockResolvedValue(validToken);
+        vi.mocked(RefreshTokenStore.resetRefreshTokenExpiration).mockResolvedValue(undefined);
 
         const agent = request.agent(app);
 

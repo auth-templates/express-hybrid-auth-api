@@ -51,11 +51,11 @@ describe('POST /auth/resend-activation-email', () => {
     
     it('should return 204 when reset password email is sent', async () => {
         const fakeTime = new Date('2025-05-15T00:00:00Z');
-        vi.useFakeTimers({ legacyFakeTimers: false });
+        vi.useFakeTimers();
         vi.setSystemTime(fakeTime);
 
         const token = "ijklmnopqrstuvwxyz0123";
-        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue(validUser);
+        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser as any);
         vi.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined);
         vi.spyOn(emailService, 'sendVerificationEmail').mockResolvedValue(undefined);
         vi.spyOn(Token, 'generateToken').mockResolvedValue({
@@ -86,7 +86,7 @@ describe('POST /auth/resend-activation-email', () => {
     });
 
     it('should return 200 when user status is not active', async () => {
-        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue({validUser2FA: validUser, status: UserStatus.Deactivated});
+        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue({validUser2FA: validUser, status: UserStatus.Deactivated} as any);
         const userEmail = "dev@mail.com"
         const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });
 
@@ -95,7 +95,7 @@ describe('POST /auth/resend-activation-email', () => {
     });
 
     it('should return 401 with generic message when user is not found in the database', async () => {
-        (UserRepository.getUserByEmail as vi.Mock).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
+        vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new AppError('errors.user_email_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
             
 
         const userEmail = "dev@mail.com"
@@ -106,7 +106,7 @@ describe('POST /auth/resend-activation-email', () => {
     });
     
     it('should return 401 with generic message when user is not found when saving the token in database', async () => {
-        (UserRepository.getUserByEmail as vi.Mock).mockResolvedValue(validUser);
+        vi.mocked(UserRepository.getUserByEmail).mockResolvedValue(validUser as any);
         vi.spyOn(VerificationTokensRepository, 'createToken').mockRejectedValue(new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404));
 
         const userEmail = "dev@mail.com"
@@ -117,7 +117,7 @@ describe('POST /auth/resend-activation-email', () => {
     });
 
     it('should return 500 for internal errors', async () => {
-        (UserRepository.getUserByEmail as vi.Mock).mockRejectedValue(new Error('Unexpected failure'));
+        vi.mocked(UserRepository.getUserByEmail).mockRejectedValue(new Error('Unexpected failure'));
 
         const userEmail = "dev@mail.com"
         const response = await request(app).post('/auth/resend-activation-email').set('Accept-Language', 'en').send({ userEmail });

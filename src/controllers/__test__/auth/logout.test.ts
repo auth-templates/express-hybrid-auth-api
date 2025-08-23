@@ -45,7 +45,7 @@ describe('POST /auth/logout', () => {
     });
 
     it('should 204 and clear cookies on successful logout', async () => {
-        (RefreshTokenStore.removeRefreshToken as vi.Mock).mockResolvedValue('stored-token');
+        vi.mocked(RefreshTokenStore.removeRefreshToken).mockResolvedValue('stored-token' as any);
 
         const agent = request.agent(app);
         
@@ -72,7 +72,7 @@ describe('POST /auth/logout', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (RefreshTokenStore.removeRefreshToken as vi.Mock).mockRejectedValue(new Error('internal error'));
+        vi.mocked(RefreshTokenStore.removeRefreshToken).mockRejectedValue(new Error('internal error'));
 
         const agent = request.agent(app);
 

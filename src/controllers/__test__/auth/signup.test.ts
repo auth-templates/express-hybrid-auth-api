@@ -34,8 +34,8 @@ describe('POST /signup', () => {
     })
 
     it('should return 204 if signup data is correct', async () => {        
-        (hashPassword as vi.Mock).mockResolvedValue('hashedPassword123');
-        (UserRepository.createUser as vi.Mock).mockResolvedValue(100); // Simulate successful creation
+        vi.mocked(hashPassword).mockResolvedValue('hashedPassword123');
+        vi.mocked(UserRepository.createUser).mockResolvedValue(100); // Simulate successful creation
         vi.spyOn(VerificationTokensRepository, 'createToken').mockResolvedValue(undefined); // Since it's void
         vi.spyOn(emailService, 'sendVerificationEmail').mockResolvedValue(undefined); // because it returns void
 
@@ -57,7 +57,7 @@ describe('POST /signup', () => {
     });
 
     it('should return 409 if email is already in use', async () => {
-        (UserRepository.createUser as vi.Mock).mockRejectedValue(new AppError('errors.email_address_already_in_use', {}, AppStatusCode.EMAIL_ALREADY_IN_USE, 409));
+        vi.mocked(UserRepository.createUser).mockRejectedValue(new AppError('errors.email_address_already_in_use', {}, AppStatusCode.EMAIL_ALREADY_IN_USE, 409));
 
         const response = await request(app)
         .post('/signup').set('Accept-Language', 'en')
@@ -68,7 +68,7 @@ describe('POST /signup', () => {
     });
 
     it('should return 500 if an unexpected error occurs', async () => {
-        (UserRepository.createUser as vi.Mock).mockRejectedValue(new Error('internal error'));
+        vi.mocked(UserRepository.createUser).mockRejectedValue(new Error('internal error'));
 
         const response = await request(app)
         .post('/signup')

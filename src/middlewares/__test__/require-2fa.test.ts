@@ -1,10 +1,11 @@
 import { AppStatusCode } from "@/@types/status-code.js";
 import { require2FA } from "../require-2fa.js";
+import { Mock } from "vitest";
 
 describe('require2FA middleware', () => {
   let req: any;
   let res: any;
-  let next: vi.Mock;
+  let next: Mock;
 
   beforeEach(() => {
     next = vi.fn();

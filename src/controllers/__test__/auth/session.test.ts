@@ -50,7 +50,7 @@ describe('GET /auth/session', () => {
     });
 
     it('should return 200 and user data when session user id is valid', async () => {
-        (UserRepository.getUserById as vi.Mock).mockResolvedValue(validUser);
+        vi.mocked(UserRepository.getUserById).mockResolvedValue(validUser as any);
 
         const agent = request.agent(app);
 
@@ -66,7 +66,7 @@ describe('GET /auth/session', () => {
 
     it('should return AppError status code and translation message', async () => {
         const appError = new AppError('errors.user_not_found', {}, AppStatusCode.USER_NOT_FOUND, 404);
-        (UserRepository.getUserById as vi.Mock).mockRejectedValue(appError);
+        vi.mocked(UserRepository.getUserById).mockRejectedValue(appError);
 
         const response = await request(app).get('/auth/session').set('Accept-Language', 'en');
 
@@ -75,7 +75,7 @@ describe('GET /auth/session', () => {
     });
 
     it('should return 500 with generic message if unknown error thrown', async () => {
-        (UserRepository.getUserById as vi.Mock).mockRejectedValue(new Error('Unexpected failure'));
+        vi.mocked(UserRepository.getUserById).mockRejectedValue(new Error('Unexpected failure'));
 
         const response = await request(app).get('/auth/session').set('Accept-Language', 'en');
 

@@ -31,7 +31,7 @@ describe('authenticate middleware', () => {
   });
 
   it('should call next() when session and valid token are present', () => {
-    (jwt.verify as vi.Mock).mockReturnValue({});
+    vi.mocked(jwt.verify).mockReturnValue({} as any);
 
     const req = mockRequest(validSession, { access_token: validToken });
     const res = mockResponse();
@@ -75,7 +75,7 @@ describe('authenticate middleware', () => {
   });
 
   it('should return 401 if token is expired', () => {
-    (jwt.verify as vi.Mock).mockImplementation(() => {
+    vi.mocked(jwt.verify).mockImplementation(() => {
       throw new jwt.TokenExpiredError('jwt expired', new Date());
     });
 
@@ -89,7 +89,7 @@ describe('authenticate middleware', () => {
   });
 
   it('should return 403 if token is invalid', () => {
-    (jwt.verify as vi.Mock).mockImplementation(() => {
+    vi.mocked(jwt.verify).mockImplementation(() => {
       throw new jwt.JsonWebTokenError('jwt malformed');
     });
 
@@ -103,7 +103,7 @@ describe('authenticate middleware', () => {
   });
 
   it('should return 500 for unexpected errors', () => {
-    (jwt.verify as vi.Mock).mockImplementation(() => {
+    vi.mocked(jwt.verify).mockImplementation(() => {
       throw new Error('Unexpected failure');
     });
 
