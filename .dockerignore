@@ -5,6 +5,7 @@ dist
 generated
 manual-route-tests
 .env*
+!.env.testing
 .git
 .github
 .husky
@@ -14,6 +15,3 @@ Dockerfile
 .devcontainer
 *.log
 npm-debug.log
-**/*.test.ts
-setupTests.js
-**/__test__
