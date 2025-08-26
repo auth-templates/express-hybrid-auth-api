@@ -2,6 +2,8 @@
 
 This is a backend API that uses a hybrid authentication approach combining Express server-side sessions and JWT-based access control, with all credentials stored in HTTP-only cookies. This approach ensures security while allowing stateless validation for route access.
 
+![OpenAPI Specification](/docs/api-docs.gif)
+
 ## 🛠️ Setup
 
 Follow these steps to get the project up and running with Prisma and ensure the `prisma/generated` folder is created properly.
