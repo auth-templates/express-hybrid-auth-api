@@ -1,5 +1,5 @@
 import { githubVerifyCallback, googleVerifyCallback } from '../callbacks.js';
-import { AccountsRepository } from '../../repositories/accounts.js';
+import { AccountsRepository } from '../../../repositories/accounts.js';
 import { Profile as GoogleProfile } from 'passport-google-oauth20';
 import { Profile as GithubProfile } from 'passport-github2';
 

@@ -6,9 +6,9 @@ dotenv.config();
 dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
 
 const GlobalConfig = {
-	env: process.env.NODE_ENV,
-	port: process.env.PORT,
-	dbUrl: process.env.DATABASE_URL,
+	ENV: process.env.NODE_ENV,
+	PORT: process.env.PORT,
+	DB_URL: process.env.DATABASE_URL,
 	SMTP_HOST: process.env.SMTP_HOST,
 	SMTP_PORT: parseInt(process.env.SMTP_PORT),
 	REDIS_PORT: parseInt(process.env.REDIS_PORT),
@@ -35,6 +35,7 @@ const GlobalConfig = {
 	EMAIL_FRONTEND_BASE_URL: process.env.EMAIL_FRONTEND_BASE_URL,
 	EMAIL_BACKEND_BASE_URL: process.env.EMAIL_BACKEND_BASE_URL,
 	EMAIL_ASSETS_BASE_URL: process.env.EMAIL_ASSETS_BASE_URL,
+	FRONTEND_URL: process.env.FRONTEND_URL,
 };
 
 export default GlobalConfig;

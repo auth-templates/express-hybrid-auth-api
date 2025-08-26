@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
 import passport from 'passport';
-import { initializeUserSession } from '../lib/session.js';
-import { User } from '../models/user.js';
-import { AppError } from '../lib/error.js';
+import { initializeUserSession } from '../../lib/session.js';
+import { User } from '../../models/user.js';
+import { AppError } from '../../lib/error.js';
 
 const router = Router();
 
