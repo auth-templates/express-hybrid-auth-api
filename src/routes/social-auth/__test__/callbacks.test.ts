@@ -3,7 +3,7 @@ import { AccountsRepository } from '../../../repositories/accounts.js';
 import { Profile as GoogleProfile } from 'passport-google-oauth20';
 import { Profile as GithubProfile } from 'passport-github2';
 
-vi.mock('../../repositories/accounts.js');
+vi.mock('../../../repositories/accounts.js');
 
 describe('OAuth verify callbacks', () => {
 	const mockUser = { id: 123, email: 'test@example.com' };

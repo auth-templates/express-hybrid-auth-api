@@ -13,7 +13,7 @@
 		"email:dev": "npx react-email dev --dir emails/templates",
 		"prisma:generate": "prisma generate",
 		"reset-and-seed": "npx prisma migrate reset --force",
-		"coverage": "vitest --coverage && node -e \"console.log('📄 Coverage report: file:///' + require('path').resolve('coverage/lcov-report/index.html'))\"",
+		"coverage": "vitest --run --coverage && npm run make-badge && node -e \"console.log('📄 Coverage report: file:///' + require('path').resolve('coverage/lcov-report/index.html'))\"",
 		"predev": "npm run run-local-dev-environment && sleep 3 && npm run reset-and-seed",
 		"dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
 		"build": "rimraf ./dist && tsc -p tsconfig.build.json && tsc-alias --outDir dist && npm run generate:swagger",
@@ -27,7 +27,8 @@
 		"create:prod-image": "docker build -t express-hybrid-auth-api:latest .",
 		"run-local-prod-environment": "docker-compose -f .devcontainer/docker-compose.prod.yml down -v && docker-compose -f .devcontainer/docker-compose.prod.yml up -d postgres redis smtp4dev && docker-compose -f .devcontainer/docker-compose.prod.yml run --rm migrate && docker-compose -f .devcontainer/docker-compose.prod.yml up --build -d --remove-orphans api",
 		"start:prod-local": "npm run run-local-prod-environment",
-		"inspect-image": "docker run --rm -it express-hybrid-auth-api sh"
+		"inspect-image": "docker run --rm -it express-hybrid-auth-api sh",
+		"make-badge": "coverage-badges --output badges/coverage.svg"
 	},
 	"keywords": [],
 	"author": "",
@@ -52,6 +53,7 @@
 		"@types/supertest": "^6.0.3",
 		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
+		"coverage-badges-cli": "^2.2.0",
 		"cross-env": "^7.0.3",
 		"dotenv-cli": "^8.0.0",
 		"eslint": "^9.21.0",

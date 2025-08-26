@@ -1,10 +1,13 @@
 # Node Hybrid JWT + Session Auth API
 
+![Coverage badge](./badges/coverage.svg)
+
 This is a backend API that uses a hybrid authentication approach combining Express server-side sessions and JWT-based access control, with all credentials stored in HTTP-only cookies. This approach ensures security while allowing stateless validation for route access.
 
 ![OpenAPI Specification](/docs/api-docs.gif)
 
-## 🛠️ Setup
+## Setup
+---
 
 Follow these steps to get the project up and running with Prisma and ensure the `prisma/generated` folder is created properly.
 
@@ -64,6 +67,8 @@ __Notes:__
     SESSION_SECRET=your_generated_value_here
     ```
 # Resources
+---
+
 - [Lucia Auth](https://lucia-auth.com/) This website provides valuable resources for understanding and implementing authentication in JavaScript and TypeScript. Special thanks to [pilcrowonpaper](https://github.com/pilcrowonpaper) for the clear and well-documented content.
 - [How To Set Up a Node Project With Typescript](https://www.digitalocean.com/community/tutorials/setting-up-a-node-project-with-typescript)
 - [How to Setup a TypeScript + Node.js Project](https://khalilstemmler.com/blogs/typescript/node-starter-project/)
