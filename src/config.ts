@@ -36,6 +36,7 @@ const GlobalConfig = {
 	EMAIL_BACKEND_BASE_URL: process.env.EMAIL_BACKEND_BASE_URL,
 	EMAIL_ASSETS_BASE_URL: process.env.EMAIL_ASSETS_BASE_URL,
 	FRONTEND_URL: process.env.FRONTEND_URL,
+	DEBUG_LOG: Boolean(process.env.DEBUG_LOG),
 };
 
 export default GlobalConfig;

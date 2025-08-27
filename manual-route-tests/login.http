@@ -1,5 +1,10 @@
 ### Valid credentials
+GET http://localhost:3000/csrf/token
+content-type: application/json
+
+### Valid credentials
 POST http://localhost:3000/auth/login
+x-csrf-token: 170691e9ce54052ddca950de19347c36006d47dd9ad66ba8f8e5504d896a336c159877eaa22b3296fada395791765f6225fc1b667125c85f1555a5f4509c2465760793bf49e194256f03738f426a861c27c7f060bd58378159de3df3454dbab6ffc38fe15e10b730c9439aef90ba1a1b5c5f68636d54488498301053f21ee8f2
 content-type: application/json
 
 {
