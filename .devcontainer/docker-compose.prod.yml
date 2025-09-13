@@ -7,10 +7,14 @@ services:
             dockerfile: Dockerfile
         image: express-hybrid-auth-api:latest
         depends_on:
-            - postgres
-            - redis
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_started
+            smtp4dev:
+                condition: service_started
         ports:
-            - '3000:3000'
+            - '3001:3000'
         env_file:
             - .env.production.local
         restart: always
@@ -20,13 +24,13 @@ services:
             context: ../
             dockerfile: Dockerfile
         depends_on:
-            - postgres
+            postgres:
+                condition: service_healthy
         env_file:
             - .env.production.local
         command: >
             sh -c "
-              echo 'Waiting 2 seconds for Postgres to be ready...'
-              sleep 3
+              echo 'PostgreSQL is healthy, running migrations...'
               npx prisma migrate reset --force
             "
         restart: 'no'
@@ -42,6 +46,12 @@ services:
         restart: always
         ports:
             - '5433:5432'
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U admin_pg -d express-hybrid-auth-api-local-prod-db']
+            interval: 5s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
 
     redis:
         image: redis:6.0.18-alpine
@@ -54,7 +64,7 @@ services:
         image: rnwood/smtp4dev
         ports:
             - '5000:80'
-            - '2525:25'
+            - '2525:2525'
         restart: unless-stopped
         environment:
             - Logging__LogLevel__Default=Information

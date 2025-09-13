@@ -18,7 +18,7 @@ import cors from 'cors';
 import { setupSocialAuth } from './routes/social-auth/index.js';
 import { registerDevRoutes } from './routes/dev/dev-routes.js';
 import { configurePassport } from './routes/social-auth/passport-config.js';
-import { pinoHttp } from 'pino-http';
+import { createHttpLogger } from './lib/logger/http-logger.js';
 
 console.log('env:', GlobalConfig.ENV);
 
@@ -26,8 +26,8 @@ const app = express();
 const port = GlobalConfig.PORT;
 
 if (GlobalConfig.DEBUG_LOG === true) {
-	// Create Pino logger middleware
-	app.use(pinoHttp());
+	// Use custom HTTP logger middleware
+	app.use(createHttpLogger());
 }
 
 app.use(

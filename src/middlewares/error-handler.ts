@@ -12,7 +12,19 @@ export const errorHandler: ErrorRequestHandler = (error, request, response, _nex
 		return;
 	}
 
-	logger.error(error);
+	// Enhanced error logging for debugging
+	logger.error({
+		message: 'Global error handler caught error',
+		err: error, // This will use the enhanced err serializer
+		request: {
+			method: request.method,
+			url: request.url,
+			headers: {
+				'user-agent': request.headers['user-agent'],
+				'content-type': request.headers['content-type'],
+			},
+		},
+	});
 
 	response
 		.status(error.status || 500)
