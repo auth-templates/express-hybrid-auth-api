@@ -11,3 +11,16 @@ export const transporter = nodemailer.createTransport({
 	//     pass: '',
 	//   },
 });
+
+transporter.sendMail(
+	{
+		from: 'test@example.com',
+		to: 'user@example.com',
+		subject: 'SMTP test',
+		text: 'Hello from smtp4dev!',
+	},
+	(err, info) => {
+		if (err) console.error('Error:', err);
+		else console.log('Sent:', info);
+	}
+);

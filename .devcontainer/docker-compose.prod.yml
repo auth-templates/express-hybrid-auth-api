@@ -64,7 +64,7 @@ services:
         image: rnwood/smtp4dev
         ports:
             - '5000:80'
-            - '2525:2525'
+            - '2525:25' # SMTP server (Host 2525 -> Container 25 (SMTP))
         restart: unless-stopped
         environment:
             - Logging__LogLevel__Default=Information
