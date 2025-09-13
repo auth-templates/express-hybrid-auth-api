@@ -7,6 +7,7 @@ import TwoFactorDisabledEmail from '../../emails/templates/2fa-disabled-email.js
 import PasswordResetEmail from '../../emails/templates/password-reset-email.js';
 import GlobalConfig from '../config.js';
 import { transporter } from './mail-transporter.js';
+import logger from './logger/logger.js';
 
 export async function sendVerificationEmail({
 	token,
@@ -19,6 +20,7 @@ export async function sendVerificationEmail({
 	expiresInMinutes: number;
 	t: (key: string, options?: any) => string;
 }) {
+	console.log('I am here');
 	const emailHtml = await render(
 		<VerificationEmail
 			verificationUrl={`${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/verify?token=${token}`}
@@ -36,7 +38,14 @@ export async function sendVerificationEmail({
 		html: emailHtml,
 	};
 
-	await transporter.sendMail(options);
+	try {
+		console.log('I am here');
+		await transporter.sendMail(options);
+	} catch (error) {
+		console.log('error', error);
+		logger.error('Failed to send verification email', { error, userEmail });
+		throw error;
+	}
 }
 
 export async function sendAccountActivationEmail({
