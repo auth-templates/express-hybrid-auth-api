@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator.js';
+import { getPreviewProps } from '../utils/getPreviewProps.js';
 
 interface AccountReactivationEmailProps {
 	assetsUrl: string;
@@ -10,7 +11,7 @@ interface AccountReactivationEmailProps {
 export default function AccountReactivationEmail({ assetsUrl, frontendUrl, t }: AccountReactivationEmailProps) {
 	return (
 		<Html>
-			<Head />
+			<Head></Head>
 			<Body style={main}>
 				<Preview>{t('emails.account-reactivation-email.preview')}</Preview>
 				<Container style={container}>
@@ -52,8 +53,7 @@ export default function AccountReactivationEmail({ assetsUrl, frontendUrl, t }: 
 }
 
 AccountReactivationEmail.PreviewProps = {
-	assetsUrl: 'http://localhost:3000',
-	frontendUrl: 'http://localhost:3000',
+	...getPreviewProps(),
 	t: getEmailTranslator(),
 } satisfies AccountReactivationEmailProps;
 

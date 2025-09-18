@@ -47,3 +47,44 @@ services:
         restart: unless-stopped
         environment:
             - Logging__LogLevel__Default=Information
+
+    minio:
+        container_name: local-minio
+        image: minio/minio:latest
+        ports:
+            - '9000:9000' # API port
+            - '9001:9001' # Console port (disabled in headless mode)
+        environment:
+            - MINIO_ROOT_USER=minioadmin
+            - MINIO_ROOT_PASSWORD=minioadmin123
+        command: server /data --console-address ":9001" # S3-compatible object storage for CDN assets
+        volumes:
+            - minio_data:/data # MinIO's internal data (metadata, buckets, permissions)
+            - ./cdn-assets:/assets # Your static assets (mounted outside /data)
+        restart: unless-stopped
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
+    minio-setup:
+        container_name: local-minio-setup
+        image: minio/mc:latest
+        depends_on:
+            minio:
+                condition: service_healthy
+        volumes:
+            - ./cdn-assets:/assets
+        entrypoint: >
+            /bin/sh -c "
+            mc alias set myminio http://minio:9000 minioadmin minioadmin123;
+            mc mb myminio/public-assets --ignore-existing;
+            mc anonymous set public myminio/public-assets;
+            mc cp /assets/* myminio/public-assets/;
+            echo 'MinIO setup completed successfully - bucket created and assets uploaded';
+            "
+        restart: 'no' # One-time setup: creates bucket and sets public permissions
+
+volumes:
+    minio_data: # Persistent storage for MinIO's internal data (buckets, permissions, metadata)

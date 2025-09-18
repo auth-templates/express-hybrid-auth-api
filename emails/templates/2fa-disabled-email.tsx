@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator.js';
+import { getPreviewProps } from '../utils/getPreviewProps.js';
 
 interface TwoFactorDisabledEmailProps {
 	assetsUrl: string;
@@ -10,7 +11,7 @@ interface TwoFactorDisabledEmailProps {
 export default function TwoFactorDisabledEmail({ assetsUrl, t, frontendUrl }: TwoFactorDisabledEmailProps) {
 	return (
 		<Html>
-			<Head />
+			<Head></Head>
 			<Body style={main}>
 				<Preview>{t('emails.2fa-disabled.preview')}</Preview>
 				<Container style={container}>
@@ -47,8 +48,7 @@ export default function TwoFactorDisabledEmail({ assetsUrl, t, frontendUrl }: Tw
 }
 
 TwoFactorDisabledEmail.PreviewProps = {
-	assetsUrl: 'http://localhost:3000',
-	frontendUrl: 'http://localhost:3000',
+	...getPreviewProps(),
 	t: getEmailTranslator(),
 } satisfies TwoFactorDisabledEmailProps;
 

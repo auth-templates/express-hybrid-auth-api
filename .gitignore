@@ -149,3 +149,8 @@ dist
 
 # Ignore all auto-generated Prisma code
 /generated/prisma/
+
+# Docker volumes and data
+.devcontainer/minio_data/
+.devcontainer/postgres_data/
+.devcontainer/redis_data/

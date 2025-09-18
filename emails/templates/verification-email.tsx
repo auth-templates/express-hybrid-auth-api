@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator.js';
+import { getPreviewProps } from '../utils/getPreviewProps.js';
 
 interface EmailVerificationProps {
 	assetsUrl: string;
@@ -18,7 +19,7 @@ export default function EmailVerification({
 }: EmailVerificationProps) {
 	return (
 		<Html>
-			<Head />
+			<Head></Head>
 			<Body style={main}>
 				<Preview>{t('emails.verification.preview')}</Preview>
 				<Container style={container}>
@@ -64,9 +65,8 @@ export default function EmailVerification({
 }
 
 EmailVerification.PreviewProps = {
-	assetsUrl: 'http://localhost:3000',
-	frontendUrl: 'http://localhost:3000',
-	verificationUrl: 'http://localhost:3000/verify?token=abc123',
+	...getPreviewProps(),
+	verificationUrl: `${getPreviewProps().frontendUrl}/verify?token=abc123`,
 	t: getEmailTranslator(),
 	expiresInMinutes: 30,
 } satisfies EmailVerificationProps;

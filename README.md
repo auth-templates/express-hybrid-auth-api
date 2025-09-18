@@ -66,7 +66,139 @@ __Notes:__
     ```
     SESSION_SECRET=your_generated_value_here
     ```
-# Resources
+## Email Development with MinIO/CDN
+---
+
+This project uses **MinIO** as a local S3-compatible object storage service for serving static assets (logos, images) used in email templates during development. This setup provides a seamless development experience while maintaining production-ready patterns.
+
+### What is MinIO?
+
+**MinIO** is a high-performance, S3-compatible object storage server that provides:
+- **S3-compatible API**: Works with existing S3 tools and libraries
+- **Local Development**: Runs in Docker containers for isolated development
+- **Public Asset Serving**: Serves static files via HTTP URLs
+- **Headless Operation**: Runs without a web interface for automated workflows
+
+### How It Works
+
+#### Development Mode
+When running `npm run email:dev`, the system:
+
+1. **Starts MinIO Container**: Launches a local MinIO server on port 9000
+2. **Creates Public Bucket**: Sets up a `public-assets` bucket with public read access
+3. **Uploads Assets**: Copies static assets from `.devcontainer/cdn-assets/` to MinIO
+4. **Serves Assets**: Assets become available at `http://localhost:9000/public-assets/`
+5. **Runs React Email**: Starts the email preview server with access to CDN assets
+
+#### Asset Structure
+```
+.devcontainer/cdn-assets/
+├── static/
+│   ├── logo.png          # Company logo
+│   ├── header.png        # Email header image
+│   ├── footer.png        # Email footer image
+│   └── logo-placeholder.png
+├── email-header.jpg      # Legacy header image
+├── email-footer.png      # Legacy footer image
+└── company-icon.svg      # Company icon
+```
+
+#### Environment Configuration
+The `CDN_URL` environment variable controls asset URLs:
+
+```env
+# Development (MinIO)
+CDN_URL=http://localhost:9000/public-assets
+
+# Production (CDN)
+CDN_URL=https://cdn.yourdomain.com/assets
+```
+
+### Production Deployment
+
+#### Replacing MinIO with a CDN
+
+In production, MinIO is replaced with a Content Delivery Network (CDN) for better performance and global distribution:
+
+##### Option 1: Cloud Storage + CDN
+```env
+# AWS S3 + CloudFront
+CDN_URL=https://d1234567890.cloudfront.net/assets
+
+# Google Cloud Storage + CDN
+CDN_URL=https://storage.googleapis.com/your-bucket/assets
+
+# Azure Blob Storage + CDN
+CDN_URL=https://your-cdn.azureedge.net/assets
+```
+
+##### Option 2: Dedicated CDN Services
+```env
+# Cloudflare
+CDN_URL=https://assets.yourdomain.com
+
+# KeyCDN
+CDN_URL=https://your-zone.kxcdn.com/assets
+
+# BunnyCDN
+CDN_URL=https://your-zone.b-cdn.net/assets
+```
+
+#### Migration Steps
+
+1. **Upload Assets**: Copy all files from `.devcontainer/cdn-assets/` to your CDN
+2. **Update Environment**: Change `CDN_URL` in production environment files
+3. **Test URLs**: Verify all asset URLs are accessible
+4. **Update Email Templates**: Ensure all `Img` components use `${assetsUrl}`
+
+#### Benefits of CDN in Production
+
+- **Global Distribution**: Faster loading times worldwide
+- **Caching**: Reduced server load and bandwidth costs
+- **HTTPS**: Secure asset delivery
+- **Scalability**: Handles high traffic volumes
+- **Reliability**: Multiple edge locations for redundancy
+
+### Email Development Workflow
+
+#### Starting Email Development
+```bash
+# Start MinIO + React Email preview
+npm run email:dev
+
+# Access email preview
+open http://localhost:3000
+```
+
+#### Adding New Assets
+1. Add files to `.devcontainer/cdn-assets/static/`
+2. Restart `npm run email:dev` to upload new assets
+3. Reference in email templates: `${assetsUrl}/static/filename.png`
+
+#### Stopping Services
+```bash
+# Stop MinIO containers
+npm run email:stop
+```
+
+### Troubleshooting
+
+#### MinIO Not Starting
+- Check if port 9000 is available
+- Verify Docker is running
+- Check container logs: `docker logs email-minio`
+
+#### Assets Not Loading
+- Verify MinIO is running: `curl http://localhost:9000/minio/health/live`
+- Check bucket exists: `curl http://localhost:9000/public-assets/`
+- Verify asset upload: `curl http://localhost:9000/public-assets/static/logo.png`
+
+#### Translation Errors
+- Ensure translation files exist in `src/locales/en/translation.json`
+- Check email template imports are correct
+- Verify `getEmailTranslator()` function is working
+
+## Resources
 ---
 
 - [Lucia Auth](https://lucia-auth.com/) This website provides valuable resources for understanding and implementing authentication in JavaScript and TypeScript. Special thanks to [pilcrowonpaper](https://github.com/pilcrowonpaper) for the clear and well-documented content.

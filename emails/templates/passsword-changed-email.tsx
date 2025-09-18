@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator.js';
+import { getPreviewProps } from '../utils/getPreviewProps.js';
 
 interface PasswordChangedEmailProps {
 	assetsUrl: string;
@@ -11,7 +12,7 @@ interface PasswordChangedEmailProps {
 export default function PasswordChangedEmail({ assetsUrl, frontendUrl, userEmail, t }: PasswordChangedEmailProps) {
 	return (
 		<Html>
-			<Head />
+			<Head></Head>
 			<Body style={main}>
 				<Preview>{t('emails.password-changed-email.preview')}</Preview>
 				<Container style={container}>
@@ -55,8 +56,7 @@ export default function PasswordChangedEmail({ assetsUrl, frontendUrl, userEmail
 }
 
 PasswordChangedEmail.PreviewProps = {
-	assetsUrl: 'http://localhost:3000',
-	frontendUrl: 'http://localhost:3000',
+	...getPreviewProps(),
 	userEmail: 'user@example.com',
 	t: getEmailTranslator(),
 } satisfies PasswordChangedEmailProps;

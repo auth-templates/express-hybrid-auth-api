@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator.js';
+import { getPreviewProps } from '../utils/getPreviewProps.js';
 
 interface AccountDeactivationConfirmationEmailProps {
 	assetsUrl: string;
@@ -14,7 +15,7 @@ export default function AccountDeactivationConfirmationEmail({
 }: AccountDeactivationConfirmationEmailProps) {
 	return (
 		<Html>
-			<Head />
+			<Head></Head>
 			<Body style={main}>
 				<Preview>{t('emails.account-deactivation-email.preview')}</Preview>
 				<Container style={container}>
@@ -52,8 +53,7 @@ export default function AccountDeactivationConfirmationEmail({
 }
 
 AccountDeactivationConfirmationEmail.PreviewProps = {
-	assetsUrl: 'http://localhost:3000',
-	frontendUrl: 'http://localhost:3000',
+	...getPreviewProps(),
 	t: getEmailTranslator(),
 } satisfies AccountDeactivationConfirmationEmailProps;
 

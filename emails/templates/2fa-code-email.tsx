@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator.js';
+import { getPreviewProps } from '../utils/getPreviewProps.js';
 
 interface TwoFactorAuthEmailProps {
 	assetsUrl: string;
@@ -18,7 +19,7 @@ export default function TwoFactorAuthEmail({
 }: TwoFactorAuthEmailProps) {
 	return (
 		<Html>
-			<Head />
+			<Head></Head>
 			<Body style={main}>
 				<Preview>{t('emails.2fa-code-email.preview')}</Preview>
 				<Container style={container}>
@@ -59,8 +60,7 @@ export default function TwoFactorAuthEmail({
 }
 
 TwoFactorAuthEmail.PreviewProps = {
-	assetsUrl: 'http://localhost:3000',
-	frontendUrl: 'http://localhost:3000',
+	...getPreviewProps(),
 	verificationCode: '123456',
 	expiresInMinutes: 30,
 	t: getEmailTranslator(),

@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator.js';
+import { getPreviewProps } from '../utils/getPreviewProps.js';
 
 interface NewDeviceLoginEmailProps {
 	assetsUrl: string;
@@ -24,7 +25,7 @@ export default function NewDeviceLoginEmail({
 }: NewDeviceLoginEmailProps) {
 	return (
 		<Html>
-			<Head />
+			<Head></Head>
 			<Body style={main}>
 				<Preview>{t('emails.new-device-login-email.preview')}</Preview>
 				<Container style={container}>
@@ -77,8 +78,7 @@ export default function NewDeviceLoginEmail({
 }
 
 NewDeviceLoginEmail.PreviewProps = {
-	assetsUrl: 'http://localhost:3000',
-	frontendUrl: 'http://localhost:3000',
+	...getPreviewProps(),
 	userEmail: 'user@example.com',
 	location: 'San Francisco, CA, USA',
 	device: 'Chrome on Windows',

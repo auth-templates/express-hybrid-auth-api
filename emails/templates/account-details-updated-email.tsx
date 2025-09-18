@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator.js';
+import { getPreviewProps } from '../utils/getPreviewProps.js';
 
 interface AccountDetailsUpdatedEmailProps {
 	assetsUrl: string;
@@ -18,7 +19,7 @@ export default function AccountDetailsUpdatedEmail({
 
 	return (
 		<Html>
-			<Head />
+			<Head></Head>
 			<Body style={main}>
 				<Preview>{t('emails.account-details-updated-email.preview')}</Preview>
 				<Container style={container}>
@@ -69,8 +70,7 @@ export default function AccountDetailsUpdatedEmail({
 }
 
 AccountDetailsUpdatedEmail.PreviewProps = {
-	assetsUrl: 'http://localhost:3000',
-	frontendUrl: 'http://localhost:3000',
+	...getPreviewProps(),
 	updatedFields: ['name', 'email address'],
 	t: getEmailTranslator(),
 } satisfies AccountDetailsUpdatedEmailProps;

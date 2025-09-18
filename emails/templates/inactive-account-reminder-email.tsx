@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
 import { getEmailTranslator } from '../utils/getEmailTranslator.js';
+import { getPreviewProps } from '../utils/getPreviewProps.js';
 
 interface InactiveAccountReminderEmailProps {
 	assetsUrl: string;
@@ -10,7 +11,7 @@ interface InactiveAccountReminderEmailProps {
 export default function InactiveAccountReminderEmail({ assetsUrl, t, frontendUrl }: InactiveAccountReminderEmailProps) {
 	return (
 		<Html>
-			<Head />
+			<Head></Head>
 			<Body style={main}>
 				<Preview>{t('emails.inactive-account-reminder-email.preview')}</Preview>
 				<Container style={container}>
@@ -54,8 +55,7 @@ export default function InactiveAccountReminderEmail({ assetsUrl, t, frontendUrl
 }
 
 InactiveAccountReminderEmail.PreviewProps = {
-	assetsUrl: 'http://localhost:3000',
-	frontendUrl: 'http://localhost:3000',
+	...getPreviewProps(),
 	t: getEmailTranslator(),
 } satisfies InactiveAccountReminderEmailProps;
 
