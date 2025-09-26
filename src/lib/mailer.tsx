@@ -23,7 +23,7 @@ export async function sendVerificationEmail({
 	console.log('I am here');
 	const emailHtml = await render(
 		<VerificationEmail
-			verificationUrl={`${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/verify?token=${token}`}
+			verificationUrl={`${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/verify-account?token=${token}`}
 			expiresInMinutes={expiresInMinutes}
 			t={t}
 			frontendUrl={GlobalConfig.EMAIL_FRONTEND_BASE_URL}

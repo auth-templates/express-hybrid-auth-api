@@ -43,7 +43,7 @@ describe('Email sending functions', () => {
 		expect(render).toHaveBeenCalledWith(
 			expect.objectContaining({
 				props: expect.objectContaining({
-					verificationUrl: `${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/verify?token=${args.token}`,
+					verificationUrl: `${GlobalConfig.EMAIL_FRONTEND_BASE_URL}/verify-account?token=${args.token}`,
 					expiresInMinutes: args.expiresInMinutes,
 					t: args.t,
 					frontendUrl: GlobalConfig.EMAIL_FRONTEND_BASE_URL,
