@@ -476,12 +476,12 @@ router.post('/reset-password/request', resetPassword);
  *       type: object
  *       required:
  *         - token
- *         - newPassword
+ *         - password
  *       properties:
  *         token:
  *           type: string
  *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *         newPassword:
+ *         password:
  *           type: string
  *           example: "StrongNewPassword!2025"
  * /auth/reset-password:
