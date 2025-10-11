@@ -561,3 +561,46 @@ export const verifyLogin2FA = async (request: Request, response: Response): Prom
 			.json(createMessageResponse(request.t('errors.internal'), 'error', AppStatusCode.INTERNAL_SERVER_ERROR));
 	}
 };
+
+export const validateSession = async (request: Request, response: Response): Promise<void> => {
+	const userId = request.session?.user?.id;
+	const refreshToken = request.cookies?.refresh_token;
+
+	try {
+		// Check if session exists and has user data
+		if (!userId || !request.session?.user) {
+			response.status(200).json({
+				valid: false,
+			});
+			return;
+		}
+
+		// Check if refresh token exists
+		if (!refreshToken) {
+			response.status(200).json({
+				valid: false,
+			});
+			return;
+		}
+
+		// Check if refresh token is valid in Redis
+		const storedRefreshToken = await RefreshTokenStore.getStoredRefreshToken(userId, refreshToken);
+		if (!storedRefreshToken || storedRefreshToken !== refreshToken) {
+			response.status(200).json({
+				valid: false,
+			});
+			return;
+		}
+
+		// Session and refresh token are valid
+		response.status(200).json({
+			valid: true,
+		});
+	} catch (error) {
+		// Log error but don't expose details to frontend
+		logger.error('Session validation error:', error);
+		response.status(200).json({
+			valid: false,
+		});
+	}
+};

@@ -1,0 +1,13 @@
+### Validate Session - Valid Session
+# Expected: {"valid": true}
+GET http://localhost:3000/api/auth/validate-session
+Cookie: connect.sid=s%3Ayour-session-id; refresh_token=your-refresh-token
+
+### Validate Session - Invalid Session
+# Expected: {"valid": false}
+GET http://localhost:3000/api/auth/validate-session
+
+### Validate Session - Invalid Session (No Refresh Token)
+# Expected: {"valid": false}
+GET http://localhost:3000/api/auth/validate-session
+Cookie: connect.sid=s%3Ayour-session-id

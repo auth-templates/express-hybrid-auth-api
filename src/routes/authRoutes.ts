@@ -11,6 +11,7 @@ import {
 	verifyLogin2FA,
 	getSession,
 	resendActivationEmail,
+	validateSession,
 } from '../controllers/authController.js';
 import { authenticate } from '../middlewares/authenticate.js';
 
@@ -771,5 +772,45 @@ router.post('/verify-2fa', authenticate, verifyLogin2FA);
  *         $ref: '#/components/responses/InternalServerError'
  */
 router.get('/session', authenticate, getSession);
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     ValidateSessionResponse:
+ *       type: object
+ *       properties:
+ *         valid:
+ *           type: boolean
+ *           description: Whether the session and refresh token are valid
+ * /auth/validate-session:
+ *   get:
+ *     summary: Validate Session and Refresh Token
+ *     description: >
+ *       Validates both the user session and refresh token to determine if the user is properly authenticated.
+ *       This endpoint checks if the session exists and if the refresh token is valid in Redis.
+ *       Returns only the validation status without exposing reasons for invalid sessions.
+ *     tags:
+ *      - Authentication
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Session validation completed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidateSessionResponse'
+ *             examples:
+ *               ValidSession:
+ *                 summary: Valid session and refresh token
+ *                 value:
+ *                   valid: true
+ *               InvalidSession:
+ *                 summary: Invalid session or refresh token
+ *                 value:
+ *                   valid: false
+ */
+router.get('/validate-session', validateSession);
 
 export default router;
